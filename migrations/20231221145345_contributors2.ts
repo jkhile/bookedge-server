@@ -1,0 +1,60 @@
+import type { Knex } from 'knex'
+
+export async function up(knex: Knex): Promise<void> {
+  return knex.schema.alterTable('contributors', (table) => {
+    table.dropColumn('text')
+    table
+      .integer('fk_book')
+      .references('id')
+      .inTable('books')
+      .onDelete('CASCADE')
+    table.string('contributor_role').defaultTo('')
+    table.string('legal_name').defaultTo('')
+    table.string('published_name').defaultTo('')
+    table.string('biography').defaultTo('')
+    table.string('email').defaultTo('')
+    table.string('address').defaultTo('')
+    table.string('phone').defaultTo('')
+    table.string('wikipedia_page').defaultTo('')
+    table.string('amazon_author_page').defaultTo('')
+    table.string('author_website').defaultTo('')
+    table.string('twitter').defaultTo('')
+    table.string('instagram').defaultTo('')
+    table.string('facebook').defaultTo('')
+    table.string('linkedin').defaultTo('')
+    table.string('goodreads').defaultTo('')
+    table.string('tiktok').defaultTo('')
+    table.string('notes').defaultTo('')
+    table.string('created_at', 32)
+    table
+      .integer('fk_created_by')
+      .references('id')
+      .inTable('users')
+      .onDelete('RESTRICT')
+  })
+}
+
+export async function down(knex: Knex): Promise<void> {
+  return knex.schema.alterTable('contributors', (table) => {
+    table.dropColumn('fk_book')
+    table.dropColumn('contributor_role')
+    table.dropColumn('legal_name')
+    table.dropColumn('published_name')
+    table.dropColumn('biography')
+    table.dropColumn('email')
+    table.dropColumn('address')
+    table.dropColumn('phone')
+    table.dropColumn('wikipedia_page')
+    table.dropColumn('amazon_author_page')
+    table.dropColumn('author_website')
+    table.dropColumn('twitter')
+    table.dropColumn('instagram')
+    table.dropColumn('facebook')
+    table.dropColumn('linkedin')
+    table.dropColumn('goodreads')
+    table.dropColumn('tiktok')
+    table.dropColumn('notes')
+    table.dropColumn('created_at')
+    table.dropColumn('fk_created_by')
+  })
+}

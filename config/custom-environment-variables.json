@@ -1,0 +1,19 @@
+{
+  "port": {
+    "__name": "PORT",
+    "__format": "number"
+  },
+  "host": "HOST",
+  "postgresql": {
+    "connection": "POSTGRESQL_CONNECTION"
+  },
+  "authentication": {
+    "secret": "FEATHERS_SECRET",
+    "oauth": {
+      "google": {
+        "key": "GOOGLE_KEY",
+        "secret": "GOOGLE_SECRET"
+      }
+    }
+  }
+}
