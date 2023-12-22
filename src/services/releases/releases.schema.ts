@@ -1,4 +1,5 @@
 import { dataValidator, queryValidator } from '../../validators'
+import { formatISO } from 'date-fns'
 import { getValidator, querySyntax, Type } from '@feathersjs/typebox'
 import { resolve } from '@feathersjs/schema'
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
@@ -107,7 +108,10 @@ export const releaseDataValidator = getValidator(
 export const releaseDataResolver = resolve<
   Release,
   HookContext<ReleaseService>
->({})
+>({
+  created_at: async () => formatISO(new Date()),
+  fk_created_by: async (value, data, context) => context.params.user?.id,
+})
 
 // Schema for updating existing entries
 export const releasePatchSchema = Type.Partial(releaseSchema, {

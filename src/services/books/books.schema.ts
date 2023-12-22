@@ -104,9 +104,9 @@ export const bookDataSchema = Type.Omit(
 )
 export type BookData = Static<typeof bookDataSchema>
 export const bookDataValidator = getValidator(bookDataSchema, dataValidator)
-export const bookDataResolver = resolve<Book, HookContext>({
+export const bookDataResolver = resolve<Book, HookContext<BookService>>({
   created_at: async () => formatISO(new Date()),
-  fk_created_by: async (value, data, context) => context.params.user.id,
+  fk_created_by: async (value, data, context) => context.params.user?.id,
 })
 
 // Schema for updating existing entries
@@ -129,6 +129,6 @@ export const bookQuerySchema = Type.Intersect(
 )
 export type BookQuery = Static<typeof bookQuerySchema>
 export const bookQueryValidator = getValidator(bookQuerySchema, queryValidator)
-export const bookQueryResolver = resolve<BookQuery, HookContext>({
+export const bookQueryResolver = resolve<BookQuery, HookContext<BookService>>({
   fk_imprint: imprintsResolver,
 })

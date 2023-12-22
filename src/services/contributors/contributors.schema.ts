@@ -1,9 +1,9 @@
 import { dataValidator, queryValidator } from '../../validators'
+import { formatISO } from 'date-fns'
 import { getValidator, querySyntax, Type } from '@feathersjs/typebox'
 import { resolve } from '@feathersjs/schema'
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
 import type { Static } from '@feathersjs/typebox'
-import { formatISO } from 'date-fns'
 
 import type { HookContext } from '../../declarations'
 import type { ContributorService } from './contributors.class'
@@ -63,9 +63,12 @@ export const contributorDataValidator = getValidator(
   contributorDataSchema,
   dataValidator,
 )
-export const contributorDataResolver = resolve<Contributor, HookContext<ContributorService>>({
+export const contributorDataResolver = resolve<
+  Contributor,
+  HookContext<ContributorService>
+>({
   created_at: async () => formatISO(new Date()),
-  fk_created_by: async (value, data, context) => context.params.user.id,
+  fk_created_by: async (value, data, context) => context.params.user?.id,
 })
 
 // Schema for updating existing entries
