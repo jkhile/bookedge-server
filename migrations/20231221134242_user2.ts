@@ -2,14 +2,14 @@ import type { Knex } from 'knex'
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.alterTable('users', (table) => {
-    table.string('access_token').defaultTo('')
-    table.string('access_token_expires').defaultTo('')
-    table.string('refresh_token').defaultTo('')
-    table.string('user_status').defaultTo('active')
+    table.text('access_token').defaultTo('')
+    table.text('access_token_expires').defaultTo('')
+    table.text('refresh_token').defaultTo('')
+    table.text('user_status').defaultTo('active')
     table
       .specificType('roles', 'text ARRAY')
       .defaultTo(knex.raw('ARRAY[]::text[]'))
-    table.string('created_at')
+    table.text('created_at')
     table.integer('fk_created_by').unsigned().references('users.id')
   })
 }

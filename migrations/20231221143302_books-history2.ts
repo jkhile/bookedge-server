@@ -13,11 +13,11 @@ export async function up(knex: Knex): Promise<void> {
       .references('id')
       .inTable('users')
       .onDelete('RESTRICT')
-    table.string('user_email').defaultTo('')
-    table.string('change_date').defaultTo('')
-    table.string('op').defaultTo('')
-    table.string('path').defaultTo('')
-    table.string('value').defaultTo('')
+    table.text('user_email').defaultTo('')
+    table.text('change_date').defaultTo('')
+    table.text('op').defaultTo('')
+    table.text('path').defaultTo('')
+    table.text('value').defaultTo('')
   })
 }
 
