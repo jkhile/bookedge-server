@@ -120,3 +120,5 @@ dist
 .sqlite
 
 lib/
+
+.DS_Store
