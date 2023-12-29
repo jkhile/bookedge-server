@@ -13,7 +13,6 @@ export const pricingSchema = Type.Object(
     id: Type.Number(),
     fk_release: Type.Number(),
     start_date: Type.String(),
-    expiration_date: Type.String(),
     us_srp: Type.Number(),
     us_discount: Type.Number(),
     us_returnable: Type.String(),

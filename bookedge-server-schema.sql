@@ -355,7 +355,6 @@ CREATE TABLE public.pricing (
     id integer NOT NULL,
     fk_release integer,
     start_date text DEFAULT ''::text,
-    expiration_date text DEFAULT ''::text,
     us_srp real DEFAULT '0'::real,
     us_discount real DEFAULT '0'::real,
     us_returnable text DEFAULT 'no'::text,

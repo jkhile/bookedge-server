@@ -9,7 +9,6 @@ export async function up(knex: Knex): Promise<void> {
       .inTable('releases')
       .onDelete('CASCADE')
     table.text('start_date').defaultTo('')
-    table.text('expiration_date').defaultTo('')
     table.float('us_srp').defaultTo(0)
     table.float('us_discount').defaultTo(0)
     table.text('us_returnable').defaultTo('no')
@@ -41,7 +40,6 @@ export async function down(knex: Knex): Promise<void> {
   return knex.schema.alterTable('pricing', (table) => {
     table.dropColumn('fk_release')
     table.dropColumn('start_date')
-    table.dropColumn('expiration_date')
     table.dropColumn('us_srp')
     table.dropColumn('us_discount')
     table.dropColumn('us_returnable')
