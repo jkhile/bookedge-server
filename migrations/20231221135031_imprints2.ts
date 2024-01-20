@@ -5,7 +5,7 @@ export async function up(knex: Knex): Promise<void> {
     table.dropColumn('text')
     table.text('imprint_name').defaultTo('')
     table.text('accounting_code').defaultTo('')
-    table.text('imprint_status').defaultTo('active')
+    table.text('status').defaultTo('active')
     table.text('contact_name').defaultTo('')
     table.text('address1').defaultTo('')
     table.text('address2').defaultTo('')
@@ -25,7 +25,7 @@ export async function down(knex: Knex): Promise<void> {
   await knex.schema.alterTable('imprints', (table) => {
     table.dropColumn('imprint_name')
     table.dropColumn('accounting_code')
-    table.dropColumn('imprint_status')
+    table.dropColumn('status')
     table.dropColumn('contact_name')
     table.dropColumn('address1')
     table.dropColumn('address2')

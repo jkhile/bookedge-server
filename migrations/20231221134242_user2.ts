@@ -5,7 +5,7 @@ export async function up(knex: Knex): Promise<void> {
     table.text('access_token').defaultTo('')
     table.text('access_token_expires').defaultTo('')
     table.text('refresh_token').defaultTo('')
-    table.text('user_status').defaultTo('active')
+    table.text('status').defaultTo('active')
     table
       .specificType('roles', 'text ARRAY')
       .defaultTo(knex.raw('ARRAY[]::text[]'))
@@ -19,7 +19,7 @@ export async function down(knex: Knex): Promise<void> {
     table.dropColumn('access_token')
     table.dropColumn('access_token_expires')
     table.dropColumn('refresh_token')
-    table.dropColumn('user_status')
+    table.dropColumn('status')
     table.dropColumn('roles')
     table.dropColumn('created_at')
     table.dropColumn('fk_created_by')

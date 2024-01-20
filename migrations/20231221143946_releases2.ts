@@ -8,7 +8,7 @@ export async function up(knex: Knex): Promise<void> {
       .references('id')
       .inTable('books')
       .onDelete('CASCADE')
-    table.text('release_status').defaultTo('active')
+    table.text('status').defaultTo('active')
     table.text('release_type').defaultTo('')
     table.text('submission_date').defaultTo('')
     table.text('acceptance_date').defaultTo('')
@@ -45,7 +45,7 @@ export async function up(knex: Knex): Promise<void> {
 export async function down(knex: Knex): Promise<void> {
   return knex.schema.alterTable('releases', (table) => {
     table.dropColumn('fk_book')
-    table.dropColumn('release_status')
+    table.dropColumn('status')
     table.dropColumn('release_type')
     table.dropColumn('submission_date')
     table.dropColumn('acceptance_date')

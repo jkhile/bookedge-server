@@ -19,7 +19,7 @@ export const userSchema = Type.Object(
     access_token: Type.Optional(Type.String()),
     access_token_expires: Type.Optional(Type.String()),
     refresh_token: Type.Optional(Type.String()),
-    user_status: Type.Union([Type.Literal('active'), Type.Literal('inactive')]),
+    status: Type.Union([Type.Literal('active'), Type.Literal('inactive')]),
     roles: Type.Array(
       Type.Union([
         Type.Literal('admin'),

@@ -13,10 +13,7 @@ export const releaseSchema = Type.Object(
   {
     id: Type.Number(),
     fk_book: Type.Number(),
-    release_status: Type.Union([
-      Type.Literal('active'),
-      Type.Literal('inactive'),
-    ]),
+    status: Type.Union([Type.Literal('active'), Type.Literal('inactive')]),
     release_type: Type.Union([
       Type.Literal(''),
       Type.Literal('print-LSI'),

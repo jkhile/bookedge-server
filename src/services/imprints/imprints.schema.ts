@@ -15,10 +15,7 @@ export const imprintSchema = Type.Object(
     id: Type.Integer(),
     imprint_name: Type.String(),
     accounting_code: Type.String(),
-    imprint_status: Type.Union([
-      Type.Literal('active'),
-      Type.Literal('inactive'),
-    ]),
+    status: Type.Union([Type.Literal('active'), Type.Literal('inactive')]),
     contact_name: Type.String(),
     address1: Type.String(),
     address2: Type.String(),

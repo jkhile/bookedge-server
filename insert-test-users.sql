@@ -3,7 +3,7 @@ INSERT INTO users (
   password,
   "googleId",
   access_token,
-  user_status,
+  status,
   roles,
   fk_created_by,
   created_at
