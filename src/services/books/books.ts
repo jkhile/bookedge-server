@@ -1,22 +1,23 @@
-// For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
 import { authenticate } from '@feathersjs/authentication'
-
+import { bookMethods, bookPath } from './books.shared'
+import { BookService, getOptions } from './books.class'
 import { hooks as schemaHooks } from '@feathersjs/schema'
+import { recordHistoryHook } from '../../hooks/record-history'
+// For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
+
 
 import {
+  bookDataResolver,
   bookDataValidator,
+  bookExternalResolver,
+  bookPatchResolver,
   bookPatchValidator,
+  bookQueryResolver,
   bookQueryValidator,
   bookResolver,
-  bookExternalResolver,
-  bookDataResolver,
-  bookPatchResolver,
-  bookQueryResolver,
 } from './books.schema'
 
 import type { Application } from '../../declarations'
-import { BookService, getOptions } from './books.class'
-import { bookPath, bookMethods } from './books.shared'
 
 export * from './books.class'
 export * from './books.schema'
@@ -37,6 +38,26 @@ export const book = (app: Application) => {
         authenticate('jwt'),
         schemaHooks.resolveExternal(bookExternalResolver),
         schemaHooks.resolveResult(bookResolver),
+      ],
+      update: [
+        recordHistoryHook([
+          'title',
+          'subtitle',
+          'short_description',
+          'long_description',
+          'keywords',
+          'notes',
+        ]),
+      ],
+      patch: [
+        recordHistoryHook([
+          'title',
+          'subtitle',
+          'short_description',
+          'long_description',
+          'keywords',
+          'notes',
+        ]),
       ],
     },
     before: {
