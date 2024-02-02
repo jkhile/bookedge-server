@@ -5,7 +5,6 @@ import { hooks as schemaHooks } from '@feathersjs/schema'
 import { recordHistoryHook } from '../../hooks/record-history'
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
 
-
 import {
   bookDataResolver,
   bookDataValidator,
