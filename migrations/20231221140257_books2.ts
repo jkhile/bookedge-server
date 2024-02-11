@@ -57,6 +57,7 @@ export async function up(knex: Knex): Promise<void> {
     table.text('press_contact').defaultTo('')
     table.text('legal_notice').defaultTo('')
     table.text('featured_ads').defaultTo('')
+    table.text('errata').defaultTo('')
     table.text('notes').defaultTo('')
     table.text('created_at')
     table

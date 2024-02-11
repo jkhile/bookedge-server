@@ -72,6 +72,7 @@ CREATE TABLE public.books (
     press_contact text DEFAULT ''::text,
     legal_notice text DEFAULT ''::text,
     featured_ads text DEFAULT ''::text,
+    errata text DEFAULT ''::text,
     notes text DEFAULT ''::text,
     created_at text,
     fk_created_by integer

@@ -82,6 +82,7 @@ export const bookSchema = Type.Object(
     press_contact: Type.String(),
     legal_notice: Type.String(),
     featured_ads: Type.String(),
+    errata: Type.String(),
     notes: Type.String(),
     fk_created_by: Type.Integer(),
     created_at: Type.String({ format: 'date-time' }),
