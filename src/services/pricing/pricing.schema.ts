@@ -1,11 +1,17 @@
-import { dataValidator, queryValidator } from '../../validators'
-import { getValidator, querySyntax, Type } from '@feathersjs/typebox'
 import { resolve } from '@feathersjs/schema'
+import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
+import { dataValidator, queryValidator } from '../../validators'
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
 import type { Static } from '@feathersjs/typebox'
 
 import type { HookContext } from '../../declarations'
 import type { PricingService } from './pricing.class'
+
+const returnableType = Type.Union([
+  Type.Literal('No'),
+  Type.Literal('Yes - Deliver'),
+  Type.Literal('Yes - Destroy'),
+])
 
 // Main data model schema
 export const pricingSchema = Type.Object(
@@ -15,22 +21,22 @@ export const pricingSchema = Type.Object(
     start_date: Type.String(),
     us_srp: Type.Number(),
     us_discount: Type.Number(),
-    us_returnable: Type.String(),
+    us_returnable: returnableType,
     uk_srp: Type.Number(),
     uk_discount: Type.Number(),
-    uk_returnable: Type.String(),
+    uk_returnable: returnableType,
     eu_srp: Type.Number(),
     eu_discount: Type.Number(),
-    eu_returnable: Type.String(),
+    eu_returnable: returnableType,
     ca_srp: Type.Number(),
     ca_discount: Type.Number(),
-    ca_returnable: Type.String(),
+    ca_returnable: returnableType,
     au_srp: Type.Number(),
     au_discount: Type.Number(),
-    au_returnable: Type.String(),
+    au_returnable: returnableType,
     gc_srp: Type.Number(),
     gc_discount: Type.Number(),
-    gc_returnable: Type.String(),
+    gc_returnable: returnableType,
     fk_created_by: Type.Integer(),
     created_at: Type.String({ format: 'date-time' }),
   },

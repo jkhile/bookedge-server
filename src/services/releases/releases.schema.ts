@@ -1,7 +1,7 @@
-import { dataValidator, queryValidator } from '../../validators'
-import { formatISO } from 'date-fns'
-import { getValidator, querySyntax, Type } from '@feathersjs/typebox'
 import { resolve } from '@feathersjs/schema'
+import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
+import { formatISO } from 'date-fns'
+import { dataValidator, queryValidator } from '../../validators'
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
 import type { Static } from '@feathersjs/typebox'
 
@@ -64,11 +64,6 @@ export const releaseSchema = Type.Object(
     carton_quantity: Type.Number(),
     weight: Type.Number(),
     full_distribution: Type.Boolean(),
-    returnable: Type.Union([
-      Type.Literal('no'),
-      Type.Literal('yes-return'),
-      Type.Literal('yes-destroy'),
-    ]),
     enable_look_inside: Type.Boolean(),
     kdp_select: Type.Boolean(),
     kdp_match_book: Type.Boolean(),
