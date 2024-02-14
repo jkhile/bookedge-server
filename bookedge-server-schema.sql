@@ -428,7 +428,6 @@ CREATE TABLE public.releases (
     carton_quantity integer DEFAULT 0,
     weight real DEFAULT '0'::real,
     full_distribution boolean DEFAULT true,
-    returnable text DEFAULT 'no'::text,
     enable_look_inside boolean DEFAULT true,
     kdp_select boolean DEFAULT false,
     kdp_match_book boolean DEFAULT false,

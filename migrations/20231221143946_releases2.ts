@@ -26,7 +26,6 @@ export async function up(knex: Knex): Promise<void> {
     table.integer('carton_quantity').defaultTo(0)
     table.float('weight').defaultTo(0)
     table.boolean('full_distribution').defaultTo(true)
-    table.text('returnable').defaultTo('no')
     table.boolean('enable_look_inside').defaultTo(true)
     table.boolean('kdp_select').defaultTo(false)
     table.boolean('kdp_match_book').defaultTo(false)
