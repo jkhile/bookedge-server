@@ -349,6 +349,61 @@ ALTER SEQUENCE public."log-messages_id_seq" OWNED BY public."log-messages".id;
 
 
 --
+-- Name: marketing; Type: TABLE; Schema: public; Owner: johnhile
+--
+
+CREATE TABLE public.marketing (
+    id integer NOT NULL,
+    fk_book integer,
+    goodreads_reviews_link text DEFAULT ''::text,
+    amazon_reviews_link text DEFAULT ''::text,
+    amazon_a1_link text DEFAULT ''::text,
+    a1_description_1 text DEFAULT ''::text,
+    a1_text_1 text DEFAULT ''::text,
+    a1_is_live_1 boolean DEFAULT false,
+    a1_rejection_reason_1 text DEFAULT ''::text,
+    a1_image_1 text DEFAULT ''::text,
+    a1_description_2 text DEFAULT ''::text,
+    a1_text_2 text DEFAULT ''::text,
+    a1_is_live_2 boolean DEFAULT false,
+    a1_rejection_reason_2 text DEFAULT ''::text,
+    a1_image_2 text DEFAULT ''::text,
+    a1_description_3 text DEFAULT ''::text,
+    a1_text_3 text DEFAULT ''::text,
+    a1_is_live_3 boolean DEFAULT false,
+    a1_rejection_reason_3 text DEFAULT ''::text,
+    a1_image_3 text DEFAULT ''::text,
+    notes text DEFAULT ''::text,
+    created_at text,
+    fk_created_by integer
+);
+
+
+ALTER TABLE public.marketing OWNER TO johnhile;
+
+--
+-- Name: marketing_id_seq; Type: SEQUENCE; Schema: public; Owner: johnhile
+--
+
+CREATE SEQUENCE public.marketing_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.marketing_id_seq OWNER TO johnhile;
+
+--
+-- Name: marketing_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: johnhile
+--
+
+ALTER SEQUENCE public.marketing_id_seq OWNED BY public.marketing.id;
+
+
+--
 -- Name: pricing; Type: TABLE; Schema: public; Owner: johnhile
 --
 
@@ -591,6 +646,13 @@ ALTER TABLE ONLY public."log-messages" ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
+-- Name: marketing id; Type: DEFAULT; Schema: public; Owner: johnhile
+--
+
+ALTER TABLE ONLY public.marketing ALTER COLUMN id SET DEFAULT nextval('public.marketing_id_seq'::regclass);
+
+
+--
 -- Name: pricing id; Type: DEFAULT; Schema: public; Owner: johnhile
 --
 
@@ -672,6 +734,14 @@ ALTER TABLE ONLY public.knex_migrations
 
 ALTER TABLE ONLY public."log-messages"
     ADD CONSTRAINT "log-messages_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: marketing marketing_pkey; Type: CONSTRAINT; Schema: public; Owner: johnhile
+--
+
+ALTER TABLE ONLY public.marketing
+    ADD CONSTRAINT marketing_pkey PRIMARY KEY (id);
 
 
 --
@@ -776,6 +846,22 @@ ALTER TABLE ONLY public.contributors
 
 ALTER TABLE ONLY public.imprints
     ADD CONSTRAINT imprints_fk_created_by_foreign FOREIGN KEY (fk_created_by) REFERENCES public.users(id);
+
+
+--
+-- Name: marketing marketing_fk_book_foreign; Type: FK CONSTRAINT; Schema: public; Owner: johnhile
+--
+
+ALTER TABLE ONLY public.marketing
+    ADD CONSTRAINT marketing_fk_book_foreign FOREIGN KEY (fk_book) REFERENCES public.books(id) ON DELETE CASCADE;
+
+
+--
+-- Name: marketing marketing_fk_created_by_foreign; Type: FK CONSTRAINT; Schema: public; Owner: johnhile
+--
+
+ALTER TABLE ONLY public.marketing
+    ADD CONSTRAINT marketing_fk_created_by_foreign FOREIGN KEY (fk_created_by) REFERENCES public.users(id) ON DELETE RESTRICT;
 
 
 --

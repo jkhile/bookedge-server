@@ -78,7 +78,7 @@
   },
   "devDependencies": {
     "@feathersjs/adapter-commons": "^5.0.22",
-    "@feathersjs/cli": "5.0.12",
+    "@feathersjs/cli": "5.0.22",
     "@feathersjs/rest-client": "^5.0.22",
     "@types/fs-extra": "^11.0.4",
     "@types/lodash": "^4.14.202",

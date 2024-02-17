@@ -74,8 +74,8 @@ devDependencies:
     specifier: ^5.0.22
     version: 5.0.22
   '@feathersjs/cli':
-    specifier: 5.0.12
-    version: 5.0.12
+    specifier: 5.0.22
+    version: 5.0.22
   '@feathersjs/rest-client':
     specifier: ^5.0.22
     version: 5.0.22
@@ -532,14 +532,14 @@ packages:
       - typescript
     dev: false
 
-  /@feathersjs/cli@5.0.12:
-    resolution: {integrity: sha512-wg9Xq7Fzepmo2C4K78uePUUeQshmRQTwKhxS0+PSLpGLzfsQjDzVAf4h+vPgd4cOerBGWMen4TLR5u6dYc/D5A==}
+  /@feathersjs/cli@5.0.22:
+    resolution: {integrity: sha512-8FL0u8U+dXZrFyK0UrsZkIfMofC1I37G/cDEl5Fh16JLz3oUdTIfg4ytI5lRxlgbJcTBpTJC4cyihgu7RsTSOg==}
     engines: {node: '>= 14'}
     hasBin: true
     dependencies:
       '@feathersjs/generators': 5.0.22
-      chalk: 4.1.2
-      commander: 11.1.0
+      chalk: 5.3.0
+      commander: 12.0.0
     dev: true
 
   /@feathersjs/commons@5.0.22:
@@ -1850,6 +1850,11 @@ packages:
   /commander@11.1.0:
     resolution: {integrity: sha512-yPVavfyCcRhmorC7rWlkHn15b4wDVgVmBA7kV4QVBsF7kv/9TKJAbAXVTxvTnwP8HHKjRCJDClKbciiYS7p0DQ==}
     engines: {node: '>=16'}
+    dev: true
+
+  /commander@12.0.0:
+    resolution: {integrity: sha512-MwVNWlYjDTtOjX5PiD7o5pK0UrFU/OYgcJfjjK4RaHZETNtjJqrZa9Y9ds88+A+f+d5lv+561eZ+yCKoS3gbAA==}
+    engines: {node: '>=18'}
     dev: true
 
   /compressible@2.0.18:

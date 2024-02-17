@@ -13,6 +13,14 @@ import { usersImprintsClient } from './services/users-imprints/users-imprints.sh
 import type { TransportConnection, Application } from '@feathersjs/feathers'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
+import { marketingClient } from './services/marketing/marketing.shared'
+export type {
+  Marketing,
+  MarketingData,
+  MarketingQuery,
+  MarketingPatch,
+} from './services/marketing/marketing.shared'
+
 export type {
   LogMessage,
   LogMessageData,
@@ -112,5 +120,6 @@ export const createClient = <Configuration = any>(
   client.configure(releaseClient)
   client.configure(pricingClient)
   client.configure(logMessageClient)
+  client.configure(marketingClient)
   return client
 }
