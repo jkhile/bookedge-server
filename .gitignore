@@ -122,3 +122,5 @@ dist
 lib/
 
 .DS_Store
+
+bookedge-server-schema.sql
