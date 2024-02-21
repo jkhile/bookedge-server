@@ -38,8 +38,8 @@
   ],
   "main": "lib/client",
   "scripts": {
-    "dev": "dotenv nodemon  -x ts-node src/index.ts",
-    "dev:test": "pnpm make-test-db && NODE_ENV=test dotenv -e .env_test -- nodemon -x ts-node src/index",
+    "dev": "dotenvx run --env-file=.env -- nodemon  -x ts-node src/index.ts",
+    "dev:test": "pnpm make-test-db && NODE_ENV=test dotenvx run --env-file=.env.test -- nodemon -x ts-node src/index",
     "check": "pnpm prettier && pnpm lint && echo '\\033[0;32m*** lint finished ***\\033[0m' && pnpm bundle:client && echo '\n\\033[0;32m*** bundle finished ***\\033[0m\n'",
     "lint": "eslint ./src",
     "compile": "shx rm -rf lib/ && tsc",
@@ -50,8 +50,8 @@
     "bundle:client": "npm run compile && npm pack --pack-destination ./public",
     "reset-db": "dropdb bookedge-server --if-exists && createdb bookedge-server && pnpm migrate && ./load-db-fixtures.sh && pnpm make-test-db",
     "make-test-db": "./setup-test-server.sh && psql --dbname=bookedge-test --file=insert-test-users.sql",
-    "migrate": "dotenv knex migrate:latest",
-    "migrate:make": "dotenv knex migrate:make"
+    "migrate": "dotenvx run -- knex migrate:latest",
+    "migrate:make": "knex migrate:make"
   },
   "dependencies": {
     "@feathersjs/authentication": "^5.0.22",
