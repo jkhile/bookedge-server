@@ -39,7 +39,7 @@
   "main": "lib/client",
   "scripts": {
     "dev": "dotenvx run --env-file=.env -- nodemon  -x ts-node src/index.ts",
-    "dev:test": "pnpm make-test-db && NODE_ENV=test dotenvx run --env-file=.env.test -- nodemon -x ts-node src/index",
+    "dev:test": "pnpm make-test-db && dotenvx run --env-file=.env.test -- nodemon -x ts-node src/index",
     "check": "pnpm prettier && pnpm lint && echo '\\033[0;32m*** lint finished ***\\033[0m' && pnpm bundle:client && echo '\n\\033[0;32m*** bundle finished ***\\033[0m\n'",
     "lint": "eslint ./src",
     "compile": "shx rm -rf lib/ && tsc",
