@@ -1,6 +1,6 @@
-import winston from 'winston'
 import { format } from 'date-fns'
 import { pathExistsSync, readdirSync, removeSync, renameSync } from 'fs-extra'
+import winston from 'winston'
 // src/logger.ts
 import { resolve } from 'node:path'
 
@@ -8,10 +8,11 @@ import { resolve } from 'node:path'
 // old log files
 const env = process.env.NODE_ENV || 'development'
 const logFile = `./debug-${env}.log`
-if (env !== 'test') {
+if (env === 'test') {
+  removeSync(logFile)
+} else {
   rotateLogFiles()
 }
-// rotateLogFiles()
 
 export const logger = winston.createLogger({
   level: 'debug',
