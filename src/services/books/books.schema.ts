@@ -1,8 +1,8 @@
-import { dataValidator, queryValidator } from '../../validators'
+import { resolve, virtual } from '@feathersjs/schema'
+import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
 import { formatISO } from 'date-fns'
-import { getValidator, querySyntax, Type } from '@feathersjs/typebox'
 import { imprintsResolver } from '../../utils/imprints-resolver'
-import { resolve } from '@feathersjs/schema'
+import { dataValidator, queryValidator } from '../../validators'
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
 import type { Static } from '@feathersjs/typebox'
 
@@ -91,7 +91,37 @@ export const bookSchema = Type.Object(
 )
 export type Book = Static<typeof bookSchema>
 export const bookValidator = getValidator(bookSchema, dataValidator)
-export const bookResolver = resolve<Book, HookContext<BookService>>({})
+export const bookResolver = resolve<Book, HookContext<BookService>>({
+  author: virtual(async (user, context) => {
+    context.pass = 'pass' in context ? context.pass + 1 : 0
+    if (context.result) {
+      try {
+        // @ts-ignore
+        const bookId = context.result.data[context.pass]['id']
+        const contributorsService = context.app.service('contributors')
+        const contributors = await contributorsService.find({
+          query: {
+            fk_book: bookId,
+            $select: ['published_name', 'contributor_role'],
+          },
+        })
+        // find the first entry with a role of 'author'
+        let author = contributors.data.find(
+          (contributor) => contributor.contributor_role === 'Author',
+        )
+        // if no author is found, use the first contributor
+        if (!author && contributors.data.length > 0) {
+          author = contributors.data[0]
+        }
+
+        return author?.published_name
+      } catch (error: any) {
+        console.log('error:', error)
+      }
+    }
+    return 'not found'
+  }),
+})
 
 export const bookExternalResolver = resolve<Book, HookContext<BookService>>({})
 
