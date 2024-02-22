@@ -73,7 +73,6 @@ export const bookSchema = Type.Object(
     edition_name: Type.String(),
     edition_number: Type.Integer(),
     right_to_left: Type.Boolean(),
-    author: Type.String(),
     contains_prior_work: Type.String(),
     contains_others_work: Type.String(),
     web_domain: Type.String(),
@@ -86,6 +85,9 @@ export const bookSchema = Type.Object(
     notes: Type.String(),
     fk_created_by: Type.Integer(),
     created_at: Type.String({ format: 'date-time' }),
+    // virtual fields
+    author: Type.String(),
+    published_date: Type.String(),
   },
   { $id: 'Book', additionalProperties: false },
 )
