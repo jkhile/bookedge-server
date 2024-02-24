@@ -95,33 +95,40 @@ export type Book = Static<typeof bookSchema>
 export const bookValidator = getValidator(bookSchema, dataValidator)
 export const bookResolver = resolve<Book, HookContext<BookService>>({
   author: virtual(async (user, context) => {
-    context.pass = 'pass' in context ? context.pass + 1 : 0
-    if (context.result) {
-      try {
-        // @ts-ignore
-        const bookId = context.result.data[context.pass]['id']
-        const contributorsService = context.app.service('contributors')
-        const contributors = await contributorsService.find({
-          query: {
-            fk_book: bookId,
-            $select: ['published_name', 'contributor_role'],
-          },
-        })
-        // find the first entry with a role of 'author'
-        let author = contributors.data.find(
-          (contributor) => contributor.contributor_role === 'Author',
-        )
-        // if no author is found, use the first contributor
-        if (!author && contributors.data.length > 0) {
-          author = contributors.data[0]
-        }
-
-        return author?.published_name
-      } catch (error: any) {
-        console.log('error:', error)
-      }
+    // Look up the author of the book and set as a virtual field on the book
+    // for display in the books list
+    // @ts-ignore
+    if (!context.result) {
+      throw new Error('No result in context in bookResolver')
     }
-    return 'not found'
+    // a get won't return a paginated result like find, so fake it to
+    // simplify the following code
+    // @ts-ignore
+    if (!context.result.data) {
+      // @ts-ignore
+      context.result.data = [context.result]
+    }
+    let author = ''
+    context.pass = 'pass' in context ? context.pass + 1 : 0
+    const contributorsService = context.app.service('contributors')
+    // @ts-ignore
+    const bookId = context.result.data[context.pass]['id']
+    const contributors = await contributorsService.find({
+      query: {
+        fk_book: bookId,
+        $select: ['contributor_role', 'published_name'],
+      },
+    })
+
+    if (contributors.data.length > 0) {
+      const contrib = contributors.data.find(
+        (contributor) => contributor.contributor_role === 'Author',
+      )
+      author = contrib
+        ? contrib.published_name
+        : contributors.data[0].published_name
+    }
+    return author
   }),
 })
 
