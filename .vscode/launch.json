@@ -7,7 +7,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Debug dev",
+      "name": "Dev debug",
       "skipFiles": [
         "<node_internals>/**"
       ],
@@ -21,7 +21,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Debug test",
+      "name": "Test debug",
       "skipFiles": [
         "<node_internals>/**"
       ],
