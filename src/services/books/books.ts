@@ -1,8 +1,8 @@
 import { authenticate } from '@feathersjs/authentication'
-import { bookMethods, bookPath } from './books.shared'
-import { BookService, getOptions } from './books.class'
 import { hooks as schemaHooks } from '@feathersjs/schema'
 import { recordHistoryHook } from '../../hooks/record-history'
+import { BookService, getOptions } from './books.class'
+import { bookMethods, bookPath } from './books.shared'
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
 
 import {
@@ -37,6 +37,16 @@ export const book = (app: Application) => {
         authenticate('jwt'),
         schemaHooks.resolveExternal(bookExternalResolver),
         schemaHooks.resolveResult(bookResolver),
+      ],
+      create: [
+        recordHistoryHook([
+          'title',
+          'subtitle',
+          'short_description',
+          'long_description',
+          'keywords',
+          'notes',
+        ]),
       ],
       update: [
         recordHistoryHook([
