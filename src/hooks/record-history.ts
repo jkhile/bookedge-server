@@ -41,7 +41,7 @@ export function recordHistoryHook(
             path,
             value,
           })
-          .catch((error) => {
+          .catch((error: any) => {
             console.error(error)
           })
       }
