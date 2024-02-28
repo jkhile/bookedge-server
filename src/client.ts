@@ -8,7 +8,6 @@ import { logMessageClient } from './services/log-messages/log-messages.shared'
 import { pricingClient } from './services/pricing/pricing.shared'
 import { releaseClient } from './services/releases/releases.shared'
 import { userClient } from './services/users/users.shared'
-import { usersImprintsClient } from './services/users-imprints/users-imprints.shared'
 // For more information about this file see https://dove.feathersjs.com/guides/cli/client.html
 import type { TransportConnection, Application } from '@feathersjs/feathers'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
@@ -64,13 +63,6 @@ export type {
 } from './services/books/books.shared'
 
 export type {
-  UsersImprints,
-  UsersImprintsData,
-  UsersImprintsQuery,
-  UsersImprintsPatch,
-} from './services/users-imprints/users-imprints.shared'
-
-export type {
   Imprint,
   ImprintData,
   ImprintQuery,
@@ -113,7 +105,6 @@ export const createClient = <Configuration = any>(
 
   client.configure(userClient)
   client.configure(imprintClient)
-  client.configure(usersImprintsClient)
   client.configure(bookClient)
   client.configure(booksHistoryClient)
   client.configure(contributorClient)

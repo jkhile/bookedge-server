@@ -8,20 +8,13 @@ export const imprintsResolver = async (
   query: any,
   context: HookContext,
 ): Promise<any> => {
+  // admins can see all imprints
   if (context.params.user.roles.includes('admin')) {
-    // admins can see all imprints
     return value
   }
-  // for non-admins, the users-imprints service has a list of
-  // allowed imprints for each user.
-  const usersImprintsService = context.app.service('users-imprints')
-  const found = await usersImprintsService.find({
-    query: {
-      fk_user: context.params.user.id,
-      $select: ['fk_imprint'],
-    },
-  })
-  const allowedImprints = found.data.map((item) => item.fk_imprint)
+  // for non-admins, user.allowed_imprints is an array of ids of
+  // the imprints they are allowed to see
+  const allowedImprints = context.params.user.allowed_imprints
   // return the value for the caller's fk_imprint query field
   return { $in: allowedImprints }
 }

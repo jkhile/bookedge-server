@@ -1,8 +1,8 @@
-import { dataValidator, queryValidator } from '../../validators'
-import { formatISO } from 'date-fns'
-import { getValidator, querySyntax, Type } from '@feathersjs/typebox'
 import { passwordHash } from '@feathersjs/authentication-local'
 import { resolve } from '@feathersjs/schema'
+import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
+import { formatISO } from 'date-fns'
+import { dataValidator, queryValidator } from '../../validators'
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
 import type { Static } from '@feathersjs/typebox'
 
@@ -31,6 +31,7 @@ export const userSchema = Type.Object(
         Type.Literal('author'),
       ]),
     ),
+    allowed_imprints: Type.Array(Type.Integer()),
     fk_created_by: Type.Optional(Type.Integer()),
     created_at: Type.Optional(Type.String()),
   },
