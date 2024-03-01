@@ -99,7 +99,7 @@ export const bookResolver = resolve<Book, HookContext<BookService>>({
     // for display in the books list
     // @ts-ignore
     if (!context.result) {
-      throw new Error('No result in context in bookResolver')
+      throw new Error('No result in context in bookResolver author')
     }
     // a get won't return a paginated result like find, so fake it to
     // simplify the following code
@@ -109,10 +109,10 @@ export const bookResolver = resolve<Book, HookContext<BookService>>({
       context.result.data = [context.result]
     }
     let author = ''
-    context.pass = 'pass' in context ? context.pass + 1 : 0
+    context.authorIx = 'authorIx' in context ? context.authorIx + 1 : 0
     const contributorsService = context.app.service('contributors')
     // @ts-ignore
-    const bookId = context.result.data[context.pass]['id']
+    const bookId = context.result.data[context.authorIx]['id']
     const contributors = await contributorsService.find({
       query: {
         fk_book: bookId,
@@ -129,6 +129,31 @@ export const bookResolver = resolve<Book, HookContext<BookService>>({
         : contributors.data[0].published_name
     }
     return author
+  }),
+
+  published_date: virtual(async (user, context) => {
+    // @ts-ignore
+    if (!context.result) {
+      throw new Error('No result in context in bookResolver author')
+    }
+    let published_date = ''
+    context.dateIx = 'dateIx' in context ? context.dateIx + 1 : 0
+    const releasesService = context.app.service('releases')
+    // @ts-ignore
+    const bookId = context.result.data[context.authorIx]['id']
+    const releases = await releasesService.find({
+      query: {
+        fk_book: bookId,
+        $select: ['publication_date'],
+        $sort: { publication_date: 1 },
+        $limit: 1,
+      },
+    })
+    if (releases.data.length > 0) {
+      published_date = releases.data[0]['publication_date']
+    }
+
+    return published_date
   }),
 })
 
