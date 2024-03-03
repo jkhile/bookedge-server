@@ -71,5 +71,6 @@ export async function down(knex: Knex): Promise<void> {
     table.dropColumn('notes')
     table.dropColumn('created_at')
     table.dropColumn('fk_created_by')
+    table.text('text')
   })
 }
