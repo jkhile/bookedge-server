@@ -1,3 +1,4 @@
+import { endorsement } from './endorsements/endorsements'
 import { marketing } from './marketing/marketing'
 import { logMessage } from './log-messages/log-messages'
 import { pricing } from './pricing/pricing'
@@ -11,6 +12,7 @@ import { user } from './users/users'
 import type { Application } from '../declarations'
 
 export const services = (app: Application) => {
+  app.configure(endorsement)
   app.configure(marketing)
   app.configure(logMessage)
   app.configure(pricing)
