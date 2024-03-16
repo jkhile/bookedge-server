@@ -25,7 +25,7 @@ export const bookSchema = Type.Object(
     subtitle: Type.String(),
     accounting_code: Type.String(),
     status: Type.Union([
-      Type.Literal('inactive'),
+      Type.Literal('archived'),
       Type.Literal('contract negotiation'),
       Type.Literal('contract signed'),
       Type.Literal('content editing'),
