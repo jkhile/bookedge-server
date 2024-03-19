@@ -5,7 +5,6 @@ import { contributorClient } from './services/contributors/contributors.shared'
 import { feathers } from '@feathersjs/feathers'
 import { imprintClient } from './services/imprints/imprints.shared'
 import { logMessageClient } from './services/log-messages/log-messages.shared'
-import { pricingClient } from './services/pricing/pricing.shared'
 import { releaseClient } from './services/releases/releases.shared'
 import { userClient } from './services/users/users.shared'
 // For more information about this file see https://dove.feathersjs.com/guides/cli/client.html
@@ -20,27 +19,12 @@ export type {
   EndorsementPatch,
 } from './services/endorsements/endorsements.shared'
 
-import { marketingClient } from './services/marketing/marketing.shared'
-export type {
-  Marketing,
-  MarketingData,
-  MarketingQuery,
-  MarketingPatch,
-} from './services/marketing/marketing.shared'
-
 export type {
   LogMessage,
   LogMessageData,
   LogMessageQuery,
   LogMessagePatch,
 } from './services/log-messages/log-messages.shared'
-
-export type {
-  Pricing,
-  PricingData,
-  PricingQuery,
-  PricingPatch,
-} from './services/pricing/pricing.shared'
 
 export type {
   Release,
@@ -117,9 +101,7 @@ export const createClient = <Configuration = any>(
   client.configure(booksHistoryClient)
   client.configure(contributorClient)
   client.configure(releaseClient)
-  client.configure(pricingClient)
   client.configure(logMessageClient)
-  client.configure(marketingClient)
   client.configure(endorsementClient)
   return client
 }
