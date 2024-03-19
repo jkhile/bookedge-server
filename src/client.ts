@@ -11,6 +11,22 @@ import { userClient } from './services/users/users.shared'
 import type { TransportConnection, Application } from '@feathersjs/feathers'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
+import { marketingClient } from './services/marketings/marketings.shared'
+export type {
+  Marketing,
+  MarketingData,
+  MarketingQuery,
+  MarketingPatch,
+} from './services/marketings/marketings.shared'
+
+import { pricingClient } from './services/pricings/pricings.shared'
+export type {
+  Pricing,
+  PricingData,
+  PricingQuery,
+  PricingPatch,
+} from './services/pricings/pricings.shared'
+
 import { endorsementClient } from './services/endorsements/endorsements.shared'
 export type {
   Endorsement,
@@ -103,5 +119,7 @@ export const createClient = <Configuration = any>(
   client.configure(releaseClient)
   client.configure(logMessageClient)
   client.configure(endorsementClient)
+  client.configure(pricingClient)
+  client.configure(marketingClient)
   return client
 }
