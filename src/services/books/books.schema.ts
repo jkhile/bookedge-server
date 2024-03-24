@@ -88,6 +88,7 @@ export const bookSchema = Type.Object(
     // virtual fields
     author: Type.String(),
     published_date: Type.String(),
+    issues_count: Type.Integer(),
   },
   { $id: 'Book', additionalProperties: false },
 )
@@ -134,13 +135,13 @@ export const bookResolver = resolve<Book, HookContext<BookService>>({
   published_date: virtual(async (user, context) => {
     // @ts-ignore
     if (!context.result) {
-      throw new Error('No result in context in bookResolver author')
+      throw new Error('No result in context in bookResolver published_date')
     }
     let published_date = ''
     context.dateIx = 'dateIx' in context ? context.dateIx + 1 : 0
     const releasesService = context.app.service('releases')
     // @ts-ignore
-    const bookId = context.result.data[context.authorIx]['id']
+    const bookId = context.result.data[context.dateIx]['id']
     const releases = await releasesService.find({
       query: {
         fk_book: bookId,
@@ -154,6 +155,26 @@ export const bookResolver = resolve<Book, HookContext<BookService>>({
     }
 
     return published_date
+  }),
+
+  issues_count: virtual(async (user, context) => {
+    // @ts-ignore
+    if (!context.result) {
+      throw new Error('No result in context in bookResolver issue_count')
+    }
+    let issues_count = 0
+    context.issueIx = 'issueIx' in context ? context.issueIx + 1 : 0
+    const issuesService = context.app.service('issues')
+    // @ts-ignore
+    const bookId = context.result.data[context.authorIx]['id']
+    const issues = await issuesService.find({
+      query: {
+        fk_book: bookId,
+        $limit: 0, // only need the count
+      },
+    })
+    issues_count = issues.total
+    return issues_count
   }),
 })
 

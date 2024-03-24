@@ -4,7 +4,7 @@
 cmd="psql --dbname=bookedge-server"
 
 # Base names of the files
-files=("insert-test-users" "insert-imprints" "insert-books" "insert-contributors" "insert-releases" "insert-pricings" "insert-marketings" "insert-endorsements")
+files=("insert-test-users" "insert-imprints" "insert-books" "insert-contributors" "insert-releases" "insert-pricings" "insert-marketings" "insert-endorsements" "insert-issues")
 
 # Loop over each base name in the array
 for file in "${files[@]}"; do

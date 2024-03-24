@@ -11,6 +11,14 @@ import { userClient } from './services/users/users.shared'
 import type { TransportConnection, Application } from '@feathersjs/feathers'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
+import { issueClient } from './services/issues/issues.shared'
+export type {
+  Issue,
+  IssueData,
+  IssueQuery,
+  IssuePatch,
+} from './services/issues/issues.shared'
+
 import { marketingClient } from './services/marketings/marketings.shared'
 export type {
   Marketing,
@@ -121,5 +129,6 @@ export const createClient = <Configuration = any>(
   client.configure(endorsementClient)
   client.configure(pricingClient)
   client.configure(marketingClient)
+  client.configure(issueClient)
   return client
 }

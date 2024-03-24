@@ -60,6 +60,7 @@ export async function up(knex: Knex): Promise<void> {
     table.text('notes').defaultTo('')
     table.text('author').defaultTo('')
     table.text('published_date').defaultTo('')
+    table.integer('issues_count').defaultTo(0)
     table.text('created_at')
     table
       .integer('fk_created_by')
