@@ -170,6 +170,7 @@ export const bookResolver = resolve<Book, HookContext<BookService>>({
     const issues = await issuesService.find({
       query: {
         fk_book: bookId,
+        resolved: false,
         $limit: 0, // only need the count
       },
     })
