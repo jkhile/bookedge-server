@@ -12,6 +12,9 @@ export async function up(knex: Knex): Promise<void> {
     table
       .specificType('allowed_imprints', 'INT[]')
       .defaultTo(knex.raw('ARRAY[]::INT[]'))
+    table
+      .specificType('allowed_books', 'INT[]')
+      .defaultTo(knex.raw('ARRAY[]::INT[]'))
     table.text('created_at')
     table.integer('fk_created_by').unsigned().references('users.id')
   })
