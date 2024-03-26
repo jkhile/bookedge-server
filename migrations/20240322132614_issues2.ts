@@ -10,6 +10,7 @@ export async function up(knex: Knex): Promise<void> {
       .onDelete('CASCADE')
     table.text('date').defaultTo('')
     table.text('issue').defaultTo('')
+    table.text('entered_by').defaultTo('')
     table.boolean('resolved').defaultTo(false)
     table.text('created_at')
     table
@@ -25,6 +26,7 @@ export async function down(knex: Knex): Promise<void> {
     table.dropColumn('fk_book')
     table.dropColumn('date')
     table.dropColumn('issue')
+    table.dropColumn('entered_by')
     table.dropColumn('resolved')
     table.dropColumn('created_at')
     table.dropColumn('fk_created_by')

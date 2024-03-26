@@ -14,6 +14,7 @@ export const issueSchema = Type.Object(
     fk_book: Type.Number(),
     date: Type.String(),
     issue: Type.String(),
+    entered_by: Type.String(),
     resolved: Type.Boolean(),
     fk_created_by: Type.Integer(),
     created_at: Type.String({ format: 'date-time' }),

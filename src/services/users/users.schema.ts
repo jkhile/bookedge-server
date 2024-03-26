@@ -16,6 +16,7 @@ export const userSchema = Type.Object(
     email: Type.Optional(Type.String({ format: 'email' })),
     password: Type.Optional(Type.String()),
     googleId: Type.Optional(Type.String()),
+    name: Type.String(),
     access_token: Type.Optional(Type.String()),
     access_token_expires: Type.Optional(Type.String()),
     refresh_token: Type.Optional(Type.String()),
