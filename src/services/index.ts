@@ -1,5 +1,4 @@
 import { issue } from './issues/issues'
-import { marketing } from './marketings/marketings'
 import { pricing } from './pricings/pricings'
 import { endorsement } from './endorsements/endorsements'
 import { logMessage } from './log-messages/log-messages'
@@ -14,7 +13,6 @@ import type { Application } from '../declarations'
 
 export const services = (app: Application) => {
   app.configure(issue)
-  app.configure(marketing)
   app.configure(pricing)
   app.configure(endorsement)
   app.configure(logMessage)

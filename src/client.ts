@@ -19,14 +19,6 @@ export type {
   IssuePatch,
 } from './services/issues/issues.shared'
 
-import { marketingClient } from './services/marketings/marketings.shared'
-export type {
-  Marketing,
-  MarketingData,
-  MarketingQuery,
-  MarketingPatch,
-} from './services/marketings/marketings.shared'
-
 import { pricingClient } from './services/pricings/pricings.shared'
 export type {
   Pricing,
@@ -128,7 +120,6 @@ export const createClient = <Configuration = any>(
   client.configure(logMessageClient)
   client.configure(endorsementClient)
   client.configure(pricingClient)
-  client.configure(marketingClient)
   client.configure(issueClient)
   return client
 }

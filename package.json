@@ -68,7 +68,6 @@
     "@feathersjs/transport-commons": "^5.0.24",
     "@feathersjs/typebox": "^5.0.24",
     "date-fns": "^3.6.0",
-    "dotenv": "^16.4.5",
     "fs-extra": "^11.2.0",
     "just-diff": "^6.0.2",
     "knex": "^3.1.0",
