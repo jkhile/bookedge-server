@@ -1,11 +1,12 @@
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
 import { resolve } from '@feathersjs/schema'
 import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
-import type { Static } from '@feathersjs/typebox'
-
-import type { HookContext } from '../../declarations'
+import { formatISO } from 'date-fns'
 import { dataValidator, queryValidator } from '../../validators'
+
 import type { IssueService } from './issues.class'
+import type { Static } from '@feathersjs/typebox'
+import type { HookContext } from '../../declarations'
 
 // Main data model schema
 export const issueSchema = Type.Object(
@@ -39,7 +40,10 @@ export const issueDataSchema = Type.Omit(
 )
 export type IssueData = Static<typeof issueDataSchema>
 export const issueDataValidator = getValidator(issueDataSchema, dataValidator)
-export const issueDataResolver = resolve<Issue, HookContext<IssueService>>({})
+export const issueDataResolver = resolve<Issue, HookContext<IssueService>>({
+  created_at: async () => formatISO(new Date()),
+  fk_created_by: async (value, data, context) => context.params.user?.id,
+})
 
 // Schema for updating existing entries
 export const issuePatchSchema = Type.Partial(issueSchema, {
