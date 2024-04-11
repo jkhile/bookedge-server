@@ -31,6 +31,11 @@ export async function up(knex: Knex): Promise<void> {
     table.boolean('kdp_match_book').defaultTo(false)
     table.text('asin').defaultTo('')
     table.boolean('drm').defaultTo(false)
+    table.text('amazon_sales_page').defaultTo('')
+    table.text('bn_sales_page').defaultTo('')
+    table.text('apple_sales_page').defaultTo('')
+    table.text('kobo_sales_page').defaultTo('')
+    table.text('google_sales_page').defaultTo('')
     table.text('notes').defaultTo('')
     table.text('created_at')
     table
