@@ -117,6 +117,9 @@ export const bookResolver = resolve<Book, HookContext<BookService>>({
     // Look up the author of the book and set as a virtual field on the book
     // for display in the books list
     // @ts-ignore
+    if (context.method === 'search') {
+      return ''
+    }
     if (!context.result) {
       throw new Error('No result in context in bookResolver author')
     }
@@ -151,6 +154,9 @@ export const bookResolver = resolve<Book, HookContext<BookService>>({
   }),
 
   published_date: virtual(async (user, context) => {
+    if (context.method === 'search') {
+      return ''
+    }
     // @ts-ignore
     if (!context.result) {
       throw new Error('No result in context in bookResolver published_date')
@@ -176,6 +182,9 @@ export const bookResolver = resolve<Book, HookContext<BookService>>({
   }),
 
   issues_count: virtual(async (user, context) => {
+    if (context.method === 'search') {
+      return 0
+    }
     // @ts-ignore
     if (!context.result) {
       throw new Error('No result in context in bookResolver issue_count')
@@ -237,3 +246,15 @@ export const bookQueryValidator = getValidator(bookQuerySchema, queryValidator)
 export const bookQueryResolver = resolve<BookQuery, HookContext<BookService>>({
   fk_imprint: imprintsResolver,
 })
+export const bookSearchQuerySchema = Type.Object(
+  {
+    fields: Type.Array(Type.String()),
+    query: Type.String(),
+  },
+  { $id: 'BookSearchQuery', additionalProperties: false },
+)
+export type BookSearchQuery = Static<typeof bookSearchQuerySchema>
+export const bookSearchQueryValidator = getValidator(
+  bookSearchQuerySchema,
+  queryValidator,
+)

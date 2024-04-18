@@ -18,7 +18,14 @@ export type BookClientService = Pick<
 
 export const bookPath = 'books'
 
-export const bookMethods = ['find', 'get', 'create', 'patch', 'remove'] as const
+export const bookMethods = [
+  'find',
+  'get',
+  'create',
+  'patch',
+  'remove',
+  'search',
+] as const
 
 export const bookClient = (client: ClientApplication) => {
   const connection = client.get('connection')
