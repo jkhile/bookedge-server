@@ -18,29 +18,35 @@ export interface BookParams extends KnexAdapterParams<BookQuery> {}
 
 // By default calls the standard Knex adapter service methods but can be customized with your own functionality.
 export class BookService<
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ServiceParams extends Params = BookParams,
 > extends KnexService<Book, BookData, BookParams, BookPatch> {
   async search(
     params: ServiceParams & { query: BookSearchQuery },
   ): Promise<string[]> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { fields, query: searchquery } = params.query
-    const db = this.Model
-    const fieldList = fields.map((field) => `${field}`).join(" || ' ' || ")
-    console.log('fieldList:', fieldList)
-
-    const tResult = await db.raw(
-      `SELECT id, title, ts_headline('english', ${fieldList}, websearch_to_tsquery('${searchquery}')) AS headline
+    const { fields, query: searchQuery } = params.query
+    const knex = this.Model
+    const fieldList = fields.map((field) => `${field}`).join(', ')
+    let searchResults: string[] = []
+    const sql = `
+      SELECT id, title, ts_headline('english', concat_ws(' ', ${fieldList}), websearch_to_tsquery('english', ?),
+        'MaxFragments=5, FragmentDelimiter="</br>&#10687;"') AS headline
       FROM books
-      WHERE to_tsvector('english', ${fieldList}) @@ websearch_to_tsquery('${searchquery}')
-      ORDER BY ts_rank_cd(to_tsvector('english', ${fieldList}), websearch_to_tsquery('${searchquery}'))
-      LIMIT 10
-      `,
-    )
-    console.log('tResult.rows:', tResult.rows)
-
-    return ['some', 'result.rows']
+      WHERE to_tsvector('english', concat_ws(' ', ${fieldList})) @@ websearch_to_tsquery('english', ?)
+      ORDER BY ts_rank_cd(to_tsvector('english', concat_ws(' ', ${fieldList})), websearch_to_tsquery('english', ?)) DESC
+      LIMIT 10;
+      `
+    try {
+      const result = await knex.raw(sql, [
+        searchQuery,
+        searchQuery,
+        searchQuery,
+      ])
+      searchResults = result.rows
+    } catch (error: any) {
+      console.error('Error searching metadata:', error.message)
+      throw error
+    }
+    return searchResults
   }
 }
 
