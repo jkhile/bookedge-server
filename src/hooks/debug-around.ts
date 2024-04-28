@@ -12,58 +12,58 @@ export function debugAround<H extends HookContext = HookContext>(
   ...fieldNames: string[]
 ) {
   return async (context: H, next: NextFunction) => {
-    console.log(
+    console.debug(
       `* ${message || ''}\nbefore type:${context.type}, method: ${
         context.method
       }`,
     )
     if (context.data) {
-      console.log('data:', context.data)
+      console.debug('data:', context.data)
     }
     if (context.params && context.params.query) {
-      console.log('query:', context.params.query)
+      console.debug('query:', context.params.query)
     }
     if (context.result) {
-      console.log('result:', context.result)
+      console.debug('result:', context.result)
     }
 
     const paramsBefore = context.params || {}
-    console.log('params props:', Object.keys(paramsBefore).sort())
+    console.debug('params props:', Object.keys(paramsBefore).sort())
 
     for (const fieldName of fieldNames) {
-      console.log(`params.${fieldName}:`, paramsBefore[fieldName])
+      console.debug(`params.${fieldName}:`, paramsBefore[fieldName])
     }
 
     if (context.error) {
-      console.log('error', context.error)
+      console.debug('error', context.error)
     }
 
     await next()
 
-    console.log(
+    console.debug(
       `* ${message || ''}\nafter type:${context.type}, method: ${
         context.method
       }`,
     )
     if (context.data) {
-      console.log('data:', context.data)
+      console.debug('data:', context.data)
     }
     if (context.params && context.params.query) {
-      console.log('query:', context.params.query)
+      console.debug('query:', context.params.query)
     }
     if (context.result) {
-      console.log('result:', context.result)
+      console.debug('result:', context.result)
     }
 
     const paramsAfter = context.params || {}
-    console.log('params props:', Object.keys(paramsAfter).sort())
+    console.debug('params props:', Object.keys(paramsAfter).sort())
 
     for (const fieldName of fieldNames) {
-      console.log(`params.${fieldName}:`, paramsAfter[fieldName])
+      console.debug(`params.${fieldName}:`, paramsAfter[fieldName])
     }
 
     if (context.error) {
-      console.log('error', context.error)
+      console.debug('error', context.error)
     }
   }
 }

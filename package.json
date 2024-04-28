@@ -5,16 +5,16 @@
   "homepage": "",
   "private": true,
   "keywords": [
-    "feathers"
+    "feathers", "bookedge"
   ],
   "author": {
     "name": "John Hile",
-    "email": "John.Hile@FrontEdgePublishing.com"
+    "email": "john.hile@frontedgepublishing.com"
   },
-  "contributors": [],
+  "contributors": ["dmitri.barvinok@frontedgepublishing.com"],
   "bugs": {},
   "engines": {
-    "node": ">= 21.1.0"
+    "node": ">= 20.12.0"
   },
   "feathers": {
     "language": "ts",
@@ -43,6 +43,7 @@
     "check": "pnpm prettier && pnpm lint && echo '\\033[0;32m*** lint finished ***\\033[0m' && pnpm bundle:client && echo '\n\\033[0;32m*** bundle finished ***\\033[0m\n'",
     "lint": "eslint ./src",
     "compile": "shx rm -rf lib/ && tsc",
+    "build": "pnpm check && pnpm compile",
     "start": "node lib/",
     "prettier": "npx prettier \"**/*.ts\" --write",
     "mocha": "cross-env NODE_ENV=test mocha test/ --require ts-node/register --recursive --extension .ts --exit",

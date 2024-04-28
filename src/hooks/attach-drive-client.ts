@@ -2,7 +2,7 @@
 import type { HookContext } from '../declarations'
 
 export const attachDriveClient = async (context: HookContext) => {
-  console.log(
+  console.info(
     `Running hook attachDriveClient on ${context.path}.${context.method}`,
   )
   return context
