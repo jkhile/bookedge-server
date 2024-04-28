@@ -1,17 +1,20 @@
 {
   "name": "bookedge-server",
   "description": "Server component of the FEP BookEdge system",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "",
   "private": true,
   "keywords": [
-    "feathers", "bookedge"
+    "feathers",
+    "bookedge"
   ],
   "author": {
     "name": "John Hile",
     "email": "john.hile@frontedgepublishing.com"
   },
-  "contributors": ["dmitri.barvinok@frontedgepublishing.com"],
+  "contributors": [
+    "dmitri.barvinok@frontedgepublishing.com"
+  ],
   "bugs": {},
   "engines": {
     "node": ">= 20.12.0"
