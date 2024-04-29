@@ -13,7 +13,7 @@
   },
   "postgresql": {
     "client": "pg",
-    "connection": "POSTGRESQL_CONNECTION"
+    "connection": "DATABASE_URL"
   },
   "authentication": {
     "entity": "user",

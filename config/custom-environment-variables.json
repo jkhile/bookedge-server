@@ -5,7 +5,7 @@
   },
   "host": "HOST",
   "postgresql": {
-    "connection": "POSTGRESQL_CONNECTION"
+    "connection": "DATABASE_URL"
   },
   "authentication": {
     "secret": "FEATHERS_SECRET",
