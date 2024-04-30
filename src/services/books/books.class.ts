@@ -29,7 +29,7 @@ export class BookService<
     let searchResults: string[] = []
     const sql = `
       SELECT id, title, ts_headline('english', concat_ws(' ', ${fieldList}), websearch_to_tsquery('english', ?),
-        'MaxFragments=5, FragmentDelimiter="</br></br>"') AS headline
+        'ShortWord=0, MaxFragments=5, FragmentDelimiter="</br></br>"') AS headline
       FROM books
       WHERE to_tsvector('english', concat_ws(' ', ${fieldList})) @@ websearch_to_tsquery('english', ?)
       ORDER BY ts_rank_cd(to_tsvector('english', concat_ws(' ', ${fieldList})), websearch_to_tsquery('english', ?)) DESC
