@@ -33,7 +33,7 @@ export class BookService<
       FROM books
       WHERE to_tsvector('english', concat_ws(' ', ${fieldList})) @@ websearch_to_tsquery('english', ?)
       ORDER BY ts_rank_cd(to_tsvector('english', concat_ws(' ', ${fieldList})), websearch_to_tsquery('english', ?)) DESC
-      LIMIT 10;
+      LIMIT 500;
       `
     try {
       const result = await knex.raw(sql, [
@@ -57,33 +57,3 @@ export const getOptions = (app: Application): KnexAdapterOptions => {
     name: 'books',
   }
 }
-
-// export class BookService<
-//   ServiceParams extends Params = BookParams,
-// > extends KnexService<Book, BookData, BookParams, BookPatch> {
-//   async search(
-//     params: ServiceParams & { query: BookSearchQuery },
-//   ): Promise<string[]> {
-//     const { fields, query } = params.query
-//     const knex = this.getModel(params)
-
-//     const result = await knex.raw(
-//       `
-//       SELECT ts_headline(
-//         'english',
-//         string_agg(concat_ws(' ', ${fields.map((field) => `"${field}"`).join(', ')}), ' '),
-//         websearch_to_tsquery('english', ?),
-//         'StartSel=<mark>, StopSel=</mark>, MaxFragments=1, MaxWords=10, MinWords=5'
-//       ) AS headline
-//       FROM books
-//       WHERE to_tsvector('english', concat_ws(' ', ${fields.map((field) => `"${field}"`).join(', ')})) @@ websearch_to_tsquery('english', ?)
-//       GROUP BY id
-//       ORDER BY ts_rank_cd(to_tsvector('english', concat_ws(' ', ${fields.map((field) => `"${field}"`).join(', ')})), websearch_to_tsquery('english', ?)) DESC
-//       LIMIT 10
-//     `,
-//       [query, query, query],
-//     )
-
-//     return result.rows.map((row: { headline: string }) => row.headline)
-//   }
-// }
