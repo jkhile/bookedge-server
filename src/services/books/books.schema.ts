@@ -82,7 +82,7 @@ export const bookSchema = Type.Object(
     legal_notice: Type.String(),
     featured_ads: Type.String(),
     goodreads_reviews_link: Type.String(),
-    amazon_reviews_link: Type.String(),
+    amazon_sales_page_link: Type.String(),
     amazon_a_plus_link: Type.String(),
     a_plus_description_1: Type.String(),
     a_plus_text_1: Type.String(),

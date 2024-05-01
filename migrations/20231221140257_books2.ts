@@ -57,7 +57,7 @@ export async function up(knex: Knex): Promise<void> {
     table.text('legal_notice').defaultTo('')
     table.text('featured_ads').defaultTo('')
     table.text('goodreads_reviews_link').defaultTo('')
-    table.text('amazon_reviews_link').defaultTo('')
+    table.text('amazon_sales_page_link').defaultTo('')
     table.text('amazon_a_plus_link').defaultTo('')
     table.text('a_plus_description_1').defaultTo('')
     table.text('a_plus_text_1').defaultTo('')
