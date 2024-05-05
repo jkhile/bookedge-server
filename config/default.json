@@ -5,7 +5,8 @@
   "origins": [
     "http://localhost:3000",
     "http://localhost:3001",
-    "http://localhost:5173"
+    "http://localhost:5173",
+    "https://fep-bookedge-staging-41e62613a6a4.herokuapp.com"
   ],
   "paginate": {
     "default": 4000,
