@@ -36,6 +36,7 @@ app.use(bodyParser())
 
 // Configure services and transports
 app.configure(rest())
+console.log('app.get("origins"):', app.get('origins'))
 app.configure(
   socketio({
     cors: {
