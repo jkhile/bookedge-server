@@ -41,6 +41,7 @@ app.configure(
   socketio({
     cors: {
       origin: app.get('origins'),
+      methods: ['GET', 'POST'],
     },
   }),
 )
