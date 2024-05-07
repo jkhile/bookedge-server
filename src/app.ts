@@ -37,11 +37,27 @@ app.use(bodyParser())
 // Configure services and transports
 app.configure(rest())
 console.log('app.get("origins"):', app.get('origins'))
+// app.configure(
+//   socketio({
+//     cors: {
+//       origin: app.get('origins'),
+//       methods: ['GET', 'POST'],
+//     },
+//   }),
+// )
 app.configure(
   socketio({
     cors: {
-      origin: app.get('origins'),
-      methods: ['GET', 'POST'],
+      origin: (origin, callback) => {
+        console.log('origin:', origin)
+        // @ts-ignore
+        if (app.get('origins').includes(origin)) {
+          // eslint-disable-next-line unicorn/no-null
+          callback(null, true)
+        } else {
+          callback(new Error('Not allowed by CORS'))
+        }
+      },
     },
   }),
 )
