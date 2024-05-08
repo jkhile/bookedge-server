@@ -50,13 +50,15 @@ app.configure(
     cors: {
       origin: (origin, callback) => {
         console.log('origin:', origin)
-        // @ts-ignore
-        if (app.get('origins').includes(origin)) {
-          // eslint-disable-next-line unicorn/no-null
-          callback(null, true)
-        } else {
-          callback(new Error('Not allowed by CORS'))
-        }
+        // eslint-disable-next-line unicorn/no-null
+        callback(null, true)
+        // // @ts-ignore
+        // if (app.get('origins').includes(origin)) {
+        //   // eslint-disable-next-line unicorn/no-null
+        //   callback(null, true)
+        // } else {
+        //   callback(new Error('Not allowed by CORS'))
+        // }
       },
     },
   }),
