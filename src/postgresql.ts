@@ -15,7 +15,11 @@ export const postgresql = (app: Application) => {
     config.connection = `${config?.connection}?sslmode=require`
   }
   console.log('config:', config)
-  const db = knex(config!)
-
-  app.set('postgresqlClient', db)
+  try {
+    const db = knex(config!)
+    app.set('postgresqlClient', db)
+  } catch (error: any) {
+    console.log('error creating db:', error)
+  }
+  console.log('db created successsfully!')
 }
