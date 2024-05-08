@@ -36,7 +36,6 @@ app.use(bodyParser())
 
 // Configure services and transports
 app.configure(rest())
-console.log('app.get("origins"):', app.get('origins'))
 // app.configure(
 //   socketio({
 //     cors: {
@@ -49,7 +48,6 @@ app.configure(
   socketio({
     cors: {
       origin: (origin, callback) => {
-        console.log('origin:', origin)
         // eslint-disable-next-line unicorn/no-null
         callback(null, true)
         // // @ts-ignore
