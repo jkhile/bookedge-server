@@ -10,8 +10,10 @@ declare module './declarations' {
 }
 
 export const postgresql = (app: Application) => {
-  console.log('process.env:', process.env)
   const config = app.get('postgresql')
+  if (process.env.NODE_ENV === 'production' && config) {
+    config.connection = `${config?.connection}?sslmode=require`
+  }
   console.log('config:', config)
   const db = knex(config!)
 
