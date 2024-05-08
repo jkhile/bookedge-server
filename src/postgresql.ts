@@ -10,9 +10,17 @@ declare module './declarations' {
 }
 
 export const postgresql = (app: Application) => {
-  const config = app.get('postgresql')
-  if (process.env.NODE_ENV === 'production' && config) {
-    config.connection = `${config?.connection}?sslmode=require`
+  const config_ = app.get('postgresql')
+  let config = config_
+  if (process.env.NODE_ENV === 'production' && config_) {
+    config = {
+      client: 'pg',
+      connection: {
+        // @ts-ignore
+        connectionString: config_.connection,
+        ssl: { rejectUnauthorized: false },
+      },
+    }
   }
   console.log('config:', config)
   try {
