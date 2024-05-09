@@ -22,12 +22,10 @@ export const postgresql = (app: Application) => {
       },
     }
   }
-  console.log('config:', config)
   try {
     const db = knex(config!)
     app.set('postgresqlClient', db)
   } catch (error: any) {
-    console.log('error creating db:', error)
+    console.error('error creating db:', error)
   }
-  console.log('db created successsfully!')
 }
