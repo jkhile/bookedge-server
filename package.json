@@ -1,7 +1,7 @@
 {
   "name": "bookedge-server",
   "description": "Server component of the FEP BookEdge system",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "homepage": "",
   "private": true,
   "keywords": [
