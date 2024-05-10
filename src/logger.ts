@@ -21,8 +21,8 @@ export const logger = winston.createLogger({
     winston.format.json(),
   ),
   transports: [
-    // new winston.transports.File({ filename: logFile }),
-    new winston.transports.Console(),
+    new winston.transports.File({ filename: logFile }),
+    // new winston.transports.Console(),
   ],
 })
 
