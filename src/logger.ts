@@ -1,7 +1,7 @@
+// src/logger.ts
 import { format } from 'date-fns'
 import { pathExistsSync, readdirSync, removeSync, renameSync } from 'fs-extra'
 import winston from 'winston'
-// src/logger.ts
 import { resolve } from 'node:path'
 
 // on initialization, create a new log file and cleanup any
