@@ -73,5 +73,4 @@ app.hooks({
   setup: [],
   teardown: [],
 })
-console.log('app.ts: app is ready to go!')
 export { app }
