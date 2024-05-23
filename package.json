@@ -72,7 +72,6 @@
     "@feathersjs/transport-commons": "^5.0.25",
     "@feathersjs/typebox": "^5.0.25",
     "coralogix-logger": "^1.1.30",
-    "coralogix-logger-winston": "^1.0.12",
     "date-fns": "^3.6.0",
     "fs-extra": "^11.2.0",
     "just-diff": "^6.0.2",
@@ -80,7 +79,8 @@
     "lodash": "^4.17.21",
     "pg": "^8.11.5",
     "pretty-format": "^29.7.0",
-    "winston": "^3.13.0"
+    "winston": "^3.13.0",
+    "winston-transport": "^4.7.0"
   },
   "devDependencies": {
     "@feathersjs/adapter-commons": "^5.0.25",
