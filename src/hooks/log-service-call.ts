@@ -8,9 +8,12 @@ export const logServiceCall = async (
   context: HookContext,
   next: NextFunction,
 ) => {
-  let simplifiedContext: Partial<HookContext> = {}
   // BEFORE:
-  if (context.path !== 'log-messages') {
+  context.logThis =
+    context.path !== 'log-messages' &&
+    process.env.DEBUG_SERVICES?.includes(context.path)
+  let simplifiedContext: Partial<HookContext> = {}
+  if (context.logThis) {
     simplifiedContext = pick(context, ['method', 'path', 'id'])
     simplifiedContext._type = 'before'
     simplifiedContext.params = simplifyParams(context.params)
@@ -18,7 +21,6 @@ export const logServiceCall = async (
       length: 500,
     })
 
-    // logger.debug(JSON.stringify(simplifiedContext))
     const { method, path, _type } = simplifiedContext
     logger.debug(
       `${_type || 'unknown'} ${method || 'unknown'} ${path || 'unknown'}`,
@@ -28,10 +30,9 @@ export const logServiceCall = async (
   await next()
 
   // AFTER:
-  if (context.path !== 'log-messages') {
+  if (context.logThis) {
     simplifiedContext = pick(context, ['method', 'path', 'result'])
     simplifiedContext._type = 'after'
-    // logger.debug(JSON.stringify(simplifiedContext))
     const { method, path, _type } = simplifiedContext
     logger.debug(
       `${_type || 'unknown'} ${method || 'unknown'} ${path || 'unknown'}`,
@@ -41,5 +42,8 @@ export const logServiceCall = async (
 }
 
 function simplifyParams(params: Params): Params {
-  return omit(params, ['authentication', 'connection', 'headers'])
+  const simplified = omit(params, ['authentication', 'connection', 'headers'])
+  delete simplified.user?.access_token
+  delete simplified.user?.refresh_token
+  return simplified
 }
