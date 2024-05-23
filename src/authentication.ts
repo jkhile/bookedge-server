@@ -2,6 +2,7 @@ import { AuthenticationService, JWTStrategy } from '@feathersjs/authentication'
 import { LocalStrategy } from '@feathersjs/authentication-local'
 import { logger } from './logger'
 import { oauth, OAuthStrategy } from '@feathersjs/authentication-oauth'
+import { logAuthenticationHook } from './hooks/log-authentication'
 // For more information about this file see https://dove.feathersjs.com/guides/cli/authentication.html
 import type { Params } from '@feathersjs/feathers'
 import type { OAuthProfile } from '@feathersjs/authentication-oauth'
@@ -26,6 +27,11 @@ export const authentication = (app: Application) => {
 
   app.use('authentication', authentication)
   app.configure(oauth())
+  app.service('authentication').hooks({
+    around: {
+      create: [logAuthenticationHook()],
+    },
+  })
 }
 
 class GoogleStrategy extends OAuthStrategy {
