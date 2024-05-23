@@ -76,7 +76,5 @@ function stringifyAndRemoveProperties(
 
   // Remove any trailing commas left after property removal
   // eslint-disable-next-line unicorn/prefer-string-replace-all
-  const cleanedJsonString = updatedJsonString.replace(/,(?=\s*[\]}])/g, '')
-  console.log('cleanedJsonString:', cleanedJsonString)
-  return cleanedJsonString
+  return updatedJsonString.replace(/,(?=\s*[\]}])/g, '')
 }
