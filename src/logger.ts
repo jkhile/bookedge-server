@@ -3,6 +3,7 @@ import { format } from 'date-fns'
 import { pathExistsSync, readdirSync, removeSync, renameSync } from 'fs-extra'
 import winston from 'winston'
 import { resolve } from 'node:path'
+import { CoralogixTransport } from './utils/coralogix-transport'
 
 // on initialization, create a new log file and cleanup any
 // old log files
@@ -14,7 +15,7 @@ if (env === 'test') {
   rotateLogFiles()
 }
 
-export const logger = winston.createLogger({
+const winstonConfig = {
   level: 'debug',
   format: winston.format.combine(
     winston.format.timestamp(),
@@ -24,7 +25,17 @@ export const logger = winston.createLogger({
     new winston.transports.File({ filename: logFile }),
     // new winston.transports.Console(),
   ],
-})
+}
+
+if (process.env.CORALOGIX_LOGGER === 'true') {
+  winstonConfig.transports.push(
+    new CoralogixTransport(
+      {},
+    ) as unknown as winston.transports.FileTransportInstance,
+  )
+}
+
+export const logger = winston.createLogger(winstonConfig)
 
 function rotateLogFiles() {
   if (pathExistsSync(logFile)) {
