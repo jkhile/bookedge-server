@@ -16,12 +16,11 @@ export function logAuthenticationHook(): (
 
     // after
     // log the authentication event
-    console.log('logging authentication event')
     const { strategy } = context
     const user = context.result?.user
     if (user) {
       logger.info(
-        `${strategy} auth for ${user.id}, ${user.email}, ${user.name}`,
+        `${strategy} auth for id ${user.id}, ${user.email}, ${user.name}`,
       )
     }
   }
