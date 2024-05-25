@@ -24,6 +24,8 @@ export class BookService<
     params: ServiceParams & { query: BookSearchQuery },
   ): Promise<string[]> {
     const { fields, query: searchQuery } = params.query
+    console.log('searchQuery:', searchQuery)
+    console.log('params:', params)
     const knex = this.Model
     const fieldList = fields.map((field) => `${field}`).join(', ')
     let searchResults: string[] = []
