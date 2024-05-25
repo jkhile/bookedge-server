@@ -3,6 +3,7 @@ import type { HookContext, NextFunction } from '../declarations'
 import type { Params } from '@feathersjs/feathers'
 import { pick, omit } from 'lodash'
 import { logger } from '../logger'
+import { format as prettyFormat } from 'pretty-format'
 
 const removeProperties = [
   'access_token',
@@ -64,7 +65,7 @@ function stringifyAndRemoveProperties(
   object: object,
   propNames: string[],
 ): string {
-  const jsonString = JSON.stringify(object, undefined, 2)
+  const stringified = prettyFormat(object) // JSON.stringify can't handle circular references
   // Create a regular expression pattern to match the properties to remove
   const propPattern = new RegExp(
     `"(${propNames.join('|')})":\\s*"?[^"]*"?\\s*(?=,|}|])`,
@@ -72,9 +73,9 @@ function stringifyAndRemoveProperties(
   )
 
   // Replace the matched properties with an empty string
-  const updatedJsonString = jsonString.replace(propPattern, '')
+  const updatedStringified = stringified.replace(propPattern, '')
 
   // Remove any trailing commas left after property removal
   // eslint-disable-next-line unicorn/prefer-string-replace-all
-  return updatedJsonString.replace(/,(?=\s*[\]}])/g, '')
+  return updatedStringified.replace(/,(?=\s*[\]}])/g, '')
 }
