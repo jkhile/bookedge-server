@@ -36,12 +36,15 @@ export class BookService<
     const { searchTerm, fields } = data
     const knex = this.Model
     const fieldList = fields.map((field) => `${field}`).join(', ')
+    const user = params?.user
+    const allowedImprints = user?.allowed_imprints || []
     let searchResults = [] as unknown as SearchResults
     const sql = `
       SELECT id, title, ts_headline('english', concat_ws(' ', ${fieldList}), websearch_to_tsquery('english', ?),
         'ShortWord=0, MaxFragments=5, FragmentDelimiter="</br></br>"') AS headline
       FROM books
       WHERE to_tsvector('english', concat_ws(' ', ${fieldList})) @@ websearch_to_tsquery('english', ?)
+      AND fk_imprint IN (${allowedImprints.join(', ')})
       ORDER BY ts_rank_cd(to_tsvector('english', concat_ws(' ', ${fieldList})), websearch_to_tsquery('english', ?)) DESC
       LIMIT 500;
       `
