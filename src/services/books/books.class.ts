@@ -16,19 +16,27 @@ export type { Book, BookData, BookPatch, BookQuery, BookSearchQuery }
 
 export interface BookParams extends KnexAdapterParams<BookQuery> {}
 
-// By default calls the standard Knex adapter service methods but can be customized with your own functionality.
+export interface SearchData {
+  fields: string[]
+  searchTerm: string
+}
+
+export interface SearchResults {
+  id: number
+  title: string
+  headline: string
+}
+;[]
+
 export class BookService<
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ServiceParams extends Params = BookParams,
 > extends KnexService<Book, BookData, BookParams, BookPatch> {
-  async search(
-    params: ServiceParams & { query: BookSearchQuery },
-  ): Promise<string[]> {
-    const { fields, query: searchQuery } = params.query
-    console.log('searchQuery:', searchQuery)
-    console.log('params:', params)
+  async search(data: SearchData, params?: Params): Promise<SearchResults> {
+    const { searchTerm, fields } = data
     const knex = this.Model
     const fieldList = fields.map((field) => `${field}`).join(', ')
-    let searchResults: string[] = []
+    let searchResults = [] as unknown as SearchResults
     const sql = `
       SELECT id, title, ts_headline('english', concat_ws(' ', ${fieldList}), websearch_to_tsquery('english', ?),
         'ShortWord=0, MaxFragments=5, FragmentDelimiter="</br></br>"') AS headline
@@ -38,11 +46,7 @@ export class BookService<
       LIMIT 500;
       `
     try {
-      const result = await knex.raw(sql, [
-        searchQuery,
-        searchQuery,
-        searchQuery,
-      ])
+      const result = await knex.raw(sql, [searchTerm, searchTerm, searchTerm])
       searchResults = result.rows
     } catch (error: any) {
       console.error('Error searching metadata:', error.message)
