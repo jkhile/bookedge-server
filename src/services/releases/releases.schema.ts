@@ -69,6 +69,7 @@ export const releaseSchema = Type.Object(
     kdp_match_book: Type.Boolean(),
     asin: Type.String(),
     drm: Type.Boolean(),
+    kdp_royalty_type: Type.String(),
     amazon_sales_page: Type.String(),
     bn_sales_page: Type.String(),
     apple_sales_page: Type.String(),
