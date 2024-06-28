@@ -42,7 +42,6 @@ export class BookService<
     const imprintsPhrase = isAdmin
       ? ''
       : `AND fk_imprint IN (${allowedImprints?.join(', ')})`
-    console.log('isAdmin:', isAdmin)
     let searchResults = [] as unknown as SearchResults
     const sql = `
       SELECT id, title, ts_headline('english', concat_ws(' ', ${fieldList}), websearch_to_tsquery('english', ?),
