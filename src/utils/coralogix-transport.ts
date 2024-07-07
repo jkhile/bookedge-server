@@ -9,10 +9,17 @@ export class CoralogixTransport extends Transport {
   constructor(options: any) {
     super(options)
 
+    const appHost = process.env.HOST
+    let subsystemName = 'development'
+    if (appHost?.includes('staging')) {
+      subsystemName = 'staging'
+    } else if (appHost?.includes('production')) {
+      subsystemName = 'production'
+    }
     const config = new LoggerConfig({
-      applicationName: 'BookEdge',
+      applicationName: 'bookedge-server',
       privateKey: coralogixKey,
-      subsystemName: 'server',
+      subsystemName,
     })
     CoralogixLogger.configure(config)
     this.coralogixLogger = new CoralogixLogger('a-category')
