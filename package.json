@@ -90,7 +90,7 @@
     "@types/fs-extra": "^11.0.4",
     "@types/lodash": "^4.17.6",
     "@types/mocha": "^10.0.7",
-    "@types/node": "^20.14.9",
+    "@types/node": "^20.14.10",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "axios": "^1.7.2",
@@ -101,12 +101,12 @@
     "eslint-plugin-unicorn": "^51.0.1",
     "eslint-plugin-vitest": "^0.3.26",
     "eslint-plugin-vitest-globals": "^1.5.0",
-    "mocha": "^10.5.2",
+    "mocha": "^10.6.0",
     "nodemon": "^3.1.4",
     "prettier": "^3.3.2",
     "shx": "^0.3.4",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.2",
+    "typescript": "^5.5.3",
     "vitest": "^1.6.0"
   }
 }
