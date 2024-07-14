@@ -1,3 +1,5 @@
 {
-  "port": "PORT"
+  "host": "HOST",
+  "port": "PORT",
+  "public": "./public/"
 }
