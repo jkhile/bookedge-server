@@ -10,12 +10,14 @@ export class CoralogixTransport extends Transport {
     super(options)
 
     const appHost = process.env.HOST
+    console.log('appHost:', appHost)
     let subsystemName = 'development'
     if (appHost?.includes('staging')) {
       subsystemName = 'staging'
     } else if (appHost?.includes('production')) {
       subsystemName = 'production'
     }
+    console.log('subsystemName:', subsystemName)
     const config = new LoggerConfig({
       applicationName: 'bookedge-server',
       privateKey: coralogixKey,

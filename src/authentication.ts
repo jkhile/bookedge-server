@@ -2,8 +2,6 @@ import { AuthenticationService, JWTStrategy } from '@feathersjs/authentication'
 import { LocalStrategy } from '@feathersjs/authentication-local'
 import { logger } from './logger'
 import { oauth, OAuthStrategy } from '@feathersjs/authentication-oauth'
-import { logAuthenticationHook } from './hooks/log-authentication'
-import { logSignoutsHook } from './hooks/log-signouts'
 // For more information about this file see https://dove.feathersjs.com/guides/cli/authentication.html
 import type { Params } from '@feathersjs/feathers'
 import type { OAuthProfile } from '@feathersjs/authentication-oauth'
@@ -28,14 +26,6 @@ export const authentication = (app: Application) => {
 
   app.use('authentication', authentication)
   app.configure(oauth())
-  app.service('authentication').hooks({
-    around: {
-      create: [logAuthenticationHook()],
-    },
-    after: {
-      remove: [logSignoutsHook()],
-    },
-  })
 }
 
 class GoogleStrategy extends OAuthStrategy {
@@ -80,7 +70,7 @@ class GoogleStrategy extends OAuthStrategy {
       (await this.findEntityByEmail(profile, params)) ||
       (await this.getCurrentEntity(params))
     if (!existingEntity) {
-      logger.error('No existing entity found, throwing error')
+      logger.warning('No existing entity found, throwing error')
       throw new Error('User not recognized')
     }
     const authEntity = existingEntity

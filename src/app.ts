@@ -9,6 +9,7 @@ import { logServiceCall } from './hooks/log-service-call'
 import { postgresql } from './postgresql'
 import { services } from './services/index'
 import { errorHandler } from './utils/error-handler'
+
 // For more information about this file see https://dove.feathersjs.com/guides/cli/application.html
 import {
   bodyParser,
@@ -21,6 +22,7 @@ import {
 } from '@feathersjs/koa'
 
 import type { Application } from './declarations'
+import { logger } from './logger'
 
 const app: Application = koa(feathers())
 
@@ -58,6 +60,20 @@ app.configure(postgresql)
 app.configure(authentication)
 app.configure(services)
 app.configure(channels)
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.on('login', (authResult, { connection }) => {
+  logger.info(
+    `${authResult.authentication.strategy} login by ${authResult.user.email}`,
+  )
+})
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.on('logout', (authResult, { connection }) => {
+  logger.info(
+    `${authResult.authentication.strategy} logout by ${authResult.user.email}`,
+  )
+})
 
 // Register hooks that run on all service methods
 app.hooks({
