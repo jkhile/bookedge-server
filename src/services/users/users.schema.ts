@@ -34,6 +34,7 @@ export const userSchema = Type.Object(
     ),
     allowed_imprints: Type.Array(Type.Integer()),
     allowed_books: Type.Array(Type.Integer()),
+    pinned_books: Type.Array(Type.Integer()),
     fk_created_by: Type.Optional(Type.Integer()),
     created_at: Type.Optional(Type.String()),
   },
