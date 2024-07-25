@@ -5,8 +5,7 @@ import winston from 'winston'
 import { resolve } from 'node:path'
 import { CoralogixTransport } from './utils/coralogix-transport'
 
-// on initialization, create a new log file and cleanup any
-// old log files
+// on initialization, create a new log file and cleanup any old log files
 const env = process.env.NODE_ENV || 'development'
 const logFile = `./debug-${env}.log`
 if (env === 'test') {

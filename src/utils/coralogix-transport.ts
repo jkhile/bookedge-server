@@ -11,14 +11,12 @@ export class CoralogixTransport extends Transport {
     super(options)
 
     const appHost = process.env.HOST
-    console.log('appHost:', appHost)
     let subsystemName = 'development'
     if (appHost?.includes('staging')) {
       subsystemName = 'staging'
     } else if (appHost?.includes('production')) {
       subsystemName = 'production'
     }
-    console.log('subsystemName:', subsystemName)
     const config = new LoggerConfig({
       applicationName: 'bookedge-server',
       privateKey: coralogixKey,
@@ -29,7 +27,6 @@ export class CoralogixTransport extends Transport {
   }
 
   log(info: any, callback: () => void) {
-    console.log('info:', info)
     // info will have message, level and timestamp properties
     setImmediate(() => {
       this.emit('logged', info)
@@ -38,7 +35,6 @@ export class CoralogixTransport extends Transport {
       severity: getSeverity(info.level),
       text: JSON.stringify(info),
     })
-    console.log('log:', log)
     this.coralogixLogger.addLog(log)
 
     callback()

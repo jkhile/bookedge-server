@@ -8,10 +8,8 @@ export const logError = async (context: HookContext, next: NextFunction) => {
     await next()
   } catch (error: any) {
     if (error.message.includes('uthenticated')) {
-      console.log('logging info', error.message)
       logger.info(error.message)
     } else {
-      console.log('logging error', error.message)
       logger.error(error.stack)
       if (error.data) {
         logger.error(`Error Data: ${JSON.stringify(error.data)}`)
