@@ -17,6 +17,7 @@ export const contributorSchema = Type.Object(
     legal_name: Type.String(),
     published_name: Type.String(),
     biography: Type.String(),
+    biography_finalized: Type.Boolean(),
     email: Type.String(),
     address: Type.String(),
     phone: Type.String(),
