@@ -1,0 +1,15 @@
+import type { Knex } from 'knex'
+
+export async function up(knex: Knex): Promise<void> {
+  await knex.schema.alterTable('', (table) => {
+    // table.dropColumn('text')
+    // table.text('imprint_name').defaultTo('')
+    // table.integer('fk_created_by').unsigned().references('users.id')
+  })
+}
+
+export async function down(knex: Knex): Promise<void> {
+  await knex.schema.alterTable('imprints', (table) => {
+    // table.dropColumn('imprint_name')
+  })
+}
