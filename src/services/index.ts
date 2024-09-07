@@ -1,3 +1,4 @@
+import { mentions } from './mentions/mentions'
 import { issue } from './issues/issues'
 import { pricing } from './pricings/pricings'
 import { endorsement } from './endorsements/endorsements'
@@ -12,6 +13,7 @@ import { user } from './users/users'
 import type { Application } from '../declarations'
 
 export const services = (app: Application) => {
+  app.configure(mentions)
   app.configure(issue)
   app.configure(pricing)
   app.configure(endorsement)

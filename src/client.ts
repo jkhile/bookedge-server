@@ -11,6 +11,14 @@ import { userClient } from './services/users/users.shared'
 import type { TransportConnection, Application } from '@feathersjs/feathers'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
+import { mentionsClient } from './services/mentions/mentions.shared'
+export type {
+  Mentions,
+  MentionsData,
+  MentionsQuery,
+  MentionsPatch,
+} from './services/mentions/mentions.shared'
+
 import { issueClient } from './services/issues/issues.shared'
 export type {
   Issue,
@@ -121,5 +129,6 @@ export const createClient = <Configuration = any>(
   client.configure(endorsementClient)
   client.configure(pricingClient)
   client.configure(issueClient)
+  client.configure(mentionsClient)
   return client
 }
