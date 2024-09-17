@@ -26,6 +26,8 @@ export const bookSchema = Type.Object(
     subtitle: Type.String(),
     subtitle_finalized: Type.Boolean(),
     accounting_code: Type.String(),
+    fep_percentage_share: Type.Number(),
+    fep_fixed_share: Type.Number(),
     status: Type.Union([
       Type.Literal('archived'),
       Type.Literal('contract negotiation'),
@@ -57,6 +59,8 @@ export const bookSchema = Type.Object(
     is_public_domain: Type.Boolean(),
     keywords: Type.String(),
     keywords_finalized: Type.Boolean(),
+    kdp_keywords: Type.String(),
+    kdp_keywords_finalized: Type.Boolean(),
     bisac_code_1: Type.String(),
     bisac_name_1: Type.String(),
     bisac_code_2: Type.String(),
