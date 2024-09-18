@@ -11,6 +11,14 @@ import { userClient } from './services/users/users.shared'
 import type { TransportConnection, Application } from '@feathersjs/feathers'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
+import { reviewQuotesClient } from './services/review-quotes/review-quotes.shared'
+export type {
+  ReviewQuotes,
+  ReviewQuotesData,
+  ReviewQuotesQuery,
+  ReviewQuotesPatch,
+} from './services/review-quotes/review-quotes.shared'
+
 import { mentionsClient } from './services/mentions/mentions.shared'
 export type {
   Mentions,
@@ -130,5 +138,6 @@ export const createClient = <Configuration = any>(
   client.configure(pricingClient)
   client.configure(issueClient)
   client.configure(mentionsClient)
+  client.configure(reviewQuotesClient)
   return client
 }
