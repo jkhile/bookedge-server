@@ -11,6 +11,14 @@ import { userClient } from './services/users/users.shared'
 import type { TransportConnection, Application } from '@feathersjs/feathers'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
+import { signinHistoryClient } from './services/signin-history/signin-history.shared'
+export type {
+  SigninHistory,
+  SigninHistoryData,
+  SigninHistoryQuery,
+  SigninHistoryPatch,
+} from './services/signin-history/signin-history.shared'
+
 import { reviewQuotesClient } from './services/review-quotes/review-quotes.shared'
 export type {
   ReviewQuotes,
@@ -139,5 +147,6 @@ export const createClient = <Configuration = any>(
   client.configure(issueClient)
   client.configure(mentionsClient)
   client.configure(reviewQuotesClient)
+  client.configure(signinHistoryClient)
   return client
 }
