@@ -1,3 +1,4 @@
+import { signinHistory } from './signin-history/signin-history'
 import { reviewQuotes } from './review-quotes/review-quotes'
 import { mentions } from './mentions/mentions'
 import { issue } from './issues/issues'
@@ -14,6 +15,7 @@ import { user } from './users/users'
 import type { Application } from '../declarations'
 
 export const services = (app: Application) => {
+  app.configure(signinHistory)
   app.configure(reviewQuotes)
   app.configure(mentions)
   app.configure(issue)

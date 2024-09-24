@@ -66,6 +66,15 @@ app.on('login', (authResult, { connection }) => {
   logger.info(
     `${authResult.authentication.strategy} login by ${authResult.user.email}`,
   )
+  // record this signin in the signin-history service
+  app.service('signin-history').create({
+    op: 'signin',
+    strategy: authResult.authentication.strategy,
+    fk_user: authResult.user.id,
+    user_email: authResult.user.email,
+    user_name: authResult.user.name,
+    datetime: new Date().toISOString(),
+  })
 })
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -73,6 +82,15 @@ app.on('logout', (authResult, { connection }) => {
   logger.info(
     `${authResult.authentication.strategy} logout by ${authResult.user.email}`,
   )
+  // record this signout in the signin-history service
+  app.service('signin-history').create({
+    op: 'signout',
+    strategy: authResult.authentication.strategy,
+    fk_user: authResult.user.id,
+    user_email: authResult.user.email,
+    user_name: authResult.user.name,
+    datetime: new Date().toISOString(),
+  })
 })
 
 // Register hooks that run on all service methods
