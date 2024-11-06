@@ -11,6 +11,14 @@ import { userClient } from './services/users/users.shared'
 import type { TransportConnection, Application } from '@feathersjs/feathers'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
+import { fileStorageClient } from './services/file-storage/file-storage.shared'
+export type {
+  FileStorage,
+  FileStorageData,
+  FileStorageQuery,
+  FileStoragePatch,
+} from './services/file-storage/file-storage.shared'
+
 import { signinHistoryClient } from './services/signin-history/signin-history.shared'
 export type {
   SigninHistory,
@@ -148,5 +156,6 @@ export const createClient = <Configuration = any>(
   client.configure(mentionsClient)
   client.configure(reviewQuotesClient)
   client.configure(signinHistoryClient)
+  client.configure(fileStorageClient)
   return client
 }
