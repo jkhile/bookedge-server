@@ -11,13 +11,13 @@ export const fileStorageHook = async (context: HookContext) => {
     const user = result.user
 
     // Check if user already has a file storage folder
-    if (user.file_storage_id) {
-      await validateFileStorage(user.file_storage_id, user)
+    if (user.file_storage_id && result.access_token) {
+      await validateFileStorage(user.file_storage_id, result)
     } else {
-      if (user.googleId) {
+      if (user.googleId && result.access_token) {
         // Initialize OAuth2 client with user's access token
         const auth = new google.auth.OAuth2()
-        auth.setCredentials({ access_token: user.access_token })
+        auth.setCredentials({ access_token: result.access_token })
 
         // Initialize drive client with authenticated auth object
         const drive = google.drive({ version: 'v3', auth })
@@ -48,11 +48,11 @@ export const fileStorageHook = async (context: HookContext) => {
 
 async function validateFileStorage(
   fileStorageId: string,
-  user: any,
+  access_token: string,
 ): Promise<void> {
   // Initialize OAuth2 client with user's access token
   const auth = new google.auth.OAuth2()
-  auth.setCredentials({ access_token: user.access_token })
+  auth.setCredentials({ access_token })
   // Initialize drive client with authenticated auth object
   const drive = google.drive({ version: 'v3', auth })
   const response = await drive.files.get({
