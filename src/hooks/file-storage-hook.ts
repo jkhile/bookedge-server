@@ -42,7 +42,7 @@ export const fileStorageHook = async (context: HookContext) => {
       }
     }
   } catch (error: any) {
-    console.log('error in hook:', error)
+    console.error('error in hook:', error)
   }
 }
 
