@@ -20,6 +20,7 @@ export const userSchema = Type.Object(
     access_token: Type.Optional(Type.String()),
     access_token_expires: Type.Optional(Type.String()),
     refresh_token: Type.Optional(Type.String()),
+    file_storage_id: Type.Optional(Type.String()),
     status: Type.Union([Type.Literal('active'), Type.Literal('archived')]),
     roles: Type.Array(
       Type.Union([

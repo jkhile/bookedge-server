@@ -10,6 +10,7 @@ import {
   AuthenticationRequest,
   AuthenticationParams,
 } from '@feathersjs/authentication'
+import { fileStorageHook } from './hooks/file-storage-hook'
 
 declare module './declarations' {
   interface ServiceTypes {
@@ -25,6 +26,11 @@ export const authentication = (app: Application) => {
   authentication.register('google', new GoogleStrategy())
 
   app.use('authentication', authentication)
+  app.service('authentication').hooks({
+    after: {
+      create: [fileStorageHook],
+    },
+  })
   app.configure(oauth())
 }
 
