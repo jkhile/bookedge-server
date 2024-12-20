@@ -1,71 +1,118 @@
 /* eslint-disable no-console */
 import type { HookContext } from '../declarations'
+import type { User } from '../services/users/users'
 import { google } from 'googleapis'
+import { Forbidden, GeneralError } from '@feathersjs/errors'
+import { logger } from '../logger'
 
-const fileStorageFolderName = 'fep_bookedge'
+const FOLDER_NAME = 'fep_bookedge'
+const FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder'
+const REQUIRED_SCOPES = [
+  'openid',
+  'email',
+  'profile',
+  'https://www.googleapis.com/auth/drive.file',
+]
 
-export const fileStorageHook = async (context: HookContext) => {
-  try {
-    const { app, result } = context
-    const userService = app.service('users')
-    const user = result.user
+interface AuthResult {
+  user: User
+  accessToken: string
+}
 
-    // Check if user already has a file storage folder
-    if (user.file_storage_id && result.access_token) {
-      await validateFileStorage(user.file_storage_id, result)
-    } else {
-      if (user.googleId && result.access_token) {
-        // Initialize OAuth2 client with user's access token
-        const auth = new google.auth.OAuth2()
-        auth.setCredentials({ access_token: result.access_token })
+async function createDriveClient(accessToken: string) {
+  const auth = new google.auth.OAuth2()
+  auth.setCredentials({
+    access_token: accessToken,
+    scope: REQUIRED_SCOPES.join(' '),
+  })
 
-        // Initialize drive client with authenticated auth object
-        const drive = google.drive({ version: 'v3', auth })
-
-        const listResults = await drive.files.list({
-          q: "mimeType='application/vnd.google-apps.folder' and name='fep_bookedge' and trashed=false",
-        })
-
-        if (!listResults.data.files || listResults.data.files.length === 0) {
-          const newFolder = await drive.files.create({
-            requestBody: {
-              name: fileStorageFolderName,
-              mimeType: 'application/vnd.google-apps.folder',
-              parents: ['root'],
-            },
-          })
-          // newFolder.data.id has the id of the newly created folder
-          await userService.patch(user.id, {
-            file_storage_id: newFolder.data.id as string,
-          })
-        }
-      }
-    }
-  } catch (error: any) {
-    console.error('error in hook:', error)
-  }
+  return google.drive({ version: 'v3', auth })
 }
 
 async function validateFileStorage(
-  fileStorageId: string,
-  access_token: string,
+  fileId: string,
+  accessToken: string,
 ): Promise<void> {
-  // Initialize OAuth2 client with user's access token
-  const auth = new google.auth.OAuth2()
-  auth.setCredentials({ access_token })
-  // Initialize drive client with authenticated auth object
-  const drive = google.drive({ version: 'v3', auth })
-  const response = await drive.files.get({
-    fileId: fileStorageId,
-    fields: 'id, name, mimeType',
-  })
+  try {
+    const drive = await createDriveClient(accessToken)
 
-  const folder = response.data
-  if (
-    !folder ||
-    folder.mimeType !== 'application/vnd.google-apps.folder' ||
-    folder.name !== fileStorageFolderName
-  ) {
-    throw new Error('Invalid file storage folder')
+    const response = await drive.files.get({
+      fileId,
+      fields: 'id, name, mimeType',
+    })
+
+    const folder = response.data
+    if (
+      !folder ||
+      folder.mimeType !== FOLDER_MIME_TYPE ||
+      folder.name !== FOLDER_NAME
+    ) {
+      throw new Forbidden('Invalid file storage folder')
+    }
+  } catch (error) {
+    logger.error('Storage validation failed:', error)
+    if (error instanceof Error) {
+      throw new GeneralError(`Failed to validate storage: ${error.message}`)
+    }
+    throw error
+  }
+}
+
+export const fileStorageHook = async (context: HookContext) => {
+  const { app, result } = context
+  const authResult = result as AuthResult
+
+  if (!authResult.user?.googleId || !authResult.user.access_token) {
+    return context
+  }
+
+  try {
+    const userService = app.service('users')
+
+    // Check existing storage
+    if (authResult.user.file_storage_id) {
+      await validateFileStorage(
+        authResult.user.file_storage_id,
+        authResult.accessToken,
+      )
+      return context
+    }
+
+    // Initialize drive client
+    const drive = await createDriveClient(authResult.user?.access_token)
+
+    // Check for existing folder
+    const listResults = await drive.files.list({
+      q: `mimeType='${FOLDER_MIME_TYPE}' and name='${FOLDER_NAME}' and trashed=false`,
+      spaces: 'drive',
+      fields: 'files(id, name)',
+    })
+
+    // Create folder if doesn't exist
+    if (!listResults.data.files?.length) {
+      const newFolder = await drive.files.create({
+        requestBody: {
+          name: FOLDER_NAME,
+          mimeType: FOLDER_MIME_TYPE,
+          parents: ['root'],
+        },
+        fields: 'id',
+      })
+
+      if (!newFolder.data.id) {
+        throw new GeneralError('Failed to create storage folder')
+      }
+
+      await userService.patch(authResult.user.id, {
+        file_storage_id: newFolder.data.id,
+      })
+    }
+    return context
+  } catch (error) {
+    logger.error('File storage hook error:', {
+      userId: authResult.user?.id,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    })
+    throw error
   }
 }
