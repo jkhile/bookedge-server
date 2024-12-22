@@ -4,12 +4,11 @@ import type { ClientApplication } from '../../client'
 import type {
   FileStorage,
   FileStorageData,
-  FileStoragePatch,
   FileStorageQuery,
   FileStorageService,
 } from './file-storage.class'
 
-export type { FileStorage, FileStorageData, FileStoragePatch, FileStorageQuery }
+export type { FileStorage, FileStorageData, FileStorageQuery }
 
 export type FileStorageClientService = Pick<
   FileStorageService<Params<FileStorageQuery>>,
@@ -22,7 +21,6 @@ export const fileStorageMethods: Array<keyof FileStorageService> = [
   'find',
   'get',
   'create',
-  'patch',
   'remove',
 ]
 

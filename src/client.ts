@@ -16,7 +16,6 @@ export type {
   FileStorage,
   FileStorageData,
   FileStorageQuery,
-  FileStoragePatch,
 } from './services/file-storage/file-storage.shared'
 
 import { signinHistoryClient } from './services/signin-history/signin-history.shared'

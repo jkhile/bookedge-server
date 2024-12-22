@@ -12,12 +12,11 @@ import type { Application } from '../../declarations'
 import type {
   FileStorage,
   FileStorageData,
-  FileStoragePatch,
   FileStorageQuery,
 } from './file-storage.schema'
 import { formatISO } from 'date-fns'
 
-export type { FileStorage, FileStorageData, FileStoragePatch, FileStorageQuery }
+export type { FileStorage, FileStorageData, FileStorageQuery }
 
 export interface FileStorageServiceOptions {
   app: Application
@@ -39,13 +38,7 @@ const CHUNK_FOLDER = 'chunks'
 
 export class FileStorageService<
   ServiceParams extends FileStorageParams = FileStorageParams,
-> implements
-    ServiceInterface<
-      FileStorage,
-      FileStorageData,
-      ServiceParams,
-      FileStoragePatch
-    >
+> implements ServiceInterface<FileStorage, FileStorageData, ServiceParams>
 {
   constructor(public options: FileStorageServiceOptions) {}
 

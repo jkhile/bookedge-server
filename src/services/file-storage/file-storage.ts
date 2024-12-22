@@ -5,12 +5,10 @@ import { hooks as schemaHooks } from '@feathersjs/schema'
 
 import {
   fileStorageDataValidator,
-  fileStoragePatchValidator,
   fileStorageQueryValidator,
   fileStorageResolver,
   fileStorageExternalResolver,
   fileStorageDataResolver,
-  fileStoragePatchResolver,
   fileStorageQueryResolver,
 } from './file-storage.schema'
 
@@ -49,10 +47,6 @@ export const fileStorage = (app: Application) => {
       create: [
         schemaHooks.validateData(fileStorageDataValidator),
         schemaHooks.resolveData(fileStorageDataResolver),
-      ],
-      patch: [
-        schemaHooks.validateData(fileStoragePatchValidator),
-        schemaHooks.resolveData(fileStoragePatchResolver),
       ],
       remove: [],
     },

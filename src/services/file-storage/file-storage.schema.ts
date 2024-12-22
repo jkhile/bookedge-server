@@ -58,20 +58,6 @@ export const fileStorageDataResolver = resolve<
   HookContext<FileStorageService>
 >({})
 
-// Schema for updating existing entries
-export const fileStoragePatchSchema = Type.Partial(fileStorageSchema, {
-  $id: 'FileStoragePatch',
-})
-export type FileStoragePatch = Static<typeof fileStoragePatchSchema>
-export const fileStoragePatchValidator = getValidator(
-  fileStoragePatchSchema,
-  dataValidator,
-)
-export const fileStoragePatchResolver = resolve<
-  FileStorage,
-  HookContext<FileStorageService>
->({})
-
 // Schema for allowed query properties
 export const fileStorageQueryProperties = Type.Pick(fileStorageSchema, [
   'id',
