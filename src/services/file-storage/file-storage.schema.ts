@@ -10,8 +10,18 @@ import type { FileStorageService } from './file-storage.class'
 // Main data model schema
 export const fileStorageSchema = Type.Object(
   {
-    id: Type.Number(),
-    text: Type.String(),
+    id: Type.String(),
+    name: Type.String(),
+    mimeType: Type.String(),
+    size: Type.Number(),
+    fkUploadedBy: Type.Integer(),
+    uploadedAt: Type.String(),
+    chunks: Type.Optional(Type.Number()),
+    status: Type.Union([
+      Type.Literal('uploading'),
+      Type.Literal('complete'),
+      Type.Literal('error'),
+    ]),
   },
   { $id: 'FileStorage', additionalProperties: false },
 )
@@ -31,9 +41,13 @@ export const fileStorageExternalResolver = resolve<
 >({})
 
 // Schema for creating new entries
-export const fileStorageDataSchema = Type.Pick(fileStorageSchema, ['text'], {
-  $id: 'FileStorageData',
-})
+export const fileStorageDataSchema = Type.Pick(
+  fileStorageSchema,
+  ['name', 'mimeType', 'size', 'fkUploadedBy'],
+  {
+    $id: 'FileStorageData',
+  },
+)
 export type FileStorageData = Static<typeof fileStorageDataSchema>
 export const fileStorageDataValidator = getValidator(
   fileStorageDataSchema,
@@ -61,7 +75,11 @@ export const fileStoragePatchResolver = resolve<
 // Schema for allowed query properties
 export const fileStorageQueryProperties = Type.Pick(fileStorageSchema, [
   'id',
-  'text',
+  'name',
+  'mimeType',
+  'fkUploadedBy',
+  'uploadedAt',
+  'status',
 ])
 export const fileStorageQuerySchema = Type.Intersect(
   [
