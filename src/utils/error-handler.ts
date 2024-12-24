@@ -4,7 +4,6 @@ import { FeathersKoaContext } from '@feathersjs/koa'
 import { logger } from '../logger'
 
 export const errorHandler =
-  // eslint-disable-next-line unicorn/consistent-function-scoping
   () => async (ctx: FeathersKoaContext, next: () => Promise<any>) => {
     try {
       await next()

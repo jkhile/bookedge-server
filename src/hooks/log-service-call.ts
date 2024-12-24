@@ -76,6 +76,5 @@ function stringifyAndRemoveProperties(
   const updatedStringified = stringified.replace(propPattern, '')
 
   // Remove any trailing commas left after property removal
-  // eslint-disable-next-line unicorn/prefer-string-replace-all
   return updatedStringified.replace(/,(?=\s*[\]}])/g, '')
 }

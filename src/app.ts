@@ -50,7 +50,6 @@ app.configure(
   socketio({
     cors: {
       origin: (origin, callback) => {
-        // eslint-disable-next-line unicorn/no-null
         callback(null, true)
       },
     },

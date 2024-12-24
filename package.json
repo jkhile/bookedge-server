@@ -90,27 +90,23 @@
     "winston-transport": "^4.9.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.17.0",
     "@feathersjs/cli": "5.0.22",
     "@types/fs-extra": "^11.0.4",
     "@types/lodash": "^4.17.13",
     "@types/mocha": "^10.0.10",
     "@types/node": "^20.17.10",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
     "axios": "^1.7.9",
     "cross-env": "^7.0.3",
-    "eslint": "^8.57.1",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-sonarjs": "^0.24.0",
-    "eslint-plugin-unicorn": "^51.0.1",
-    "eslint-plugin-vitest": "^0.3.26",
-    "eslint-plugin-vitest-globals": "^1.5.0",
+    "eslint": "^9.17.0",
+    "globals": "^15.14.0",
     "mocha": "^10.8.2",
     "nodemon": "^3.1.9",
     "prettier": "^3.4.2",
     "shx": "^0.3.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.2",
     "vitest": "^1.6.0"
   }
 }

@@ -16,7 +16,7 @@ export const postgresql = (app: Application) => {
     config = {
       client: 'pg',
       connection: {
-        // @ts-ignore
+        // @ts-expect-error connectionString works but isn't in the interface
         connectionString: config_.connection,
         ssl: { rejectUnauthorized: false },
       },

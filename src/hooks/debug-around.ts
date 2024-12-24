@@ -1,6 +1,5 @@
-/* eslint-disable sonarjs/cognitive-complexity */
 // src/hooks/debug-around.ts
-/* eslint-disable no-console */
+
 import type { HookContext, NextFunction } from '@feathersjs/feathers'
 
 /**

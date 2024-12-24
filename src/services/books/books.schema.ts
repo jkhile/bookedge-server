@@ -131,7 +131,6 @@ export const bookResolver = resolve<Book, HookContext<BookService>>({
   author: virtual(async (user, context) => {
     // Look up the author of the book and set as a virtual field on the book
     // for display in the books list
-    // @ts-ignore
     if (context.method === 'search') {
       return ''
     }
@@ -140,15 +139,12 @@ export const bookResolver = resolve<Book, HookContext<BookService>>({
     }
     // a get won't return a paginated result like find, so fake it to
     // simplify the following code
-    // @ts-ignore
     if (!context.result.data) {
-      // @ts-ignore
       context.result.data = [context.result]
     }
     let author = ''
     context.authorIx = 'authorIx' in context ? context.authorIx + 1 : 0
     const contributorsService = context.app.service('contributors')
-    // @ts-ignore
     const bookId = context.result.data[context.authorIx]['id']
     const contributors = await contributorsService.find({
       query: {
@@ -172,14 +168,12 @@ export const bookResolver = resolve<Book, HookContext<BookService>>({
     if (context.method === 'search') {
       return ''
     }
-    // @ts-ignore
     if (!context.result) {
       throw new Error('No result in context in bookResolver published_date')
     }
     let published_date = ''
     context.dateIx = 'dateIx' in context ? context.dateIx + 1 : 0
     const releasesService = context.app.service('releases')
-    // @ts-ignore
     const bookId = context.result.data[context.dateIx]['id']
     const releases = await releasesService.find({
       query: {
@@ -200,14 +194,12 @@ export const bookResolver = resolve<Book, HookContext<BookService>>({
     if (context.method === 'search') {
       return 0
     }
-    // @ts-ignore
     if (!context.result) {
       throw new Error('No result in context in bookResolver issue_count')
     }
     let issues_count = 0
     context.issueIx = 'issueIx' in context ? context.issueIx + 1 : 0
     const issuesService = context.app.service('issues')
-    // @ts-ignore
     const bookId = context.result.data[context.authorIx]['id']
     const issues = await issuesService.find({
       query: {

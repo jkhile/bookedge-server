@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import type { HookContext } from '../declarations'
 import type { User } from '../services/users/users'
 import { google } from 'googleapis'

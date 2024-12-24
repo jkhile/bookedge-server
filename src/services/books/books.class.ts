@@ -26,7 +26,6 @@ export interface SearchResults {
   title: string
   headline: string
 }
-;[]
 
 export class BookService<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -1,5 +1,3 @@
-/* eslint-disable unicorn/explicit-length-check */
-/* eslint-disable sonarjs/no-duplicate-string */
 import type {
   Id,
   NullableId,
@@ -96,7 +94,6 @@ export class FileStorageService<
         id: file.id,
         name: file.name,
         mimeType: file.mimeType,
-        // eslint-disable-next-line unicorn/explicit-length-check
         size: Number.parseInt(file.size || '0', 10),
         fkUploadedBy: params.user?.id as number,
         uploadedAt: file.createdTime || formatISO(new Date()),
@@ -125,7 +122,6 @@ export class FileStorageService<
         id: data.id,
         name: data.name,
         mimeType: data.mimeType,
-        // eslint-disable-next-line unicorn/explicit-length-check
         size: Number.parseInt(data.size || '0', 10),
         fkUploadedBy: params.user?.id as number,
         uploadedAt: data.createdTime || formatISO(new Date()),
