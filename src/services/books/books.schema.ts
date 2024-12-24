@@ -3,9 +3,9 @@ import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
 import { formatISO } from 'date-fns'
 import { imprintsResolver } from '../../utils/imprints-resolver'
 import { dataValidator, queryValidator } from '../../validators'
+
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
 import type { Static } from '@feathersjs/typebox'
-
 import type { HookContext } from '../../declarations'
 import type { BookService } from './books.class'
 
@@ -119,7 +119,7 @@ export const bookSchema = Type.Object(
     fk_created_by: Type.Integer(),
     created_at: Type.String({ format: 'date-time' }),
     // virtual fields
-    author: Type.String(),
+    author: Type.Optional(Type.String()),
     published_date: Type.String(),
     issues_count: Type.Integer(),
   },
@@ -127,25 +127,32 @@ export const bookSchema = Type.Object(
 )
 export type Book = Static<typeof bookSchema>
 export const bookValidator = getValidator(bookSchema, dataValidator)
+// Helper function to get book data regardless of method
+const getBookData = (context: HookContext<BookService>) => {
+  if (!context.result) return null
+
+  // If it's a 'find' operation, result will have a data property
+  if ('data' in context.result) {
+    return Array.isArray(context.result.data) ? context.result.data : null
+  }
+
+  // If it's a 'get' operation, result will be the book object
+  return Array.isArray(context.result) ? context.result : [context.result]
+}
+
 export const bookResolver = resolve<Book, HookContext<BookService>>({
-  author: virtual(async (user, context) => {
-    // Look up the author of the book and set as a virtual field on the book
-    // for display in the books list
-    if (context.method === 'search') {
-      return ''
-    }
-    if (!context.result) {
-      throw new Error('No result in context in bookResolver author')
-    }
-    // a get won't return a paginated result like find, so fake it to
-    // simplify the following code
-    if (!context.result.data) {
-      context.result.data = [context.result]
-    }
-    let author = ''
+  author: virtual(async (book, context) => {
+    if (context.method === 'search') return ''
+
+    const bookData = getBookData(context)
+    if (!bookData) throw new Error('No result data available in context')
+
     context.authorIx = 'authorIx' in context ? context.authorIx + 1 : 0
+    if (context.authorIx >= bookData.length) return ''
+
     const contributorsService = context.app.service('contributors')
-    const bookId = context.result.data[context.authorIx]['id']
+    const bookId = bookData[context.authorIx].id
+
     const contributors = await contributorsService.find({
       query: {
         fk_book: bookId,
@@ -153,28 +160,28 @@ export const bookResolver = resolve<Book, HookContext<BookService>>({
       },
     })
 
-    if (contributors.data.length > 0) {
-      const contrib = contributors.data.find(
-        (contributor) => contributor.contributor_role === 'Author',
-      )
-      author = contrib
-        ? contrib.published_name
-        : contributors.data[0].published_name
-    }
-    return author
+    if (!contributors.data.length) return ''
+
+    const authorContrib = contributors.data.find(
+      (contributor) => contributor.contributor_role === 'Author',
+    )
+    return authorContrib
+      ? authorContrib.published_name
+      : contributors.data[0].published_name
   }),
 
-  published_date: virtual(async (user, context) => {
-    if (context.method === 'search') {
-      return ''
-    }
-    if (!context.result) {
-      throw new Error('No result in context in bookResolver published_date')
-    }
-    let published_date = ''
+  published_date: virtual(async (book, context) => {
+    if (context.method === 'search') return ''
+
+    const bookData = getBookData(context)
+    if (!bookData) throw new Error('No result data available in context')
+
     context.dateIx = 'dateIx' in context ? context.dateIx + 1 : 0
+    if (context.dateIx >= bookData.length) return ''
+
     const releasesService = context.app.service('releases')
-    const bookId = context.result.data[context.dateIx]['id']
+    const bookId = bookData[context.dateIx].id
+
     const releases = await releasesService.find({
       query: {
         fk_book: bookId,
@@ -183,36 +190,33 @@ export const bookResolver = resolve<Book, HookContext<BookService>>({
         $limit: 1,
       },
     })
-    if (releases.data.length > 0) {
-      published_date = releases.data[0]['publication_date']
-    }
 
-    return published_date
+    return releases.data.length ? releases.data[0].publication_date : ''
   }),
 
-  issues_count: virtual(async (user, context) => {
-    if (context.method === 'search') {
-      return 0
-    }
-    if (!context.result) {
-      throw new Error('No result in context in bookResolver issue_count')
-    }
-    let issues_count = 0
+  issues_count: virtual(async (book, context) => {
+    if (context.method === 'search') return 0
+
+    const bookData = getBookData(context)
+    if (!bookData) throw new Error('No result data available in context')
+
     context.issueIx = 'issueIx' in context ? context.issueIx + 1 : 0
+    if (context.issueIx >= bookData.length) return 0
+
     const issuesService = context.app.service('issues')
-    const bookId = context.result.data[context.authorIx]['id']
+    const bookId = bookData[context.issueIx].id
+
     const issues = await issuesService.find({
       query: {
         fk_book: bookId,
         resolved: false,
-        $limit: 0, // only need the count
+        $limit: 0,
       },
     })
-    issues_count = issues.total
-    return issues_count
+
+    return issues.total
   }),
 })
-
 export const bookExternalResolver = resolve<Book, HookContext<BookService>>({})
 
 // Schema for creating new entries
