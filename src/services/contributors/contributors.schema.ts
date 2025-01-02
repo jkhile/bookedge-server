@@ -25,6 +25,8 @@ export const contributorSchema = Type.Object(
     amazon_author_page: Type.String(),
     author_website: Type.String(),
     twitter: Type.String(),
+    threads: Type.String(),
+    bluesky: Type.String(),
     instagram: Type.String(),
     facebook: Type.String(),
     linkedin: Type.String(),
