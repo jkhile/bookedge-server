@@ -26,8 +26,10 @@ export const bookSchema = Type.Object(
     subtitle: Type.String(),
     subtitle_finalized: Type.Boolean(),
     accounting_code: Type.String(),
-    fep_percentage_share: Type.Number(),
-    fep_fixed_share: Type.Number(),
+    fep_percentage_share_hc: Type.Number(),
+    fep_fixed_share_hc: Type.Number(),
+    fep_percentage_share_pb: Type.Number(),
+    fep_fixed_share_pb: Type.Number(),
     status: Type.Union([
       Type.Literal('archived'),
       Type.Literal('contract negotiation'),
