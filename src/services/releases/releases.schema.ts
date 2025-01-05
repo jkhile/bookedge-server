@@ -32,6 +32,7 @@ export const releaseSchema = Type.Object(
     publication_date: Type.String(),
     preorder: Type.Boolean(),
     sku: Type.String(),
+    base_print_cost: Type.Number(),
     trim_size: Type.String(),
     binding: Type.Union([
       Type.Literal(''),
@@ -62,6 +63,7 @@ export const releaseSchema = Type.Object(
       Type.Literal('glossy'),
       Type.Literal('matte'),
     ]),
+    full_duplex_cover: Type.Boolean(),
     carton_quantity: Type.Number(),
     weight: Type.Number(),
     full_distribution: Type.Boolean(),
