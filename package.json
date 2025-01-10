@@ -52,7 +52,7 @@
     "prettier": "npx prettier \"**/*.ts\" --write",
     "mocha": "cross-env NODE_ENV=test mocha test/ --require ts-node/register --recursive --extension .ts --exit",
     "test": "cross-env NODE_ENV=test pnpm run migrate && pnpm run mocha",
-    "bundle:client": "pnpm run compile && pnpm pack --pack-destination ./public",
+    "bundle:client": "pnpm run compile && pnpm pack --pack-destination ./public && cp -vfp ./public/bookedge-server-0.11.0.tgz ../bookedge-client",
     "pull-db": "./pulldb.zsh",
     "reset-db": "dropdb bookedge-server --if-exists && createdb bookedge-server && pnpm migrate && ./load-db-fixtures.sh && pnpm make-test-db",
     "make-test-db": "./setup-test-server.sh && psql --dbname=bookedge-test --file=insert-test-users.sql",

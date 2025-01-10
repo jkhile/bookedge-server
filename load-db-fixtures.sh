@@ -1,17 +1,16 @@
 #!/bin/zsh
 
-# Start the command string
+# Initialize the psql command with your target database
 cmd="psql --dbname=bookedge-server"
 
-# Base names of the files
-files=("insert-test-users" "insert-imprints" "insert-books" "insert-contributors" "insert-releases" "insert-pricings" "insert-endorsements" "insert-issues")
-
-# Loop over each base name in the array
-for file in "${files[@]}"; do
+# Loop over each file that matches "insert-*.sql" in the fixtures directory
+for file in ../bookedge-client/cypress/fixtures/insert-*.sql; do
   # Append an additional argument of '--file=filename'
-  cmd+=" --file=../bookedge-client/cypress/fixtures/${file}.sql"
+  cmd+=" --file=\"${file}\""
 done
 
-echo $cmd
+# Show the full command string
+echo "${cmd}"
+
 # Execute the command
-eval $cmd
+eval "${cmd}"
