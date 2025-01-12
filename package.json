@@ -9,6 +9,10 @@
     "feathers",
     "bookedge"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johnhile/bookedge-server.git"
+  },
   "author": {
     "name": "John Hile",
     "email": "john.hile@frontedgepublishing.com"
