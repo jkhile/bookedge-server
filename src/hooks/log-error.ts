@@ -6,6 +6,10 @@ export const logError = async (context: HookContext, next: NextFunction) => {
   try {
     await next()
   } catch (error: any) {
+    console.log(
+      'JSON.stringify(error, null, 2):',
+      JSON.stringify(error, null, 2),
+    )
     if (error.message.includes('unauthenticated')) {
       logger.info(error.message)
     } else {

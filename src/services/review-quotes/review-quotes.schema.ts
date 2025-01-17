@@ -2,6 +2,7 @@
 import { resolve } from '@feathersjs/schema'
 import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
 import type { Static } from '@feathersjs/typebox'
+import { formatISO } from 'date-fns'
 
 import type { HookContext } from '../../declarations'
 import { dataValidator, queryValidator } from '../../validators'
@@ -50,7 +51,10 @@ export const reviewQuotesDataValidator = getValidator(
 export const reviewQuotesDataResolver = resolve<
   ReviewQuotes,
   HookContext<ReviewQuotesService>
->({})
+>({
+  created_at: async () => formatISO(new Date()),
+  fk_created_by: async (value, data, context) => context.params.user?.id,
+})
 
 // Schema for updating existing entries
 export const reviewQuotesPatchSchema = Type.Partial(reviewQuotesSchema, {

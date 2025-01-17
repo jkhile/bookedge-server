@@ -82,7 +82,7 @@
     "@feathersjs/typebox": "^5.0.31",
     "coralogix-logger": "^1.1.30",
     "date-fns": "^4.1.0",
-    "fs-extra": "^11.2.0",
+    "fs-extra": "^11.3.0",
     "google-auth-library": "^9.15.0",
     "googleapis": "^144.0.0",
     "just-diff": "^6.0.2",
@@ -99,7 +99,7 @@
     "@types/fs-extra": "^11.0.4",
     "@types/lodash": "^4.17.14",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^22.10.5",
+    "@types/node": "^22.10.7",
     "axios": "^1.7.9",
     "cross-env": "^7.0.3",
     "eslint": "^9.18.0",
@@ -110,7 +110,7 @@
     "shx": "^0.3.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3",
-    "typescript-eslint": "^8.19.1",
+    "typescript-eslint": "^8.20.0",
     "vitest": "^2.1.8"
   }
 }
