@@ -10,7 +10,7 @@ export const logError = async (context: HookContext, next: NextFunction) => {
       'JSON.stringify(error, null, 2):',
       JSON.stringify(error, null, 2),
     )
-    if (error.message.includes('unauthenticated')) {
+    if (convertToInfo(error.message)) {
       logger.info(error.message)
     } else {
       logger.error(error.stack)
@@ -21,4 +21,10 @@ export const logError = async (context: HookContext, next: NextFunction) => {
 
     throw error
   }
+}
+
+const convertToInfo = (errMessage: string): boolean => {
+  const infoClues = ['NotAuthenticated', 'TokenExpiredError']
+  const containsClue = infoClues.some((clue) => errMessage.includes(clue))
+  return containsClue
 }
