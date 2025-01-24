@@ -6,19 +6,22 @@ export const logError = async (context: HookContext, next: NextFunction) => {
   try {
     await next()
   } catch (error: any) {
+    console.log('in logError, context:', context)
     console.log(
-      'JSON.stringify(error, null, 2):',
+      'in logError, JSON.stringify(error, null, 2):',
       JSON.stringify(error, null, 2),
     )
-    if (convertToInfo(error.message)) {
-      logger.info(error.message)
-    } else {
-      logger.error(error.stack)
-      if (error.data) {
-        logger.error(`Error Data: ${JSON.stringify(error.data)}`)
-      }
-    }
-
+    const userEmail = context.arguments[2].connection.user.email
+    const logLevel = convertToInfo(error.message) ? 'info' : 'error'
+    logger.log({
+      level: logLevel,
+      message: error.message,
+      _meta: {
+        user: userEmail,
+        data: error.data,
+        event: context.event,
+      },
+    })
     throw error
   }
 }
