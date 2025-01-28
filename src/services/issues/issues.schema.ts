@@ -1,5 +1,4 @@
-// // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
-import { resolve } from '@feathersjs/schema'
+import { resolve, virtual } from '@feathersjs/schema'
 import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
 import { formatISO } from 'date-fns'
 import { dataValidator, queryValidator } from '../../validators'
@@ -19,12 +18,25 @@ export const issueSchema = Type.Object(
     resolved: Type.Boolean(),
     fk_created_by: Type.Integer(),
     created_at: Type.String({ format: 'date-time' }),
+    book_title: Type.Optional(Type.String()),
   },
   { $id: 'Issue', additionalProperties: false },
 )
 export type Issue = Static<typeof issueSchema>
 export const issueValidator = getValidator(issueSchema, dataValidator)
-export const issueResolver = resolve<Issue, HookContext<IssueService>>({})
+export const issueResolver = resolve<Issue, HookContext<IssueService>>({
+  book_title: virtual(async (issue, context) => {
+    if (!issue.fk_book) return ''
+
+    const bookService = context.app.service('books')
+    try {
+      const book = await bookService.get(issue.fk_book)
+      return book.title
+    } catch {
+      return ''
+    }
+  }),
+})
 
 export const issueExternalResolver = resolve<Issue, HookContext<IssueService>>(
   {},
@@ -43,6 +55,8 @@ export const issueDataValidator = getValidator(issueDataSchema, dataValidator)
 export const issueDataResolver = resolve<Issue, HookContext<IssueService>>({
   created_at: async () => formatISO(new Date()),
   fk_created_by: async (value, data, context) => context.params.user?.id,
+  // Explicitly return undefined for book_title to exclude it from validation
+  book_title: () => undefined,
 })
 
 // Schema for updating existing entries
@@ -51,10 +65,13 @@ export const issuePatchSchema = Type.Partial(issueSchema, {
 })
 export type IssuePatch = Static<typeof issuePatchSchema>
 export const issuePatchValidator = getValidator(issuePatchSchema, dataValidator)
-export const issuePatchResolver = resolve<Issue, HookContext<IssueService>>({})
+export const issuePatchResolver = resolve<Issue, HookContext<IssueService>>({
+  // Explicitly return undefined for book_title to exclude it from validation
+  book_title: () => undefined,
+})
 
 // Schema for allowed query properties
-export const issueQueryProperties = Type.Omit(issueSchema, [])
+export const issueQueryProperties = Type.Omit(issueSchema, ['book_title'])
 export const issueQuerySchema = Type.Intersect(
   [
     querySyntax(issueQueryProperties),

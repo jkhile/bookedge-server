@@ -17,6 +17,7 @@ import {
 import type { Application } from '../../declarations'
 import { IssueService, getOptions } from './issues.class'
 import { issuePath, issueMethods } from './issues.shared'
+import { notifyBookOnIssueResolved } from '../../hooks/notify-book-on-issue-resolved'
 
 export * from './issues.class'
 export * from './issues.schema'
@@ -58,6 +59,8 @@ export const issue = (app: Application) => {
     },
     after: {
       all: [],
+      patch: [notifyBookOnIssueResolved],
+      update: [notifyBookOnIssueResolved],
     },
     error: {
       all: [],
