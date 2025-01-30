@@ -1,7 +1,7 @@
 import type { HookContext } from '../declarations'
 import type { User } from '../services/users/users'
 import { google } from 'googleapis'
-import { Forbidden, GeneralError } from '@feathersjs/errors'
+import { GeneralError } from '@feathersjs/errors'
 import { logger } from '../logger'
 
 const FOLDER_NAME = 'fep_bookedge'
@@ -32,7 +32,9 @@ async function createDriveClient(accessToken: string) {
 async function validateFileStorage(
   fileId: string,
   accessToken: string,
-): Promise<void> {
+  userId: number,
+  userService: any,
+): Promise<boolean> {
   try {
     const drive = await createDriveClient(accessToken)
 
@@ -47,14 +49,35 @@ async function validateFileStorage(
       folder.mimeType !== FOLDER_MIME_TYPE ||
       folder.name !== FOLDER_NAME
     ) {
-      throw new Forbidden('Invalid file storage folder')
+      logger.error('Invalid file storage folder detected', {
+        userId,
+        fileId,
+        folderName: folder?.name,
+        mimeType: folder?.mimeType,
+      })
+
+      // Clear the invalid storage ID
+      await userService.patch(userId, {
+        file_storage_id: null,
+      })
+
+      return false
     }
+
+    return true
   } catch (error) {
-    logger.error('Storage validation failed:', error)
-    if (error instanceof Error) {
-      throw new GeneralError(`Failed to validate storage: ${error.message}`)
-    }
-    throw error
+    logger.error('Storage validation failed', {
+      userId,
+      fileId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    })
+
+    // Clear the invalid storage ID
+    await userService.patch(userId, {
+      file_storage_id: '',
+    })
+
+    return false
   }
 }
 
@@ -62,7 +85,7 @@ export const fileStorageHook = async (context: HookContext) => {
   const { app, result } = context
   const authResult = result as AuthResult
 
-  // if the user hasn't signed in with Google Oauth, can't access GDrive
+  // if the user hasn't signed in with Google OAuth, can't access GDrive
   if (
     authResult.authentication.strategy !== 'google' ||
     !authResult.user?.googleId ||
@@ -72,13 +95,28 @@ export const fileStorageHook = async (context: HookContext) => {
   }
 
   try {
+    const userService = app.service('users')
+
     // Check existing storage
     if (authResult.user.file_storage_id) {
-      await validateFileStorage(
+      const isValid = await validateFileStorage(
         authResult.user.file_storage_id,
         authResult.user.access_token,
+        authResult.user.id,
+        userService,
       )
-      return context
+
+      if (!isValid) {
+        // Continue execution to create new storage
+        logger.info(
+          'Proceeding to create new storage after validation failure',
+          {
+            userId: authResult.user.id,
+          },
+        )
+      } else {
+        return context
+      }
     }
 
     // Initialize drive client
@@ -90,8 +128,6 @@ export const fileStorageHook = async (context: HookContext) => {
       spaces: 'drive',
       fields: 'files(id, name)',
     })
-
-    const userService = app.service('users')
 
     if (listResults.data.files?.length) {
       // Existing folder found - use the first matching folder
