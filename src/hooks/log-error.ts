@@ -72,6 +72,7 @@ function isInfoLevel(errMessage: string): boolean {
     'TokenExpiredError',
     'NotFound',
     'Forbidden',
+    'jwt expired',
   ]
   return infoPatterns.some((pattern) => errMessage.includes(pattern))
 }
