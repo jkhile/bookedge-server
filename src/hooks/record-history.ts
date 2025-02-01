@@ -19,6 +19,7 @@ export function recordHistoryHook(
           long_description: '',
           keywords: '',
           notes: '',
+          supplementary_notes: '',
         }
 
     await next()

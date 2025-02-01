@@ -46,6 +46,8 @@ export const book = (app: Application) => {
           'long_description',
           'keywords',
           'notes',
+          'supplementary_notes',
+          'marketing_notes',
         ]),
       ],
       update: [
@@ -56,6 +58,8 @@ export const book = (app: Application) => {
           'long_description',
           'keywords',
           'notes',
+          'supplementary_notes',
+          'marketing_notes',
         ]),
       ],
       patch: [
@@ -66,6 +70,8 @@ export const book = (app: Application) => {
           'long_description',
           'keywords',
           'notes',
+          'supplementary_notes',
+          'marketing_notes',
         ]),
       ],
     },

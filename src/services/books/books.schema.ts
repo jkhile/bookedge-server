@@ -117,7 +117,10 @@ export const bookSchema = Type.Object(
     a_plus_rejection_reason_3: Type.String(),
     a_plus_image_3: Type.String(),
     errata: Type.String(),
+    project_priorities: Type.String(),
     notes: Type.String(),
+    supplementary_notes: Type.String(),
+    marketing_notes: Type.String(),
     fk_created_by: Type.Integer(),
     created_at: Type.String({ format: 'date-time' }),
     // virtual fields
