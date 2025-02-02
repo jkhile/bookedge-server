@@ -20,6 +20,7 @@ export function recordHistoryHook(
           keywords: '',
           notes: '',
           supplementary_notes: '',
+          marketing_notes: '',
         }
 
     await next()
