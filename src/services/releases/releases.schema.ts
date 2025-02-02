@@ -17,6 +17,7 @@ export const releaseSchema = Type.Object(
       Type.Literal('active'),
       Type.Literal('pending'),
       Type.Literal('archived'),
+      Type.Literal('duplicate'),
     ]),
     release_type: Type.Union([
       Type.Literal(''),
