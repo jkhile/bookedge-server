@@ -48,6 +48,7 @@ export const book = (app: Application) => {
           'notes',
           'supplementary_notes',
           'marketing_notes',
+          'project_priorities',
         ]),
       ],
       update: [
@@ -60,6 +61,7 @@ export const book = (app: Application) => {
           'notes',
           'supplementary_notes',
           'marketing_notes',
+          'project_priorities',
         ]),
       ],
       patch: [
@@ -72,6 +74,7 @@ export const book = (app: Application) => {
           'notes',
           'supplementary_notes',
           'marketing_notes',
+          'project_priorities',
         ]),
       ],
     },

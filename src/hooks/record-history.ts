@@ -21,6 +21,7 @@ export function recordHistoryHook(
           notes: '',
           supplementary_notes: '',
           marketing_notes: '',
+          project_priorities: '',
         }
 
     await next()
