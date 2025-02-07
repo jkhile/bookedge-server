@@ -16,6 +16,7 @@ export const endorsementSchema = Type.Object(
     fk_book: Type.Number(),
     date: Type.String(),
     by: Type.String(),
+    priority: Type.Integer(),
     text: Type.String(),
     notes: Type.String(),
     fk_created_by: Type.Integer(),
