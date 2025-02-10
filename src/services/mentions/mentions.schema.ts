@@ -1,5 +1,6 @@
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
 import { resolve } from '@feathersjs/schema'
+import { formatISO } from 'date-fns'
 import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
 import type { Static } from '@feathersjs/typebox'
 
@@ -49,7 +50,10 @@ export const mentionsDataValidator = getValidator(
 export const mentionsDataResolver = resolve<
   Mentions,
   HookContext<MentionsService>
->({})
+>({
+  created_at: async () => formatISO(new Date()),
+  fk_created_by: async (value, data, context) => context.params.user?.id,
+})
 
 // Schema for updating existing entries
 export const mentionsPatchSchema = Type.Partial(mentionsSchema, {
