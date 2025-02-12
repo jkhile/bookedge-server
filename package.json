@@ -58,8 +58,8 @@
     "test": "cross-env NODE_ENV=test pnpm run migrate && pnpm run mocha",
     "bundle:client": "pnpm run compile && pnpm pack --pack-destination ./public",
     "pull-db": "./pulldb.zsh",
-    "reset-db": "dropdb bookedge-server --if-exists && createdb bookedge-server && pnpm migrate && ./load-db-fixtures.sh && pnpm make-test-db",
-    "make-test-db": "./setup-test-server.sh && psql --dbname=bookedge-test --file=insert-test-users.sql",
+    "reset-db": "dropdb bookedge-server --if-exists && createdb bookedge-server && pnpm migrate && ./load-db-fixtures.zsh && pnpm make-test-db",
+    "make-test-db": "./setup-test-server.zsh && psql --dbname=bookedge-test --file=insert-test-users.sql",
     "migrate": "dotenvx run -- knex migrate:latest",
     "migrate:down": "dotenvx run -- knex migrate:down",
     "migrate:make": "knex migrate:make"
