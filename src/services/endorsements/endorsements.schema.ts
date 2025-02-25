@@ -19,8 +19,8 @@ export const endorsementSchema = Type.Object(
     priority: Type.Integer(),
     text: Type.String(),
     notes: Type.String(),
-    fk_created_by: Type.Integer(),
-    created_at: Type.String({ format: 'date-time' }),
+    fk_created_by: Type.Optional(Type.Integer()),
+    created_at: Type.Optional(Type.String({ format: 'date-time' })),
   },
   { $id: 'Endorsement', additionalProperties: false },
 )

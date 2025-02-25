@@ -87,8 +87,8 @@ export const releaseSchema = Type.Object(
     audio_book_narrator: Type.String(),
     audio_book_run_time: Type.Number(),
     notes: Type.String(),
-    fk_created_by: Type.Integer(),
-    created_at: Type.String({ format: 'date-time' }),
+    fk_created_by: Type.Optional(Type.Integer()),
+    created_at: Type.Optional(Type.String({ format: 'date-time' })),
   },
   { $id: 'Release', additionalProperties: false },
 )

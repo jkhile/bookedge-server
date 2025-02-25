@@ -12,13 +12,13 @@ export const issueSchema = Type.Object(
   {
     id: Type.Number(),
     fk_book: Type.Number(),
+    book_title: Type.Optional(Type.String()),
     date: Type.String(),
     issue: Type.String(),
     entered_by: Type.String(),
     resolved: Type.Boolean(),
-    fk_created_by: Type.Integer(),
-    created_at: Type.String({ format: 'date-time' }),
-    book_title: Type.Optional(Type.String()),
+    fk_created_by: Type.Optional(Type.Integer()),
+    created_at: Type.Optional(Type.String({ format: 'date-time' })),
   },
   { $id: 'Issue', additionalProperties: false },
 )

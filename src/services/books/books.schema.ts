@@ -121,8 +121,8 @@ export const bookSchema = Type.Object(
     notes: Type.String(),
     supplementary_notes: Type.String(),
     marketing_notes: Type.String(),
-    fk_created_by: Type.Integer(),
-    created_at: Type.String({ format: 'date-time' }),
+    fk_created_by: Type.Optional(Type.Integer()),
+    created_at: Type.Optional(Type.String({ format: 'date-time' })),
     // virtual fields
     author: Type.Optional(Type.String()),
     published_date: Type.String(),

@@ -37,8 +37,8 @@ export const pricingSchema = Type.Object(
     gc_srp: Type.Number(),
     gc_discount: Type.Number(),
     gc_returnable: returnableType,
-    fk_created_by: Type.Integer(),
-    created_at: Type.String({ format: 'date-time' }),
+    fk_created_by: Type.Optional(Type.Integer()),
+    created_at: Type.Optional(Type.String({ format: 'date-time' })),
   },
   { $id: 'Pricing', additionalProperties: false },
 )

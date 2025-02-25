@@ -15,8 +15,8 @@ export const reviewQuotesSchema = Type.Object(
     fk_book: Type.Number(),
     quote_text: Type.String(),
     reviewer: Type.String(),
-    fk_created_by: Type.Integer(),
-    created_at: Type.String({ format: 'date-time' }),
+    fk_created_by: Type.Optional(Type.Integer()),
+    created_at: Type.Optional(Type.String({ format: 'date-time' })),
   },
   { $id: 'ReviewQuotes', additionalProperties: false },
 )

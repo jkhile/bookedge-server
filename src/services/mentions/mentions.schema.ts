@@ -18,8 +18,8 @@ export const mentionsSchema = Type.Object(
     headline: Type.String(),
     date: Type.String(),
     byline: Type.String(),
-    fk_created_by: Type.Integer(),
-    created_at: Type.String({ format: 'date-time' }),
+    fk_created_by: Type.Optional(Type.Integer()),
+    created_at: Type.Optional(Type.String({ format: 'date-time' })),
   },
   { $id: 'Mentions', additionalProperties: false },
 )

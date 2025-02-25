@@ -26,8 +26,8 @@ export const imprintSchema = Type.Object(
     email: Type.String(),
     phone: Type.String(),
     notes: Type.String(),
-    fk_created_by: Type.Integer(),
-    created_at: Type.String({ format: 'date-time' }),
+    fk_created_by: Type.Optional(Type.Integer()),
+    created_at: Type.Optional(Type.String({ format: 'date-time' })),
   },
   { $id: 'Imprint', additionalProperties: false },
 )

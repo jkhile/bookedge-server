@@ -7,7 +7,8 @@
     "http://localhost:3001",
     "http://localhost:3002",
     "https://bookedge.surge.sh",
-    "https://bookedge-staging.surge.sh"
+    "https://bookedge-staging.surge.sh",
+    "https://fep-client-staging-988a83abb394.herokuapp.com/"
   ],
   "paginate": {
     "default": 4000,

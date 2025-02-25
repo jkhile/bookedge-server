@@ -39,8 +39,8 @@ export const contributorSchema = Type.Object(
     goodreads: Type.String(),
     tiktok: Type.String(),
     notes: Type.String(),
-    fk_created_by: Type.Integer(),
-    created_at: Type.String({ format: 'date-time' }),
+    fk_created_by: Type.Optional(Type.Integer()),
+    created_at: Type.Optional(Type.String({ format: 'date-time' })),
   },
   { $id: 'Contributor', additionalProperties: false },
 )
