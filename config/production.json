@@ -1,0 +1,52 @@
+{
+  "host": "HOST",
+  "port": "PORT",
+  "public": "./public/",
+  "origins": [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3002",
+    "https://bookedge.surge.sh",
+    "https://bookedge-staging.surge.sh",
+    "https://fep-client-staging-988a83abb394.herokuapp.com",
+    "https://fep-client-production-2a306f144208.herokuapp.com",
+    "https://bookedge-production.netlify.app",
+    "https://bookedge-staging.netlify.app"
+  ],
+  "paginate": {
+    "default": 4000,
+    "max": 4000
+  },
+  "postgresql": {
+    "client": "pg",
+    "connection": "DATABASE_URL"
+  },
+  "authentication": {
+    "entity": "user",
+    "service": "users",
+    "secret": "OGf3yRkdoF/MaD5vVZ4JMqyxW5wUI52A",
+    "authStrategies": [
+      "jwt",
+      "local"
+    ],
+    "jwtOptions": {
+      "header": {
+        "typ": "access"
+      },
+      "audience": "https://yourdomain.com",
+      "algorithm": "HS256",
+      "expiresIn": "1d"
+    },
+    "local": {
+      "usernameField": "email",
+      "passwordField": "password"
+    },
+    "oauth": {
+      "google": {
+        "key": "GOOGLE_KEY",
+        "secret": "GOOGLE_SECRET",
+        "scope": [ "openid", "email", "profile", "https://www.googleapis.com/auth/drive.file" ]
+      }
+    }
+  }
+}
