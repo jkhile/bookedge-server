@@ -8,13 +8,12 @@
     "http://localhost:3002",
     "https://bookedge.surge.sh",
     "https://bookedge-staging.surge.sh",
-    "https://fep-client-staging-988a83abb394.herokuapp.com",
-    "https://fep-client-production-2a306f144208.herokuapp.com",
+    "https://*.netlify.app",
     "https://bookedge-production.netlify.app",
     "https://bookedge-staging.netlify.app",
-    "https://bookedge-production.netlify.app/",
-    "https://bookedge-staging.netlify.app/"
-  ],
+    "https://fep-client-staging-988a83abb394.herokuapp.com",
+    "https://fep-client-production-2a306f144208.herokuapp.com"
+],
   "paginate": {
     "default": 4000,
     "max": 4000
