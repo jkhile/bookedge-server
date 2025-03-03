@@ -190,12 +190,15 @@ export const bookResolver = resolve<Book, HookContext<BookService>>({
     const releasesService = context.app.service('releases')
     const bookId = bookData[context.dateIx].id
 
+    // Get all releases with non-empty publication dates
     const releases = await releasesService.find({
       query: {
         fk_book: bookId,
+        publication_date: {
+          $ne: ''  // Filter out empty publication dates
+        },
         $select: ['publication_date'],
         $sort: { publication_date: 1 },
-        $limit: 1,
       },
     })
 
