@@ -195,7 +195,7 @@ export const bookResolver = resolve<Book, HookContext<BookService>>({
       query: {
         fk_book: bookId,
         publication_date: {
-          $ne: ''  // Filter out empty publication dates
+          $ne: '', // Filter out empty publication dates
         },
         $select: ['publication_date'],
         $sort: { publication_date: 1 },
