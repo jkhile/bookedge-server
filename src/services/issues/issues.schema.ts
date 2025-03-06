@@ -1,4 +1,4 @@
-import { resolve, virtual } from '@feathersjs/schema'
+import { resolve } from '@feathersjs/schema'
 import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
 import { formatISO } from 'date-fns'
 import { dataValidator, queryValidator } from '../../validators'
@@ -25,17 +25,7 @@ export const issueSchema = Type.Object(
 export type Issue = Static<typeof issueSchema>
 export const issueValidator = getValidator(issueSchema, dataValidator)
 export const issueResolver = resolve<Issue, HookContext<IssueService>>({
-  book_title: virtual(async (issue, context) => {
-    if (!issue.fk_book) return ''
-
-    const bookService = context.app.service('books')
-    try {
-      const book = await bookService.get(issue.fk_book)
-      return book.title
-    } catch {
-      return ''
-    }
-  }),
+  // No need for virtual resolver as book_title now comes from the join
 })
 
 export const issueExternalResolver = resolve<Issue, HookContext<IssueService>>(
@@ -71,12 +61,18 @@ export const issuePatchResolver = resolve<Issue, HookContext<IssueService>>({
 })
 
 // Schema for allowed query properties
-export const issueQueryProperties = Type.Omit(issueSchema, ['book_title'])
+export const issueQueryProperties = Type.Omit(issueSchema, [])
 export const issueQuerySchema = Type.Intersect(
   [
     querySyntax(issueQueryProperties),
     // Add additional query properties here
-    Type.Object({}, { additionalProperties: false }),
+    Type.Object(
+      {
+        // Allow querying by book_title from the join
+        book_title: Type.Optional(Type.String()),
+      },
+      { additionalProperties: false },
+    ),
   ],
   { additionalProperties: false },
 )

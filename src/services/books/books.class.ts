@@ -31,6 +31,24 @@ export class BookService<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ServiceParams extends Params = BookParams,
 > extends KnexService<Book, BookData, BookParams, BookPatch> {
+  // Override createQuery to add the join with contributors
+  createQuery(params: KnexAdapterParams<BookQuery>) {
+    const query = super.createQuery(params)
+
+    // Subquery to get the author name from contributors table
+    // First trying to find one with contributor_role 'Author', falling back to first contributor
+    const authorSubquery = this.Model.select('published_name')
+      .from('contributors')
+      .whereRaw('contributors.fk_book = books.id')
+      .orderByRaw("CASE WHEN contributor_role = 'Author' THEN 0 ELSE 1 END")
+      .limit(1)
+
+    // Add the author as a field via subquery
+    query.select(this.Model.raw(`(${authorSubquery.toQuery()}) as author`))
+
+    return query
+  }
+
   async search(data: SearchData, params?: Params): Promise<SearchResults> {
     const { searchTerm, fields } = data
     const knex = this.Model

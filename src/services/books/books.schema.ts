@@ -149,34 +149,7 @@ const getBookData = (context: HookContext<BookService>) => {
 }
 
 export const bookResolver = resolve<Book, HookContext<BookService>>({
-  author: virtual(async (book, context) => {
-    if (context.method === 'search') return ''
-
-    const bookData = getBookData(context)
-    if (!bookData) throw new Error('No result data available in context')
-
-    context.authorIx = 'authorIx' in context ? context.authorIx + 1 : 0
-    if (context.authorIx >= bookData.length) return ''
-
-    const contributorsService = context.app.service('contributors')
-    const bookId = bookData[context.authorIx].id
-
-    const contributors = await contributorsService.find({
-      query: {
-        fk_book: bookId,
-        $select: ['contributor_role', 'published_name'],
-      },
-    })
-
-    if (!contributors.data.length) return ''
-
-    const authorContrib = contributors.data.find(
-      (contributor) => contributor.contributor_role === 'Author',
-    )
-    return authorContrib
-      ? authorContrib.published_name
-      : contributors.data[0].published_name
-  }),
+  // No need for virtual author property as it now comes from the subquery
 
   published_date: virtual(async (book, context) => {
     if (context.method === 'search') return ''
@@ -254,12 +227,22 @@ export const bookPatchValidator = getValidator(bookPatchSchema, dataValidator)
 export const bookPatchResolver = resolve<Book, HookContext<BookService>>({})
 
 // Schema for allowed query properties
-export const bookQueryProperties = Type.Omit(bookSchema, [])
+export const bookQueryProperties = Type.Omit(bookSchema, [
+  'author',
+  'published_date',
+  'issues_count',
+])
 export const bookQuerySchema = Type.Intersect(
   [
     querySyntax(bookQueryProperties),
     // Add additional query properties here
-    Type.Object({}, { additionalProperties: false }),
+    Type.Object(
+      {
+        // Allow querying by author
+        author: Type.Optional(Type.String()),
+      },
+      { additionalProperties: false },
+    ),
   ],
   { additionalProperties: false },
 )
