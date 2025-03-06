@@ -150,33 +150,7 @@ const getBookData = (context: HookContext<BookService>) => {
 
 export const bookResolver = resolve<Book, HookContext<BookService>>({
   // No need for virtual author property as it now comes from the subquery
-
-  published_date: virtual(async (book, context) => {
-    if (context.method === 'search') return ''
-
-    const bookData = getBookData(context)
-    if (!bookData) throw new Error('No result data available in context')
-
-    context.dateIx = 'dateIx' in context ? context.dateIx + 1 : 0
-    if (context.dateIx >= bookData.length) return ''
-
-    const releasesService = context.app.service('releases')
-    const bookId = bookData[context.dateIx].id
-
-    // Get all releases with non-empty publication dates
-    const releases = await releasesService.find({
-      query: {
-        fk_book: bookId,
-        publication_date: {
-          $ne: '', // Filter out empty publication dates
-        },
-        $select: ['publication_date'],
-        $sort: { publication_date: 1 },
-      },
-    })
-
-    return releases.data.length ? releases.data[0].publication_date : ''
-  }),
+  // No need for virtual published_date property as it now comes from the subquery
 
   issues_count: virtual(async (book, context) => {
     if (context.method === 'search') return 0
@@ -238,8 +212,9 @@ export const bookQuerySchema = Type.Intersect(
     // Add additional query properties here
     Type.Object(
       {
-        // Allow querying by author
+        // Allow querying by author and published_date
         author: Type.Optional(Type.String()),
+        published_date: Type.Optional(Type.String()),
       },
       { additionalProperties: false },
     ),

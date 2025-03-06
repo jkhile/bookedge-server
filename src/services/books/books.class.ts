@@ -31,7 +31,7 @@ export class BookService<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ServiceParams extends Params = BookParams,
 > extends KnexService<Book, BookData, BookParams, BookPatch> {
-  // Override createQuery to add the join with contributors
+  // Override createQuery to add subqueries for virtual properties
   createQuery(params: KnexAdapterParams<BookQuery>) {
     const query = super.createQuery(params)
 
@@ -45,6 +45,23 @@ export class BookService<
 
     // Add the author as a field via subquery
     query.select(this.Model.raw(`(${authorSubquery.toQuery()}) as author`))
+
+    // Subquery to get the earliest publication date from releases table
+    // Only considering non-empty publication dates
+    const publishedDateSubquery = this.Model.select('publication_date')
+      .from('releases')
+      .whereRaw('releases.fk_book = books.id')
+      .whereRaw("releases.publication_date != ''")
+      .orderBy('publication_date', 'asc')
+      .limit(1)
+
+    // Add the published_date as a field via subquery
+    // Use COALESCE to default to empty string if no releases are found
+    query.select(
+      this.Model.raw(
+        `COALESCE((${publishedDateSubquery.toQuery()}), '') as published_date`,
+      ),
+    )
 
     return query
   }
