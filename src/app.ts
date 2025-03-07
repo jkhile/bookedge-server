@@ -31,10 +31,19 @@ const app: Application = koa(feathers())
 app.configure(configuration(configurationValidator))
 
 // Set up Koa middleware
-app.use(cors({
-  origin: app.get('origins'),
-  credentials: true
-}))
+app.use(
+  cors({
+    origin: function (ctx) {
+      const requestOrigin = ctx.request.header.origin || ''
+      const origins = app.get('origins') as string[]
+      if (origins.includes(requestOrigin)) {
+        return requestOrigin
+      }
+      return ''
+    },
+    credentials: true,
+  }),
+)
 app.use(serveStatic(app.get('public')))
 app.use(errorHandler())
 app.use(parseAuthentication())
@@ -53,10 +62,17 @@ app.configure(rest())
 app.configure(
   socketio({
     cors: {
-      origin: app.get('origins'),
+      origin: function (origin, callback) {
+        const origins = app.get('origins') as string[]
+        if (!origin || origins.includes(origin)) {
+          callback(null, true)
+        } else {
+          callback(new Error(`Origin ${origin} not allowed by CORS`))
+        }
+      },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization']
+      allowedHeaders: ['Content-Type', 'Authorization'],
     },
   }),
 )
