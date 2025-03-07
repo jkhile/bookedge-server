@@ -63,6 +63,20 @@ export class BookService<
       ),
     )
 
+    // Subquery to count unresolved issues for the book
+    const issuesCountSubquery = this.Model.count('* as count')
+      .from('issues')
+      .whereRaw('issues.fk_book = books.id')
+      .where('resolved', false)
+
+    // Add the issues_count as a field via subquery
+    // Use COALESCE to default to 0 if there are no issues
+    query.select(
+      this.Model.raw(
+        `COALESCE((${issuesCountSubquery.toQuery()}), 0) as issues_count`,
+      ),
+    )
+
     return query
   }
 

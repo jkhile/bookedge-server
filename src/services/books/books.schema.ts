@@ -1,4 +1,4 @@
-import { resolve, virtual } from '@feathersjs/schema'
+import { resolve } from '@feathersjs/schema'
 import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
 import { formatISO } from 'date-fns'
 import { imprintsResolver } from '../../utils/imprints-resolver'
@@ -126,60 +126,27 @@ export const bookSchema = Type.Object(
     marketing_notes: Type.String(),
     fk_created_by: Type.Optional(Type.Integer()),
     created_at: Type.Optional(Type.String({ format: 'date-time' })),
-    // virtual fields
+    // virtual fields - all should be optional since they're calculated by the server
     author: Type.Optional(Type.String()),
-    published_date: Type.String(),
-    issues_count: Type.Integer(),
+    published_date: Type.Optional(Type.String()),
+    issues_count: Type.Optional(Type.Number()), // Changed from Integer to Number to be more permissive
   },
   { $id: 'Book', additionalProperties: false },
 )
 export type Book = Static<typeof bookSchema>
 export const bookValidator = getValidator(bookSchema, dataValidator)
 // Helper function to get book data regardless of method
-const getBookData = (context: HookContext<BookService>) => {
-  if (!context.result) return null
-
-  // If it's a 'find' operation, result will have a data property
-  if ('data' in context.result) {
-    return Array.isArray(context.result.data) ? context.result.data : null
-  }
-
-  // If it's a 'get' operation, result will be the book object
-  return Array.isArray(context.result) ? context.result : [context.result]
-}
-
 export const bookResolver = resolve<Book, HookContext<BookService>>({
   // No need for virtual author property as it now comes from the subquery
   // No need for virtual published_date property as it now comes from the subquery
-
-  issues_count: virtual(async (book, context) => {
-    if (context.method === 'search') return 0
-
-    const bookData = getBookData(context)
-    if (!bookData) throw new Error('No result data available in context')
-
-    context.issueIx = 'issueIx' in context ? context.issueIx + 1 : 0
-    if (context.issueIx >= bookData.length) return 0
-
-    const issuesService = context.app.service('issues')
-    const bookId = bookData[context.issueIx].id
-
-    const issues = await issuesService.find({
-      query: {
-        fk_book: bookId,
-        resolved: false,
-        $limit: 0,
-      },
-    })
-
-    return issues.total
-  }),
+  // No need for virtual issues_count property as it now comes from the subquery
 })
 export const bookExternalResolver = resolve<Book, HookContext<BookService>>({})
 
 // Schema for creating new entries
 export const bookDataSchema = Type.Omit(
   bookSchema,
+  // Only omit fields that are set by the server, leave virtual fields in the schema
   ['id', 'fk_created_by', 'created_at'],
   {
     $id: 'BookData',
@@ -212,9 +179,10 @@ export const bookQuerySchema = Type.Intersect(
     // Add additional query properties here
     Type.Object(
       {
-        // Allow querying by author and published_date
+        // Allow querying by author, published_date, and issues_count, but make them optional
         author: Type.Optional(Type.String()),
         published_date: Type.Optional(Type.String()),
+        issues_count: Type.Optional(Type.Number()), // Keep as Number to match main schema
       },
       { additionalProperties: false },
     ),
