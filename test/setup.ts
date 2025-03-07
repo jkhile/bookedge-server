@@ -8,9 +8,9 @@ process.env.PORT = '8998'
 
 // Global setup hooks
 beforeAll(async () => {
-  console.log('Starting test server...')
+  console.info('Starting test server...')
 })
 
 afterAll(async () => {
-  console.log('Cleaning up test resources...')
+  console.info('Cleaning up test resources...')
 })
