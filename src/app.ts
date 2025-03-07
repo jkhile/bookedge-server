@@ -31,7 +31,10 @@ const app: Application = koa(feathers())
 app.configure(configuration(configurationValidator))
 
 // Set up Koa middleware
-app.use(cors())
+app.use(cors({
+  origin: app.get('origins'),
+  credentials: true
+}))
 app.use(serveStatic(app.get('public')))
 app.use(errorHandler())
 app.use(parseAuthentication())
@@ -50,9 +53,10 @@ app.configure(rest())
 app.configure(
   socketio({
     cors: {
-      origin: (origin, callback) => {
-        callback(null, true)
-      },
+      origin: app.get('origins'),
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization']
     },
   }),
 )
