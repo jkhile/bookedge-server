@@ -34,7 +34,10 @@ app.configure(configuration(configurationValidator))
 // More permissive CORS policy for debugging
 app.use(
   cors({
-    origin: true, // Allow all origins for now to debug staging CORS issues
+    origin: function (ctx) {
+      // Always return the request origin to allow all origins
+      return ctx.request.header.origin || '*'
+    },
     credentials: true,
   }),
 )
@@ -56,7 +59,7 @@ app.configure(rest())
 app.configure(
   socketio({
     cors: {
-      origin: true, // Allow all origins for debugging purposes
+      origin: '*', // Allow all origins for debugging purposes
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
