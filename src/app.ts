@@ -31,12 +31,16 @@ const app: Application = koa(feathers())
 app.configure(configuration(configurationValidator))
 
 // Set up Koa middleware
-// More permissive CORS policy for debugging
 app.use(
   cors({
     origin: function (ctx) {
-      // Always return the request origin to allow all origins
-      return ctx.request.header.origin || '*'
+      const requestOrigin = ctx.request.header.origin || ''
+      const origins = app.get('origins') as string[]
+
+      if (origins.includes(requestOrigin)) {
+        return requestOrigin
+      }
+      return ''
     },
     credentials: true,
   }),
@@ -59,7 +63,14 @@ app.configure(rest())
 app.configure(
   socketio({
     cors: {
-      origin: '*', // Allow all origins for debugging purposes
+      origin: function (origin, callback) {
+        const origins = app.get('origins') as string[]
+        if (!origin || origins.includes(origin)) {
+          callback(null, true)
+        } else {
+          callback(new Error(`Origin ${origin} not allowed by CORS`))
+        }
+      },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
