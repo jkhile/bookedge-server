@@ -11,7 +11,9 @@ import type { BooksHistoryService } from './books-history.class'
 export const booksHistorySchema = Type.Object(
   {
     id: Type.Number(),
-    fk_book: Type.Number(),
+    entity_type: Type.String(), // New field: The type of entity ("book", "contributor", etc.)
+    entity_id: Type.Number(), // New field: The ID of the entity
+    fk_book: Type.Optional(Type.Number()), // Keep for backward compatibility
     fk_user: Type.Number(),
     user_email: Type.String(),
     change_date: Type.String(),

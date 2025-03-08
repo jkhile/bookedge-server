@@ -1,7 +1,7 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
 import { authenticate } from '@feathersjs/authentication'
-
 import { hooks as schemaHooks } from '@feathersjs/schema'
+import { recordHistoryHook } from '../../hooks/record-history'
 
 import {
   contributorDataValidator,
@@ -37,6 +37,49 @@ export const contributor = (app: Application) => {
         authenticate('jwt'),
         schemaHooks.resolveExternal(contributorExternalResolver),
         schemaHooks.resolveResult(contributorResolver),
+      ],
+      create: [
+        recordHistoryHook({
+          entityType: 'contributor',
+          fields: [
+            'biography',
+            'short_biography',
+            'amazon_biography',
+            'one_line_biography',
+            'notes',
+          ],
+          defaultValues: {
+            biography: '',
+            short_biography: '',
+            amazon_biography: '',
+            one_line_biography: '',
+            notes: '',
+          },
+        }),
+      ],
+      update: [
+        recordHistoryHook({
+          entityType: 'contributor',
+          fields: [
+            'biography',
+            'short_biography',
+            'amazon_biography',
+            'one_line_biography',
+            'notes',
+          ],
+        }),
+      ],
+      patch: [
+        recordHistoryHook({
+          entityType: 'contributor',
+          fields: [
+            'biography',
+            'short_biography',
+            'amazon_biography',
+            'one_line_biography',
+            'notes',
+          ],
+        }),
       ],
     },
     before: {
