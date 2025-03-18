@@ -30,12 +30,28 @@ export const channels = (app: Application) => {
     },
   )
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   app.publish((data: any, context: HookContext) => {
-    // Here you can add event publishers to channels set up in `channels.js`
-    // To publish only for a specific event use `app.publish(eventname, () => {})`
+    // Get the authenticated channel
+    const channels = app.channel('authenticated')
 
-    // e.g. to publish all service events to all authenticated users use
-    return app.channel('authenticated')
+    // No need to modify data if we're not sending user info
+    if (
+      !context.params.user ||
+      (context.method !== 'patch' && context.method !== 'update')
+    ) {
+      return channels
+    }
+
+    // Create a new object with the user metadata
+    const dataWithUser = {
+      ...data,
+      _lastModifiedBy: {
+        id: context.params.user.id,
+        email: context.params.user.email,
+      },
+    }
+
+    // Send the modified data to authenticated users
+    return channels.send(dataWithUser)
   })
 }
