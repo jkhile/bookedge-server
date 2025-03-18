@@ -2,6 +2,10 @@
 import { resolve } from '@feathersjs/schema'
 import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
 import type { Static } from '@feathersjs/typebox'
+import {
+  createDataResolver,
+  createUpdateResolver,
+} from '../../utils/update-resolver'
 
 import type { HookContext } from '../../declarations'
 import { dataValidator, queryValidator } from '../../validators'
@@ -39,6 +43,8 @@ export const pricingSchema = Type.Object(
     gc_returnable: returnableType,
     fk_created_by: Type.Optional(Type.Integer()),
     created_at: Type.Optional(Type.String({ format: 'date-time' })),
+    fk_updated_by: Type.Optional(Type.Integer()),
+    updated_at: Type.Optional(Type.String({ format: 'date-time' })),
   },
   { $id: 'Pricing', additionalProperties: false },
 )
@@ -54,7 +60,7 @@ export const pricingExternalResolver = resolve<
 // Schema for creating new entries
 export const pricingDataSchema = Type.Omit(
   pricingSchema,
-  ['id', 'fk_created_by', 'created_at'],
+  ['id', 'fk_created_by', 'created_at', 'fk_updated_by', 'updated_at'],
   {
     $id: 'PricingData',
   },
@@ -64,10 +70,7 @@ export const pricingDataValidator = getValidator(
   pricingDataSchema,
   dataValidator,
 )
-export const pricingDataResolver = resolve<
-  Pricing,
-  HookContext<PricingService>
->({})
+export const pricingDataResolver = createDataResolver<Pricing>()
 
 // Schema for updating existing entries
 export const pricingPatchSchema = Type.Partial(pricingSchema, {
@@ -78,10 +81,7 @@ export const pricingPatchValidator = getValidator(
   pricingPatchSchema,
   dataValidator,
 )
-export const pricingPatchResolver = resolve<
-  Pricing,
-  HookContext<PricingService>
->({})
+export const pricingPatchResolver = createUpdateResolver<Pricing>()
 
 // Schema for allowed query properties
 export const pricingQueryProperties = Type.Omit(pricingSchema, [])

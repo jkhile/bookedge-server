@@ -1,7 +1,10 @@
 import { resolve } from '@feathersjs/schema'
 import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
-import { formatISO } from 'date-fns'
 import { dataValidator, queryValidator } from '../../validators'
+import {
+  createDataResolver,
+  createUpdateResolver,
+} from '../../utils/update-resolver'
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
 import type { Static } from '@feathersjs/typebox'
 
@@ -89,6 +92,8 @@ export const releaseSchema = Type.Object(
     notes: Type.String(),
     fk_created_by: Type.Optional(Type.Integer()),
     created_at: Type.Optional(Type.String({ format: 'date-time' })),
+    fk_updated_by: Type.Optional(Type.Integer()),
+    updated_at: Type.Optional(Type.String({ format: 'date-time' })),
   },
   { $id: 'Release', additionalProperties: false },
 )
@@ -104,7 +109,7 @@ export const releaseExternalResolver = resolve<
 // Schema for creating new entries
 export const releaseDataSchema = Type.Omit(
   releaseSchema,
-  ['id', 'fk_created_by', 'created_at'],
+  ['id', 'fk_created_by', 'created_at', 'fk_updated_by', 'updated_at'],
   {
     $id: 'ReleaseData',
   },
@@ -114,13 +119,7 @@ export const releaseDataValidator = getValidator(
   releaseDataSchema,
   dataValidator,
 )
-export const releaseDataResolver = resolve<
-  Release,
-  HookContext<ReleaseService>
->({
-  created_at: async () => formatISO(new Date()),
-  fk_created_by: async (value, data, context) => context.params.user?.id,
-})
+export const releaseDataResolver = createDataResolver<Release>()
 
 // Schema for updating existing entries
 export const releasePatchSchema = Type.Partial(releaseSchema, {
@@ -131,10 +130,7 @@ export const releasePatchValidator = getValidator(
   releasePatchSchema,
   dataValidator,
 )
-export const releasePatchResolver = resolve<
-  Release,
-  HookContext<ReleaseService>
->({})
+export const releasePatchResolver = createUpdateResolver<Release>()
 
 // Schema for allowed query properties
 export const releaseQueryProperties = Type.Omit(releaseSchema, [])

@@ -38,6 +38,8 @@ export const userSchema = Type.Object(
     pinned_books: Type.Array(Type.Integer()),
     fk_created_by: Type.Optional(Type.Integer()),
     created_at: Type.Optional(Type.String()),
+    fk_updated_by: Type.Optional(Type.Integer()),
+    updated_at: Type.Optional(Type.String()),
   },
   { $id: 'User', additionalProperties: false },
 )
@@ -53,7 +55,7 @@ export const userExternalResolver = resolve<User, HookContext<UserService>>({
 // Schema for creating new entries
 export const userDataSchema = Type.Omit(
   userSchema,
-  ['id', 'fk_created_by', 'created_at'],
+  ['id', 'fk_created_by', 'created_at', 'fk_updated_by', 'updated_at'],
   {
     $id: 'UserData',
   },
@@ -64,6 +66,8 @@ export const userDataResolver = resolve<User, HookContext<UserService>>({
   password: passwordHash({ strategy: 'local' }),
   created_at: async () => formatISO(new Date()),
   fk_created_by: async (value, data, context) => context.params.user?.id,
+  updated_at: async () => formatISO(new Date()),
+  fk_updated_by: async (value, data, context) => context.params.user?.id,
 })
 
 // Schema for updating existing entries
@@ -74,6 +78,8 @@ export type UserPatch = Static<typeof userPatchSchema>
 export const userPatchValidator = getValidator(userPatchSchema, dataValidator)
 export const userPatchResolver = resolve<User, HookContext<UserService>>({
   password: passwordHash({ strategy: 'local' }),
+  updated_at: async () => formatISO(new Date()),
+  fk_updated_by: async (value, data, context) => context.params.user?.id,
 })
 
 // Schema for allowed query properties

@@ -2,7 +2,10 @@
 import { resolve } from '@feathersjs/schema'
 import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
 import type { Static } from '@feathersjs/typebox'
-import { formatISO } from 'date-fns'
+import {
+  createDataResolver,
+  createUpdateResolver,
+} from '../../utils/update-resolver'
 
 import type { HookContext } from '../../declarations'
 import { dataValidator, queryValidator } from '../../validators'
@@ -17,6 +20,8 @@ export const reviewQuotesSchema = Type.Object(
     reviewer: Type.String(),
     fk_created_by: Type.Optional(Type.Integer()),
     created_at: Type.Optional(Type.String({ format: 'date-time' })),
+    fk_updated_by: Type.Optional(Type.Integer()),
+    updated_at: Type.Optional(Type.String({ format: 'date-time' })),
   },
   { $id: 'ReviewQuotes', additionalProperties: false },
 )
@@ -38,7 +43,7 @@ export const reviewQuotesExternalResolver = resolve<
 // Schema for creating new entries
 export const reviewQuotesDataSchema = Type.Omit(
   reviewQuotesSchema,
-  ['id', 'fk_created_by', 'created_at'],
+  ['id', 'fk_created_by', 'created_at', 'fk_updated_by', 'updated_at'],
   {
     $id: 'ReviewQuotesData',
   },
@@ -48,13 +53,7 @@ export const reviewQuotesDataValidator = getValidator(
   reviewQuotesDataSchema,
   dataValidator,
 )
-export const reviewQuotesDataResolver = resolve<
-  ReviewQuotes,
-  HookContext<ReviewQuotesService>
->({
-  created_at: async () => formatISO(new Date()),
-  fk_created_by: async (value, data, context) => context.params.user?.id,
-})
+export const reviewQuotesDataResolver = createDataResolver<ReviewQuotes>()
 
 // Schema for updating existing entries
 export const reviewQuotesPatchSchema = Type.Partial(reviewQuotesSchema, {
@@ -65,10 +64,7 @@ export const reviewQuotesPatchValidator = getValidator(
   reviewQuotesPatchSchema,
   dataValidator,
 )
-export const reviewQuotesPatchResolver = resolve<
-  ReviewQuotes,
-  HookContext<ReviewQuotesService>
->({})
+export const reviewQuotesPatchResolver = createUpdateResolver<ReviewQuotes>()
 
 // Schema for allowed query properties
 export const reviewQuotesQueryProperties = Type.Omit(reviewQuotesSchema, [])

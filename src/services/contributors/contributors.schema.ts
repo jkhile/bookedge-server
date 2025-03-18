@@ -1,7 +1,10 @@
 import { dataValidator, queryValidator } from '../../validators'
-import { formatISO } from 'date-fns'
 import { getValidator, querySyntax, Type } from '@feathersjs/typebox'
 import { resolve } from '@feathersjs/schema'
+import {
+  createDataResolver,
+  createUpdateResolver,
+} from '../../utils/update-resolver'
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
 import type { Static } from '@feathersjs/typebox'
 
@@ -41,6 +44,8 @@ export const contributorSchema = Type.Object(
     notes: Type.String(),
     fk_created_by: Type.Optional(Type.Integer()),
     created_at: Type.Optional(Type.String({ format: 'date-time' })),
+    fk_updated_by: Type.Optional(Type.Integer()),
+    updated_at: Type.Optional(Type.String({ format: 'date-time' })),
   },
   { $id: 'Contributor', additionalProperties: false },
 )
@@ -62,7 +67,7 @@ export const contributorExternalResolver = resolve<
 // Schema for creating new entries
 export const contributorDataSchema = Type.Omit(
   contributorSchema,
-  ['id', 'fk_created_by', 'created_at'],
+  ['id', 'fk_created_by', 'created_at', 'fk_updated_by', 'updated_at'],
   {
     $id: 'ContributorData',
   },
@@ -72,13 +77,7 @@ export const contributorDataValidator = getValidator(
   contributorDataSchema,
   dataValidator,
 )
-export const contributorDataResolver = resolve<
-  Contributor,
-  HookContext<ContributorService>
->({
-  created_at: async () => formatISO(new Date()),
-  fk_created_by: async (value, data, context) => context.params.user?.id,
-})
+export const contributorDataResolver = createDataResolver<Contributor>()
 
 // Schema for updating existing entries
 export const contributorPatchSchema = Type.Partial(contributorSchema, {
@@ -89,10 +88,7 @@ export const contributorPatchValidator = getValidator(
   contributorPatchSchema,
   dataValidator,
 )
-export const contributorPatchResolver = resolve<
-  Contributor,
-  HookContext<ContributorService>
->({})
+export const contributorPatchResolver = createUpdateResolver<Contributor>()
 
 // Schema for allowed query properties
 export const contributorQueryProperties = Type.Omit(contributorSchema, [])

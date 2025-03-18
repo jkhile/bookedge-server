@@ -1,7 +1,10 @@
 import { resolve } from '@feathersjs/schema'
 import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
-import { formatISO } from 'date-fns'
 import { imprintsResolver } from '../../utils/imprints-resolver'
+import {
+  createDataResolver,
+  createUpdateResolver,
+} from '../../utils/update-resolver'
 import { dataValidator, queryValidator } from '../../validators'
 
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
@@ -129,6 +132,8 @@ export const bookSchema = Type.Object(
     marketing_notes: Type.String(),
     fk_created_by: Type.Optional(Type.Integer()),
     created_at: Type.Optional(Type.String({ format: 'date-time' })),
+    fk_updated_by: Type.Optional(Type.Integer()),
+    updated_at: Type.Optional(Type.String({ format: 'date-time' })),
     // virtual fields - all should be optional since they're calculated by the server
     author: Type.Optional(Type.String()),
     published_date: Type.Optional(Type.String()),
@@ -150,17 +155,14 @@ export const bookExternalResolver = resolve<Book, HookContext<BookService>>({})
 export const bookDataSchema = Type.Omit(
   bookSchema,
   // Only omit fields that are set by the server, leave virtual fields in the schema
-  ['id', 'fk_created_by', 'created_at'],
+  ['id', 'fk_created_by', 'created_at', 'fk_updated_by', 'updated_at'],
   {
     $id: 'BookData',
   },
 )
 export type BookData = Static<typeof bookDataSchema>
 export const bookDataValidator = getValidator(bookDataSchema, dataValidator)
-export const bookDataResolver = resolve<Book, HookContext<BookService>>({
-  created_at: async () => formatISO(new Date()),
-  fk_created_by: async (value, data, context) => context.params.user?.id,
-})
+export const bookDataResolver = createDataResolver<Book>()
 
 // Schema for updating existing entries
 export const bookPatchSchema = Type.Partial(bookSchema, {
@@ -168,7 +170,7 @@ export const bookPatchSchema = Type.Partial(bookSchema, {
 })
 export type BookPatch = Static<typeof bookPatchSchema>
 export const bookPatchValidator = getValidator(bookPatchSchema, dataValidator)
-export const bookPatchResolver = resolve<Book, HookContext<BookService>>({})
+export const bookPatchResolver = createUpdateResolver<Book>()
 
 // Schema for allowed query properties
 export const bookQueryProperties = Type.Omit(bookSchema, [

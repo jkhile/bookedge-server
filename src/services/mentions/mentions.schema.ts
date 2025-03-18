@@ -1,8 +1,11 @@
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
 import { resolve } from '@feathersjs/schema'
-import { formatISO } from 'date-fns'
 import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
 import type { Static } from '@feathersjs/typebox'
+import {
+  createDataResolver,
+  createUpdateResolver,
+} from '../../utils/update-resolver'
 
 import type { HookContext } from '../../declarations'
 import { dataValidator, queryValidator } from '../../validators'
@@ -20,6 +23,8 @@ export const mentionsSchema = Type.Object(
     byline: Type.String(),
     fk_created_by: Type.Optional(Type.Integer()),
     created_at: Type.Optional(Type.String({ format: 'date-time' })),
+    fk_updated_by: Type.Optional(Type.Integer()),
+    updated_at: Type.Optional(Type.String({ format: 'date-time' })),
   },
   { $id: 'Mentions', additionalProperties: false },
 )
@@ -37,7 +42,7 @@ export const mentionsExternalResolver = resolve<
 // Schema for creating new entries
 export const mentionsDataSchema = Type.Omit(
   mentionsSchema,
-  ['id', 'fk_created_by', 'created_at'],
+  ['id', 'fk_created_by', 'created_at', 'fk_updated_by', 'updated_at'],
   {
     $id: 'MentionsData',
   },
@@ -47,13 +52,7 @@ export const mentionsDataValidator = getValidator(
   mentionsDataSchema,
   dataValidator,
 )
-export const mentionsDataResolver = resolve<
-  Mentions,
-  HookContext<MentionsService>
->({
-  created_at: async () => formatISO(new Date()),
-  fk_created_by: async (value, data, context) => context.params.user?.id,
-})
+export const mentionsDataResolver = createDataResolver<Mentions>()
 
 // Schema for updating existing entries
 export const mentionsPatchSchema = Type.Partial(mentionsSchema, {
@@ -64,10 +63,7 @@ export const mentionsPatchValidator = getValidator(
   mentionsPatchSchema,
   dataValidator,
 )
-export const mentionsPatchResolver = resolve<
-  Mentions,
-  HookContext<MentionsService>
->({})
+export const mentionsPatchResolver = createUpdateResolver<Mentions>()
 
 // Schema for allowed query properties
 export const mentionsQueryProperties = Type.Omit(mentionsSchema, [])

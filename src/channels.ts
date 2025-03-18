@@ -43,6 +43,9 @@ export const channels = (app: Application) => {
     }
 
     // Create a new object with the user metadata
+    // This is maintained for backwards compatibility with clients
+    // that haven't been updated to use fk_updated_by yet
+    // TODO: Remove this once all clients have been updated
     const dataWithUser = {
       ...data,
       _lastModifiedBy: {

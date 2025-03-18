@@ -1,7 +1,10 @@
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
 import { resolve } from '@feathersjs/schema'
 import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
-import { formatISO } from 'date-fns'
+import {
+  createDataResolver,
+  createUpdateResolver,
+} from '../../utils/update-resolver'
 
 import type { Static } from '@feathersjs/typebox'
 
@@ -21,6 +24,8 @@ export const endorsementSchema = Type.Object(
     notes: Type.String(),
     fk_created_by: Type.Optional(Type.Integer()),
     created_at: Type.Optional(Type.String({ format: 'date-time' })),
+    fk_updated_by: Type.Optional(Type.Integer()),
+    updated_at: Type.Optional(Type.String({ format: 'date-time' })),
   },
   { $id: 'Endorsement', additionalProperties: false },
 )
@@ -42,7 +47,7 @@ export const endorsementExternalResolver = resolve<
 // Schema for creating new entries
 export const endorsementDataSchema = Type.Omit(
   endorsementSchema,
-  ['id', 'fk_created_by', 'created_at'],
+  ['id', 'fk_created_by', 'created_at', 'fk_updated_by', 'updated_at'],
   {
     $id: 'EndorsementData',
   },
@@ -52,13 +57,7 @@ export const endorsementDataValidator = getValidator(
   endorsementDataSchema,
   dataValidator,
 )
-export const endorsementDataResolver = resolve<
-  Endorsement,
-  HookContext<EndorsementService>
->({
-  created_at: async () => formatISO(new Date()),
-  fk_created_by: async (value, data, context) => context.params.user?.id,
-})
+export const endorsementDataResolver = createDataResolver<Endorsement>()
 
 // Schema for updating existing entries
 export const endorsementPatchSchema = Type.Partial(endorsementSchema, {
@@ -69,10 +68,7 @@ export const endorsementPatchValidator = getValidator(
   endorsementPatchSchema,
   dataValidator,
 )
-export const endorsementPatchResolver = resolve<
-  Endorsement,
-  HookContext<EndorsementService>
->({})
+export const endorsementPatchResolver = createUpdateResolver<Endorsement>()
 
 // Schema for allowed query properties
 export const endorsementQueryProperties = Type.Omit(endorsementSchema, [])

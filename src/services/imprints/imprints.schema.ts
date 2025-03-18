@@ -1,8 +1,11 @@
 import { dataValidator, queryValidator } from '../../validators'
-import { formatISO } from 'date-fns'
 import { getValidator, querySyntax, Type } from '@feathersjs/typebox'
 import { imprintsResolver } from '../../utils/imprints-resolver'
 import { resolve } from '@feathersjs/schema'
+import {
+  createDataResolver,
+  createUpdateResolver,
+} from '../../utils/update-resolver'
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
 import type { Static } from '@feathersjs/typebox'
 
@@ -28,6 +31,8 @@ export const imprintSchema = Type.Object(
     notes: Type.String(),
     fk_created_by: Type.Optional(Type.Integer()),
     created_at: Type.Optional(Type.String({ format: 'date-time' })),
+    fk_updated_by: Type.Optional(Type.Integer()),
+    updated_at: Type.Optional(Type.String({ format: 'date-time' })),
   },
   { $id: 'Imprint', additionalProperties: false },
 )
@@ -43,7 +48,7 @@ export const imprintExternalResolver = resolve<
 // Schema for creating new entries
 export const imprintDataSchema = Type.Omit(
   imprintSchema,
-  ['id', 'fk_created_by', 'created_at'],
+  ['id', 'fk_created_by', 'created_at', 'fk_updated_by', 'updated_at'],
   {
     $id: 'ImprintData',
   },
@@ -53,13 +58,7 @@ export const imprintDataValidator = getValidator(
   imprintDataSchema,
   dataValidator,
 )
-export const imprintDataResolver = resolve<
-  Imprint,
-  HookContext<ImprintService>
->({
-  created_at: async () => formatISO(new Date()),
-  fk_created_by: async (value, data, context) => context.params.user?.id,
-})
+export const imprintDataResolver = createDataResolver<Imprint>()
 
 // Schema for updating existing entries
 export const imprintPatchSchema = Type.Partial(imprintSchema, {
@@ -70,10 +69,7 @@ export const imprintPatchValidator = getValidator(
   imprintPatchSchema,
   dataValidator,
 )
-export const imprintPatchResolver = resolve<
-  Imprint,
-  HookContext<ImprintService>
->({})
+export const imprintPatchResolver = createUpdateResolver<Imprint>()
 
 // Schema for allowed query properties
 export const imprintQueryProperties = Type.Omit(imprintSchema, [])
