@@ -70,7 +70,10 @@ export const pricingDataValidator = getValidator(
   pricingDataSchema,
   dataValidator,
 )
-export const pricingDataResolver = createDataResolver<Pricing>()
+export const pricingDataResolver = resolve<
+  Pricing,
+  HookContext<PricingService>
+>(createDataResolver<Pricing>())
 
 // Schema for updating existing entries
 export const pricingPatchSchema = Type.Partial(pricingSchema, {
@@ -81,7 +84,10 @@ export const pricingPatchValidator = getValidator(
   pricingPatchSchema,
   dataValidator,
 )
-export const pricingPatchResolver = createUpdateResolver<Pricing>()
+export const pricingPatchResolver = resolve<
+  Pricing,
+  HookContext<PricingService>
+>(createUpdateResolver<Pricing>())
 
 // Schema for allowed query properties
 export const pricingQueryProperties = Type.Omit(pricingSchema, [])

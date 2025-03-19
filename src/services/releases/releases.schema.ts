@@ -119,7 +119,10 @@ export const releaseDataValidator = getValidator(
   releaseDataSchema,
   dataValidator,
 )
-export const releaseDataResolver = createDataResolver<Release>()
+export const releaseDataResolver = resolve<
+  Release,
+  HookContext<ReleaseService>
+>(createDataResolver<Release>())
 
 // Schema for updating existing entries
 export const releasePatchSchema = Type.Partial(releaseSchema, {
@@ -130,7 +133,10 @@ export const releasePatchValidator = getValidator(
   releasePatchSchema,
   dataValidator,
 )
-export const releasePatchResolver = createUpdateResolver<Release>()
+export const releasePatchResolver = resolve<
+  Release,
+  HookContext<ReleaseService>
+>(createUpdateResolver<Release>())
 
 // Schema for allowed query properties
 export const releaseQueryProperties = Type.Omit(releaseSchema, [])

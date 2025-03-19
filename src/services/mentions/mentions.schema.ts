@@ -52,7 +52,10 @@ export const mentionsDataValidator = getValidator(
   mentionsDataSchema,
   dataValidator,
 )
-export const mentionsDataResolver = createDataResolver<Mentions>()
+export const mentionsDataResolver = resolve<
+  Mentions,
+  HookContext<MentionsService>
+>(createDataResolver<Mentions>())
 
 // Schema for updating existing entries
 export const mentionsPatchSchema = Type.Partial(mentionsSchema, {
@@ -63,7 +66,10 @@ export const mentionsPatchValidator = getValidator(
   mentionsPatchSchema,
   dataValidator,
 )
-export const mentionsPatchResolver = createUpdateResolver<Mentions>()
+export const mentionsPatchResolver = resolve<
+  Mentions,
+  HookContext<MentionsService>
+>(createUpdateResolver<Mentions>())
 
 // Schema for allowed query properties
 export const mentionsQueryProperties = Type.Omit(mentionsSchema, [])

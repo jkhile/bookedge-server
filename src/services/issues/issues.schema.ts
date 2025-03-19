@@ -47,9 +47,15 @@ export const issueDataSchema = Type.Omit(
 )
 export type IssueData = Static<typeof issueDataSchema>
 export const issueDataValidator = getValidator(issueDataSchema, dataValidator)
-// Combine our standard data resolver with custom field handling
+// Create a data resolver that also includes our book_title override
 export const issueDataResolver = resolve<Issue, HookContext<IssueService>>({
-  ...createDataResolver<Issue>(),
+  // Get field resolvers for standard timestamp fields
+  created_at: async () => new Date().toISOString(),
+  fk_created_by: async (value: any, data: any, context: HookContext<any>) =>
+    context.params.user?.id,
+  updated_at: async () => new Date().toISOString(),
+  fk_updated_by: async (value: any, data: any, context: HookContext<any>) =>
+    context.params.user?.id,
   // Explicitly return undefined for book_title to exclude it from validation
   book_title: () => undefined,
 })
@@ -61,7 +67,10 @@ export const issuePatchSchema = Type.Partial(issueSchema, {
 export type IssuePatch = Static<typeof issuePatchSchema>
 export const issuePatchValidator = getValidator(issuePatchSchema, dataValidator)
 export const issuePatchResolver = resolve<Issue, HookContext<IssueService>>({
-  ...createUpdateResolver<Issue>(),
+  // Get field resolvers for standard timestamp fields
+  updated_at: async () => new Date().toISOString(),
+  fk_updated_by: async (value: any, data: any, context: HookContext<any>) =>
+    context.params.user?.id,
   // Explicitly return undefined for book_title to exclude it from validation
   book_title: () => undefined,
 })

@@ -58,7 +58,10 @@ export const imprintDataValidator = getValidator(
   imprintDataSchema,
   dataValidator,
 )
-export const imprintDataResolver = createDataResolver<Imprint>()
+export const imprintDataResolver = resolve<
+  Imprint,
+  HookContext<ImprintService>
+>(createDataResolver<Imprint>())
 
 // Schema for updating existing entries
 export const imprintPatchSchema = Type.Partial(imprintSchema, {
@@ -69,7 +72,10 @@ export const imprintPatchValidator = getValidator(
   imprintPatchSchema,
   dataValidator,
 )
-export const imprintPatchResolver = createUpdateResolver<Imprint>()
+export const imprintPatchResolver = resolve<
+  Imprint,
+  HookContext<ImprintService>
+>(createUpdateResolver<Imprint>())
 
 // Schema for allowed query properties
 export const imprintQueryProperties = Type.Omit(imprintSchema, [])

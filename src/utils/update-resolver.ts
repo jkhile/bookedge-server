@@ -20,14 +20,12 @@ interface WithCreatedFields extends WithUpdatedFields {
  * @returns A resolver that sets updated_at and fk_updated_by fields
  */
 export function createUpdateResolver<T extends WithUpdatedFields>() {
-  // Use type assertion to satisfy TypeScript
-  const properties = {
+  // Just return the property resolver map directly
+  return {
     updated_at: async () => formatISO(new Date()),
     fk_updated_by: async (value: any, data: any, context: HookContext<any>) =>
       context.params.user?.id,
   } as unknown as PropertyResolverMap<T, HookContext<any>>
-
-  return resolve<T, HookContext<any>>(properties)
 }
 
 /**
@@ -36,8 +34,8 @@ export function createUpdateResolver<T extends WithUpdatedFields>() {
  * @returns A resolver that sets all created and updated fields
  */
 export function createDataResolver<T extends WithCreatedFields>() {
-  // Use type assertion to satisfy TypeScript
-  const properties = {
+  // Just return the property resolver map directly
+  return {
     created_at: async () => formatISO(new Date()),
     fk_created_by: async (value: any, data: any, context: HookContext<any>) =>
       context.params.user?.id,
@@ -45,6 +43,5 @@ export function createDataResolver<T extends WithCreatedFields>() {
     fk_updated_by: async (value: any, data: any, context: HookContext<any>) =>
       context.params.user?.id,
   } as unknown as PropertyResolverMap<T, HookContext<any>>
-
-  return resolve<T, HookContext<any>>(properties)
 }
+ 

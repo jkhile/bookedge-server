@@ -162,7 +162,9 @@ export const bookDataSchema = Type.Omit(
 )
 export type BookData = Static<typeof bookDataSchema>
 export const bookDataValidator = getValidator(bookDataSchema, dataValidator)
-export const bookDataResolver = createDataResolver<Book>()
+export const bookDataResolver = resolve<Book, HookContext<BookService>>(
+  createDataResolver<Book>(),
+)
 
 // Schema for updating existing entries
 export const bookPatchSchema = Type.Partial(bookSchema, {
@@ -170,7 +172,9 @@ export const bookPatchSchema = Type.Partial(bookSchema, {
 })
 export type BookPatch = Static<typeof bookPatchSchema>
 export const bookPatchValidator = getValidator(bookPatchSchema, dataValidator)
-export const bookPatchResolver = createUpdateResolver<Book>()
+export const bookPatchResolver = resolve<Book, HookContext<BookService>>(
+  createUpdateResolver<Book>(),
+)
 
 // Schema for allowed query properties
 export const bookQueryProperties = Type.Omit(bookSchema, [

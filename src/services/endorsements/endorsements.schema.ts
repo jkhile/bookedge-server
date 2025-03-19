@@ -57,7 +57,10 @@ export const endorsementDataValidator = getValidator(
   endorsementDataSchema,
   dataValidator,
 )
-export const endorsementDataResolver = createDataResolver<Endorsement>()
+export const endorsementDataResolver = resolve<
+  Endorsement,
+  HookContext<EndorsementService>
+>(createDataResolver<Endorsement>())
 
 // Schema for updating existing entries
 export const endorsementPatchSchema = Type.Partial(endorsementSchema, {
@@ -68,7 +71,10 @@ export const endorsementPatchValidator = getValidator(
   endorsementPatchSchema,
   dataValidator,
 )
-export const endorsementPatchResolver = createUpdateResolver<Endorsement>()
+export const endorsementPatchResolver = resolve<
+  Endorsement,
+  HookContext<EndorsementService>
+>(createUpdateResolver<Endorsement>())
 
 // Schema for allowed query properties
 export const endorsementQueryProperties = Type.Omit(endorsementSchema, [])

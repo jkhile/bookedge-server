@@ -4,6 +4,7 @@
 * Fix mentions DataResolver to add created_at and fk_create_by
 * Html editor fields now show when another changes them
 * Saving edited pages are a bit faster
+* Added multi-user conflict detection and resolution
 
 ## 14.0
 * Add priority property to endorsement

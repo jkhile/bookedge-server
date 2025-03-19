@@ -53,7 +53,10 @@ export const reviewQuotesDataValidator = getValidator(
   reviewQuotesDataSchema,
   dataValidator,
 )
-export const reviewQuotesDataResolver = createDataResolver<ReviewQuotes>()
+export const reviewQuotesDataResolver = resolve<
+  ReviewQuotes,
+  HookContext<ReviewQuotesService>
+>(createDataResolver<ReviewQuotes>())
 
 // Schema for updating existing entries
 export const reviewQuotesPatchSchema = Type.Partial(reviewQuotesSchema, {
@@ -64,7 +67,10 @@ export const reviewQuotesPatchValidator = getValidator(
   reviewQuotesPatchSchema,
   dataValidator,
 )
-export const reviewQuotesPatchResolver = createUpdateResolver<ReviewQuotes>()
+export const reviewQuotesPatchResolver = resolve<
+  ReviewQuotes,
+  HookContext<ReviewQuotesService>
+>(createUpdateResolver<ReviewQuotes>())
 
 // Schema for allowed query properties
 export const reviewQuotesQueryProperties = Type.Omit(reviewQuotesSchema, [])

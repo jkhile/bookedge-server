@@ -77,7 +77,10 @@ export const contributorDataValidator = getValidator(
   contributorDataSchema,
   dataValidator,
 )
-export const contributorDataResolver = createDataResolver<Contributor>()
+export const contributorDataResolver = resolve<
+  Contributor,
+  HookContext<ContributorService>
+>(createDataResolver<Contributor>())
 
 // Schema for updating existing entries
 export const contributorPatchSchema = Type.Partial(contributorSchema, {
@@ -88,7 +91,10 @@ export const contributorPatchValidator = getValidator(
   contributorPatchSchema,
   dataValidator,
 )
-export const contributorPatchResolver = createUpdateResolver<Contributor>()
+export const contributorPatchResolver = resolve<
+  Contributor,
+  HookContext<ContributorService>
+>(createUpdateResolver<Contributor>())
 
 // Schema for allowed query properties
 export const contributorQueryProperties = Type.Omit(contributorSchema, [])
