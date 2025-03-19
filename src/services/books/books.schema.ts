@@ -130,6 +130,7 @@ export const bookSchema = Type.Object(
     cover_text_submitted_date: Type.String(),
     supplementary_notes: Type.String(),
     marketing_notes: Type.String(),
+    amazon_review_quotes: Type.String(),
     fk_created_by: Type.Optional(Type.Integer()),
     created_at: Type.Optional(Type.String({ format: 'date-time' })),
     fk_updated_by: Type.Optional(Type.Integer()),

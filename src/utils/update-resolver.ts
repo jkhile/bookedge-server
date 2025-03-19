@@ -44,4 +44,3 @@ export function createDataResolver<T extends WithCreatedFields>() {
       context.params.user?.id,
   } as unknown as PropertyResolverMap<T, HookContext<any>>
 }
- 
