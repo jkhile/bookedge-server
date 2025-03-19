@@ -26,14 +26,6 @@ export type {
   SigninHistoryPatch,
 } from './services/signin-history/signin-history.shared'
 
-import { reviewQuotesClient } from './services/review-quotes/review-quotes.shared'
-export type {
-  ReviewQuotes,
-  ReviewQuotesData,
-  ReviewQuotesQuery,
-  ReviewQuotesPatch,
-} from './services/review-quotes/review-quotes.shared'
-
 import { mentionsClient } from './services/mentions/mentions.shared'
 export type {
   Mentions,
@@ -153,7 +145,6 @@ export const createClient = <Configuration = any>(
   client.configure(pricingClient)
   client.configure(issueClient)
   client.configure(mentionsClient)
-  client.configure(reviewQuotesClient)
   client.configure(signinHistoryClient)
   client.configure(fileStorageClient)
   return client
