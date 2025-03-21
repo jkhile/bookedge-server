@@ -5,6 +5,7 @@
 * Html editor fields now show when another changes them
 * Saving edited pages are a bit faster
 * Added multi-user conflict detection and resolution
+* Removed review-quotes service and table (migrated to amazon_review_quotes field in books table)
 
 ## 14.0
 * Add priority property to endorsement

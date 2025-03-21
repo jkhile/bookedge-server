@@ -1,4 +1,3 @@
-import { resolve } from '@feathersjs/schema'
 import { formatISO } from 'date-fns'
 import type { HookContext } from '../declarations'
 import type { PropertyResolverMap } from '@feathersjs/schema'

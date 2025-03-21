@@ -1,9 +1,5 @@
 import { resolve } from '@feathersjs/schema'
 import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
-import {
-  createDataResolver,
-  createUpdateResolver,
-} from '../../utils/update-resolver'
 import { dataValidator, queryValidator } from '../../validators'
 
 import type { IssueService } from './issues.class'
