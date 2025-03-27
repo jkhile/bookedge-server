@@ -2,7 +2,7 @@
 import type { RealTimeConnection, Params } from '@feathersjs/feathers'
 import type { AuthenticationResult } from '@feathersjs/authentication'
 import '@feathersjs/transport-commons'
-import type { Application, HookContext } from './declarations'
+import type { Application } from './declarations'
 // import { logger } from './logger'
 
 export const channels = (app: Application) => {
@@ -30,31 +30,11 @@ export const channels = (app: Application) => {
     },
   )
 
-  app.publish((data: any, context: HookContext) => {
+  app.publish(() => {
     // Get the authenticated channel
     const channels = app.channel('authenticated')
 
-    // No need to modify data if we're not sending user info
-    if (
-      !context.params.user ||
-      (context.method !== 'patch' && context.method !== 'update')
-    ) {
-      return channels
-    }
-
-    // Create a new object with the user metadata
-    // This is maintained for backwards compatibility with clients
-    // that haven't been updated to use fk_updated_by yet
-    // TODO: Remove this once all clients have been updated
-    const dataWithUser = {
-      ...data,
-      _lastModifiedBy: {
-        id: context.params.user.id,
-        email: context.params.user.email,
-      },
-    }
-
-    // Send the modified data to authenticated users
-    return channels.send(dataWithUser)
+    // Send data to authenticated users
+    return channels
   })
 }
