@@ -1,4 +1,5 @@
 // src/utils/error-handler.ts
+//
 import { FeathersError, NotFound } from '@feathersjs/errors'
 import { FeathersKoaContext } from '@feathersjs/koa'
 import { logger } from '../logger'
