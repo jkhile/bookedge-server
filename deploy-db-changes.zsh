@@ -21,7 +21,7 @@ fi
 echo "Dropping local database 'bookedge-server'..."
 dropdb bookedge-server
 
-# 2. Pull the remote database from Heroku to local
+# 2. Pull the production database from Heroku to local
 echo "Pulling remote database into local 'bookedge-server'..."
 heroku pg:pull DATABASE_URL bookedge-server --app=fep-bookedge-production
 
