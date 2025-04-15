@@ -124,3 +124,5 @@ lib/
 .DS_Store
 
 bookedge-server-schema.sql
+
+Bookedge App Engine Service Account.json
