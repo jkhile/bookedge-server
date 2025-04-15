@@ -1,4 +1,3 @@
-import { fileStorage } from './file-storage/file-storage'
 import { signinHistory } from './signin-history/signin-history'
 import { mentions } from './mentions/mentions'
 import { issue } from './issues/issues'
@@ -15,7 +14,6 @@ import { user } from './users/users'
 import type { Application } from '../declarations'
 
 export const services = (app: Application) => {
-  app.configure(fileStorage)
   app.configure(signinHistory)
   app.configure(mentions)
   app.configure(issue)
