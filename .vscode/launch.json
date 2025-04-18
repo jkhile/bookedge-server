@@ -31,6 +31,20 @@
       "outFiles": [
         "${workspaceFolder}/lib/**/*.js"
       ]
-    }
+    },
+        {
+      "type": "node",
+      "request": "launch",
+      "name": "Import authors",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}/src/scripts/import-author-contacts.ts",
+      "preLaunchTask": "tsc: build - tsconfig.json",
+      "outFiles": [
+        "${workspaceFolder}/lib/**/*.js"
+      ]
+    },
+
   ]
 }

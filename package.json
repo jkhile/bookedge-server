@@ -64,7 +64,9 @@
     "make-test-db": "./setup-test-server.zsh && psql --dbname=bookedge-test --file=insert-test-users.sql",
     "migrate": "dotenvx run -- knex migrate:latest",
     "migrate:down": "dotenvx run -- knex migrate:down",
-    "migrate:make": "knex migrate:make"
+    "migrate:make": "knex migrate:make",
+    "import-authors": "ts-node src/scripts/import-author-contacts.ts",
+    "test-parser": "ts-node src/scripts/test-parser.ts"
   },
   "dependencies": {
     "@feathersjs/adapter-commons": "^5.0.33",
@@ -83,6 +85,7 @@
     "@feathersjs/transport-commons": "^5.0.33",
     "@feathersjs/typebox": "^5.0.33",
     "coralogix-logger": "^1.1.30",
+    "csv-parse": "^5.6.0",
     "date-fns": "^4.1.0",
     "fs-extra": "^11.3.0",
     "google-auth-library": "^9.15.1",
