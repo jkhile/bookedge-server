@@ -15,5 +15,10 @@
         "secret": "GOOGLE_SECRET"
       }
     }
+  },
+  "googleDrive": {
+    "serviceAccount": "GOOGLE_DRIVE_SERVICE_ACCOUNT",
+    "rootFolder": "GOOGLE_DRIVE_ROOT_FOLDER",
+    "workspaceDomain": "GOOGLE_WORKSPACE_DOMAIN"
   }
 }

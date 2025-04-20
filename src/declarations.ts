@@ -7,12 +7,15 @@ import { Application as FeathersApplication } from '@feathersjs/koa'
 import { ApplicationConfiguration } from './configuration'
 
 import { User } from './services/users/users'
+import { GoogleDriveService } from './utils/google-drive-service'
 
 export type { NextFunction }
 
 // The types for app.get(name) and app.set(name)
 
-export interface Configuration extends ApplicationConfiguration {}
+export interface Configuration extends ApplicationConfiguration {
+  driveService?: GoogleDriveService
+}
 
 // A mapping of service names to types. Will be extended in service files.
 
