@@ -4,6 +4,7 @@ import socketio from '@feathersjs/socketio'
 import { authentication } from './authentication'
 import { channels } from './channels'
 import { configurationValidator } from './configuration'
+import { googleDrive } from './google-drive'
 import { logError } from './hooks/log-error'
 import { logServiceCall } from './hooks/log-service-call'
 // import { measurePerformance } from './hooks/measure-performance'
@@ -78,6 +79,7 @@ app.configure(
   }),
 )
 app.configure(postgresql)
+app.configure(googleDrive)
 app.configure(authentication)
 app.configure(services)
 app.configure(channels)

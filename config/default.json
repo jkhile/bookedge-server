@@ -46,5 +46,10 @@
         "scope": [ "openid", "email", "profile", "https://www.googleapis.com/auth/drive.file" ]
       }
     }
+  },
+  "googleDrive": {
+    "serviceAccount": "",
+    "rootFolder": "BookEdge",
+    "workspaceDomain": "frontedgepublishing.com"
   }
 }
