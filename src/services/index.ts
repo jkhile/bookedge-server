@@ -1,3 +1,4 @@
+import { metadataSearch } from './metadata-search/metadata-search'
 import { signinHistory } from './signin-history/signin-history'
 import { mentions } from './mentions/mentions'
 import { issue } from './issues/issues'
@@ -26,5 +27,6 @@ export const services = (app: Application) => {
   app.configure(book)
   app.configure(imprint)
   app.configure(user)
+  app.configure(metadataSearch)
   // All services will be registered here
 }

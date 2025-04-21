@@ -33,3 +33,20 @@ declare module '@feathersjs/feathers' {
     user?: User
   }
 }
+
+// Add the metadata-search service path to the list of service paths
+export interface ServiceTypesMap {
+  users: 'users'
+  contributors: 'contributors'
+  releases: 'releases'
+  issues: 'issues'
+  books: 'books'
+  'books-history': 'books-history'
+  imprints: 'imprints'
+  'log-messages': 'log-messages'
+  'signin-history': 'signin-history'
+  mentions: 'mentions'
+  pricings: 'pricings'
+  endorsements: 'endorsements'
+  'metadata-search': 'metadata-search'
+}
