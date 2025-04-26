@@ -33,7 +33,7 @@
       },
       "audience": "https://yourdomain.com",
       "algorithm": "HS256",
-      "expiresIn": "1d"
+      "expiresIn": "7d"
     },
     "local": {
       "usernameField": "email",
