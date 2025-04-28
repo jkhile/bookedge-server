@@ -31,6 +31,7 @@ export const userSchema = Type.Object(
         Type.Literal('proofer'),
         Type.Literal('publisher'),
         Type.Literal('author'),
+        Type.Literal('production'),
       ]),
     ),
     allowed_imprints: Type.Array(Type.Integer()),

@@ -2,6 +2,7 @@
 import { authenticate } from '@feathersjs/authentication'
 
 import { hooks as schemaHooks } from '@feathersjs/schema'
+import { restrictUserFields } from '../../hooks/restrict-user-fields'
 
 import {
   userDataValidator,
@@ -55,7 +56,9 @@ export const user = (app: Application) => {
         schemaHooks.validateData(userDataValidator),
         schemaHooks.resolveData(userDataResolver),
       ],
+      update: [restrictUserFields],
       patch: [
+        restrictUserFields,
         schemaHooks.validateData(userPatchValidator),
         schemaHooks.resolveData(userPatchResolver),
       ],
