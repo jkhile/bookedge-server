@@ -16,6 +16,7 @@ describe('restrictUserFields hook', () => {
           id: 1,
           roles: ['editor'],
         },
+        provider: 'rest', // Simulate an external request
       },
       data: {},
     }
@@ -88,5 +89,46 @@ describe('restrictUserFields hook', () => {
 
     // Should pass through without error
     expect(result).toBe(context)
+  })
+
+  it('allows internal calls to modify any field', async () => {
+    // Remove provider to simulate an internal call
+    delete context.params.provider
+
+    context.data = {
+      name: 'New Name',
+      roles: ['editor', 'author'],
+      file_storage_id: 'some-file-id',
+    }
+
+    const result = await restrictUserFields(context)
+
+    // Should pass through without error
+    expect(result).toBe(context)
+    expect(result.data).toEqual({
+      name: 'New Name',
+      roles: ['editor', 'author'],
+      file_storage_id: 'some-file-id',
+    })
+  })
+
+  it('allows internal calls to modify other user records', async () => {
+    // Remove provider to simulate an internal call
+    delete context.params.provider
+
+    // Different user ID
+    context.id = 999
+
+    context.data = {
+      file_storage_id: 'some-file-id',
+    }
+
+    const result = await restrictUserFields(context)
+
+    // Should pass through without error
+    expect(result).toBe(context)
+    expect(result.data).toEqual({
+      file_storage_id: 'some-file-id',
+    })
   })
 })
