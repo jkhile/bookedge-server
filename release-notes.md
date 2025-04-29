@@ -6,6 +6,7 @@
 * Saving edited pages are a bit faster
 * Added multi-user conflict detection and resolution
 * Removed review-quotes service and table (migrated to amazon_review_quotes field in books table)
+* Changed Issue text to use html editor rather than text area
 
 ## 14.0
 * Add priority property to endorsement
