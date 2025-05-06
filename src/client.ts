@@ -11,6 +11,14 @@ import { userClient } from './services/users/users.shared'
 import type { TransportConnection, Application } from '@feathersjs/feathers'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
+import { refreshTokenClient } from './services/refresh-token/refresh-token.shared'
+export type {
+  RefreshToken,
+  RefreshTokenData,
+  RefreshTokenQuery,
+  RefreshTokenPatch,
+} from './services/refresh-token/refresh-token.shared'
+
 import { signinHistoryClient } from './services/signin-history/signin-history.shared'
 export type {
   SigninHistory,
@@ -139,5 +147,6 @@ export const createClient = <Configuration = any>(
   client.configure(issueClient)
   client.configure(mentionsClient)
   client.configure(signinHistoryClient)
+  client.configure(refreshTokenClient)
   return client
 }

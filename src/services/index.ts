@@ -1,3 +1,4 @@
+import { refreshToken } from './refresh-token/refresh-token'
 import { metadataSearch } from './metadata-search/metadata-search'
 import { signinHistory } from './signin-history/signin-history'
 import { mentions } from './mentions/mentions'
@@ -15,6 +16,7 @@ import { user } from './users/users'
 import type { Application } from '../declarations'
 
 export const services = (app: Application) => {
+  app.configure(refreshToken)
   app.configure(signinHistory)
   app.configure(mentions)
   app.configure(issue)
