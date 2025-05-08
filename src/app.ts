@@ -11,6 +11,7 @@ import { logServiceCall } from './hooks/log-service-call'
 import { postgresql } from './postgresql'
 import { services } from './services/index'
 import { errorHandler } from './utils/error-handler'
+import debug from 'debug'
 
 // For more information about this file see https://dove.feathersjs.com/guides/cli/application.html
 import {
@@ -25,7 +26,7 @@ import {
 
 import type { Application } from './declarations'
 import { logger } from './logger'
-
+feathers.setDebug(debug)
 const app: Application = koa(feathers())
 
 // Load our app configuration (see config/ folder)
