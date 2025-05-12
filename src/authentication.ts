@@ -11,6 +11,7 @@ import {
   AuthenticationParams,
 } from '@feathersjs/authentication'
 import { fileStorageHook } from './hooks/file-storage-hook'
+import { addRefreshToken } from './hooks/add-refresh-token'
 
 declare module './declarations' {
   interface ServiceTypes {
@@ -28,7 +29,7 @@ export const authentication = (app: Application) => {
   app.use('authentication', authentication)
   app.service('authentication').hooks({
     after: {
-      create: [fileStorageHook],
+      create: [fileStorageHook, addRefreshToken],
     },
   })
   app.configure(oauth())

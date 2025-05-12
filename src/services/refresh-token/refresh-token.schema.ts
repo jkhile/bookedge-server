@@ -11,7 +11,11 @@ import type { RefreshTokenService } from './refresh-token.class'
 export const refreshTokenSchema = Type.Object(
   {
     id: Type.Number(),
-    text: Type.String(),
+    userId: Type.Number(),
+    token: Type.String(),
+    expiresAt: Type.String({ format: 'date-time' }),
+    createdAt: Type.String({ format: 'date-time' }),
+    updatedAt: Type.String({ format: 'date-time' }),
   },
   { $id: 'RefreshToken', additionalProperties: false },
 )
@@ -31,9 +35,13 @@ export const refreshTokenExternalResolver = resolve<
 >({})
 
 // Schema for creating new entries
-export const refreshTokenDataSchema = Type.Pick(refreshTokenSchema, ['text'], {
-  $id: 'RefreshTokenData',
-})
+export const refreshTokenDataSchema = Type.Omit(
+  refreshTokenSchema,
+  ['id', 'createdAt', 'updatedAt'],
+  {
+    $id: 'RefreshTokenData',
+  },
+)
 export type RefreshTokenData = Static<typeof refreshTokenDataSchema>
 export const refreshTokenDataValidator = getValidator(
   refreshTokenDataSchema,
@@ -59,10 +67,7 @@ export const refreshTokenPatchResolver = resolve<
 >({})
 
 // Schema for allowed query properties
-export const refreshTokenQueryProperties = Type.Pick(refreshTokenSchema, [
-  'id',
-  'text',
-])
+export const refreshTokenQueryProperties = Type.Omit(refreshTokenSchema, [])
 export const refreshTokenQuerySchema = Type.Intersect(
   [
     querySyntax(refreshTokenQueryProperties),

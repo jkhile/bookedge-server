@@ -35,6 +35,10 @@
       "algorithm": "HS256",
       "expiresIn": "7d"
     },
+    "refreshToken": {
+      "secret": "H82jKLm5Rn7PqA3Xt4zCvS6wByE9DfGu",
+      "expiresIn": "365d"
+    },
     "local": {
       "usernameField": "email",
       "passwordField": "password"

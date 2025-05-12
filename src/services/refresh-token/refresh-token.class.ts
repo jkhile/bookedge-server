@@ -23,6 +23,7 @@ export interface RefreshTokenParams
 
 // By default calls the standard Knex adapter service methods but can be customized with your own functionality.
 export class RefreshTokenService<
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ServiceParams extends Params = RefreshTokenParams,
 > extends KnexService<
   RefreshToken,
