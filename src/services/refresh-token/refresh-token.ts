@@ -34,10 +34,16 @@ export const refreshToken = (app: Application) => {
   app.service(refreshTokenPath).hooks({
     around: {
       all: [
-        authenticate('jwt'),
         schemaHooks.resolveExternal(refreshTokenExternalResolver),
         schemaHooks.resolveResult(refreshTokenResolver),
       ],
+      find: [authenticate('jwt')],
+      get: [authenticate('jwt')],
+      create: [authenticate('jwt')],
+      update: [authenticate('jwt')],
+      patch: [authenticate('jwt')],
+      remove: [authenticate('jwt')],
+      // Don't authenticate refresh - it needs to work with expired tokens
     },
     before: {
       all: [
