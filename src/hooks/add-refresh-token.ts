@@ -93,10 +93,22 @@ export const addRefreshToken = async (
       expiresAt,
     })
 
-    // Add refresh token data to authentication result
+    // Add refresh token data to authentication result directly as enumerable properties
     const authResult = result as AuthResult
-    authResult.refreshToken = tokenValue
-    authResult.refreshTokenExpires = expiresAt
+    Object.defineProperties(authResult, {
+      refreshToken: {
+        value: tokenValue,
+        enumerable: true,
+        configurable: true,
+        writable: true,
+      },
+      refreshTokenExpires: {
+        value: expiresAt,
+        enumerable: true,
+        configurable: true,
+        writable: true,
+      },
+    })
 
     // Add access token expiration information if available
     if (authResult.accessToken) {
@@ -112,15 +124,16 @@ export const addRefreshToken = async (
           const accessTokenExpiry = new Date(
             Date.now() + expiresInSeconds * 1000,
           ).toISOString()
-          authResult.accessTokenExpires = accessTokenExpiry
-          console.log(`Access token expires at: ${accessTokenExpiry}`)
+
+          Object.defineProperty(authResult, 'accessTokenExpires', {
+            value: accessTokenExpiry,
+            enumerable: true,
+            configurable: true,
+            writable: true,
+          })
         }
       }
     }
-
-    logger.debug(
-      'Refresh token successfully created and added to authentication result',
-    )
   } catch (error) {
     // Log error but don't fail authentication if refresh token creation fails
     logger.error('Error creating refresh token:', error)
