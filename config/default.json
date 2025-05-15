@@ -33,7 +33,7 @@
       },
       "audience": "https://yourdomain.com",
       "algorithm": "HS256",
-      "expiresIn": "7d"
+      "expiresIn": "1d"
     },
     "refreshToken": {
       "secret": "H82jKLm5Rn7PqA3Xt4zCvS6wByE9DfGu",
