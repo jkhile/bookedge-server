@@ -85,7 +85,7 @@ export class RefreshTokenService<
     // Check if this is a token refresh request
     if (id === 'token' && data.token) {
       // We need to cast here because the refreshToken method returns an enhanced token
-      return this.refreshToken(data.token, params) as unknown as RefreshToken
+      return this.refreshToken(data.token) as unknown as RefreshToken
     }
 
     // If not a refresh request, perform normal patch operation
@@ -97,27 +97,44 @@ export class RefreshTokenService<
    */
   private async refreshToken(
     refreshToken: string,
-    params?: ServiceParams,
   ): Promise<EnhancedRefreshToken> {
     logger.info('Token refresh request received')
 
     try {
-      // Find the refresh token in the database
-      const result = await this.find({
+      // Find the specific refresh token using FeathersJS service methods
+      logger.info(`Searching for refresh token: ${refreshToken}`)
+
+      // Use super.find() to call the parent KnexService method directly
+      const result = await super.find({
         query: {
           token: refreshToken,
         },
         paginate: false,
-        ...params,
       })
 
-      const tokenRecords = Array.isArray(result) ? result : result.data
+      const tokenRecords = Array.isArray(result)
+        ? result
+        : (result as any).data || []
+      logger.info(`Found ${tokenRecords.length} token records`)
 
       if (!tokenRecords || tokenRecords.length === 0) {
+        logger.error('No refresh token found')
         throw new NotAuthenticated('Invalid refresh token')
       }
 
-      const tokenRecord = tokenRecords[0]
+      // Should only be one record, but verify we have the exact match
+      const tokenRecord = tokenRecords.find(
+        (record: any) => record.token === refreshToken,
+      )
+
+      if (!tokenRecord) {
+        logger.error('Exact token match not found')
+        throw new NotAuthenticated('Invalid refresh token')
+      }
+
+      logger.info(
+        `Found token record: ID ${tokenRecord.id}, userId: ${tokenRecord.userId}`,
+      )
 
       // Check if the token has expired
       if (new Date(tokenRecord.expiresAt) < new Date()) {
@@ -128,12 +145,17 @@ export class RefreshTokenService<
 
       // Get the user associated with this token
       const userId = tokenRecord.userId
+      logger.info(`Looking up user with ID: ${userId} for refresh token`)
       const userService = this.app.service('users')
-      const user = await userService.get(userId)
+      // Use internal service call (provider: undefined) to bypass authentication
+      const user = await userService.get(userId, { provider: undefined })
 
       if (!user) {
+        logger.error(`User not found for ID: ${userId}`)
         throw new NotAuthenticated('User not found')
       }
+
+      logger.info(`Successfully retrieved user: ${user.email} (ID: ${user.id})`)
 
       // Get the authentication service and configuration
       const authService = this.app.service(
