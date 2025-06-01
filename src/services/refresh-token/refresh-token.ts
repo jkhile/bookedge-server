@@ -1,5 +1,4 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
-import { authenticate } from '@feathersjs/authentication'
 
 import { hooks as schemaHooks } from '@feathersjs/schema'
 
@@ -37,12 +36,6 @@ export const refreshToken = (app: Application) => {
         schemaHooks.resolveExternal(refreshTokenExternalResolver),
         schemaHooks.resolveResult(refreshTokenResolver),
       ],
-      find: [authenticate('jwt')],
-      get: [authenticate('jwt')],
-      create: [authenticate('jwt')],
-      update: [authenticate('jwt')],
-      patch: [authenticate('jwt')],
-      remove: [authenticate('jwt')],
       // Don't authenticate refresh - it needs to work with expired tokens
     },
     before: {
