@@ -59,12 +59,7 @@ export type {
   EndorsementPatch,
 } from './services/endorsements/endorsements.shared'
 
-export type {
-  LogMessage,
-  LogMessageData,
-  LogMessageQuery,
-  LogMessagePatch,
-} from './services/log-messages/log-messages.shared'
+export type { LogMessageData } from './services/log-messages/log-messages.shared'
 
 export type {
   Release,

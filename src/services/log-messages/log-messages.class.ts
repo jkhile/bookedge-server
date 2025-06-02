@@ -1,35 +1,51 @@
-import { KnexService } from '@feathersjs/knex'
-// For more information about this file see https://dove.feathersjs.com/guides/cli/service.class.html#database-services
 import type { Params } from '@feathersjs/feathers'
-import type { KnexAdapterParams, KnexAdapterOptions } from '@feathersjs/knex'
 
 import type { Application } from '../../declarations'
-import type {
-  LogMessage,
-  LogMessageData,
-  LogMessagePatch,
-  LogMessageQuery,
-} from './log-messages.schema'
+import { logger } from '../../logger'
 
-export type { LogMessage, LogMessageData, LogMessagePatch, LogMessageQuery }
+export interface LogMessageData {
+  level: 'debug' | 'info' | 'warn' | 'error'
+  message: string
+  source?: 'client' | 'server'
+  metadata?: Record<string, unknown>
+  timestamp?: string // Client timestamp in ISO format
+}
 
-export interface LogMessageParams extends KnexAdapterParams<LogMessageQuery> {}
+export interface LogMessageParams extends Params {}
 
-// By default calls the standard Knex adapter service methods but can be customized with your own functionality.
-export class LogMessageService<
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ServiceParams extends Params = LogMessageParams,
-> extends KnexService<
-  LogMessage,
-  LogMessageData,
-  LogMessageParams,
-  LogMessagePatch
-> {}
+// Simple logging service that only uses Winston
+export class LogMessageService {
+  constructor(public options: { app: Application }) {}
 
-export const getOptions = (app: Application): KnexAdapterOptions => {
-  return {
-    paginate: app.get('paginate'),
-    Model: app.get('postgresqlClient'),
-    name: 'log-messages',
+  async create(data: LogMessageData): Promise<{ success: true; logged: 1 }> {
+    // Handle single log message only (no batching needed for development)
+    this.logToWinston(data)
+    return { success: true, logged: 1 }
   }
+
+  private logToWinston(data: LogMessageData): void {
+    try {
+      const { level, message, source, metadata, timestamp } = data
+      const logMessage = `[${source || 'client'}] ${message}`
+
+      // Create log entry with client timestamp at the root level
+      const logEntry = {
+        level,
+        message: logMessage,
+        timestamp: timestamp || new Date().toISOString(), // Use client time or fallback
+        source,
+        ...metadata, // Spread metadata at root level
+      }
+
+      // Use Winston's log method with the complete entry
+      logger.log(logEntry)
+    } catch (error) {
+      // Don't let logging errors break the application
+      console.error('Failed to log message to Winston:', error)
+    }
+  }
+}
+
+export const getOptions = (app: Application) => {
+  return { app }
 }

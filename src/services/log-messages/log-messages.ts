@@ -1,17 +1,9 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
-import { authenticate } from '@feathersjs/authentication'
-
 import { hooks as schemaHooks } from '@feathersjs/schema'
 
 import {
   logMessageDataValidator,
-  logMessagePatchValidator,
-  logMessageQueryValidator,
-  logMessageResolver,
-  logMessageExternalResolver,
   logMessageDataResolver,
-  logMessagePatchResolver,
-  logMessageQueryResolver,
 } from './log-messages.schema'
 
 import type { Application } from '../../declarations'
@@ -19,7 +11,10 @@ import { LogMessageService, getOptions } from './log-messages.class'
 import { logMessagePath, logMessageMethods } from './log-messages.shared'
 
 export * from './log-messages.class'
-export * from './log-messages.schema'
+export {
+  logMessageDataValidator,
+  logMessageDataResolver,
+} from './log-messages.schema'
 
 // A configure function that registers the service and its hooks via `app.configure`
 export const logMessage = (app: Application) => {
@@ -30,31 +25,20 @@ export const logMessage = (app: Application) => {
     // You can add additional custom events to be sent to clients here
     events: [],
   })
+
   // Initialize hooks
   app.service(logMessagePath).hooks({
     around: {
-      all: [
-        authenticate('jwt'),
-        schemaHooks.resolveExternal(logMessageExternalResolver),
-        schemaHooks.resolveResult(logMessageResolver),
-      ],
+      all: [],
     },
     before: {
-      all: [
-        schemaHooks.validateQuery(logMessageQueryValidator),
-        schemaHooks.resolveQuery(logMessageQueryResolver),
-      ],
-      find: [],
-      get: [],
+      all: [],
       create: [
+        // Remove authentication and rate limiting for development debugging
+        // rateLimitLogs,
         schemaHooks.validateData(logMessageDataValidator),
         schemaHooks.resolveData(logMessageDataResolver),
       ],
-      patch: [
-        schemaHooks.validateData(logMessagePatchValidator),
-        schemaHooks.resolveData(logMessagePatchResolver),
-      ],
-      remove: [],
     },
     after: {
       all: [],

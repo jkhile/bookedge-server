@@ -1,30 +1,17 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.shared.html
-import type { Params } from '@feathersjs/feathers'
 import type { ClientApplication } from '../../client'
-import type {
-  LogMessage,
-  LogMessageData,
-  LogMessagePatch,
-  LogMessageQuery,
-  LogMessageService,
-} from './log-messages.class'
+import type { LogMessageData, LogMessageService } from './log-messages.class'
 
-export type { LogMessage, LogMessageData, LogMessagePatch, LogMessageQuery }
+export type { LogMessageData }
 
 export type LogMessageClientService = Pick<
-  LogMessageService<Params<LogMessageQuery>>,
+  LogMessageService,
   (typeof logMessageMethods)[number]
 >
 
 export const logMessagePath = 'log-messages'
 
-export const logMessageMethods = [
-  'find',
-  'get',
-  'create',
-  'patch',
-  'remove',
-] as const
+export const logMessageMethods = ['create'] as const
 
 export const logMessageClient = (client: ClientApplication) => {
   const connection = client.get('connection')

@@ -1,29 +1,42 @@
 // src/logger.ts
-import { format } from 'date-fns'
-import { pathExistsSync, readdirSync, removeSync, renameSync } from 'fs-extra'
+import { removeSync } from 'fs-extra'
 import winston from 'winston'
-import { resolve } from 'node:path'
 import { CoralogixTransport } from './utils/coralogix-transport'
 
-// on initialization, create a new log file and cleanup any old log files
+// on initialization, create a new log file (only in dev mode)
 const env = process.env.NODE_ENV || 'development'
 const logFile = `./debug-${env}.log`
 if (env === 'test') {
   removeSync(logFile)
-} else {
-  rotateLogFiles()
+} else if (env === 'development') {
+  // Clear the existing log file for a fresh start
+  removeSync(logFile)
 }
 
 const winstonConfig = {
   level: 'debug',
   format: winston.format.combine(
-    winston.format.timestamp(),
+    // Custom format to handle client timestamps
+    winston.format((info) => {
+      // If there's already a timestamp in the log data (from client), keep it
+      if (!info.timestamp || typeof info.timestamp !== 'string') {
+        // Server log - add server timestamp
+        info.timestamp = new Date().toISOString()
+      }
+      // Client logs already have timestamp from the logData
+      return info
+    })(),
     winston.format.json(),
   ),
-  transports: [
-    new winston.transports.File({ filename: logFile }),
-    // new winston.transports.Console(),
-  ],
+  transports:
+    env === 'development'
+      ? [
+          new winston.transports.File({ filename: logFile }),
+          // new winston.transports.Console(),
+        ]
+      : [
+          // new winston.transports.Console(),
+        ],
 }
 
 if (process.env.CORALOGIX_LOGGER === 'true') {
@@ -35,22 +48,3 @@ if (process.env.CORALOGIX_LOGGER === 'true') {
 }
 
 export const logger = winston.createLogger(winstonConfig)
-
-function rotateLogFiles() {
-  if (pathExistsSync(logFile)) {
-    const renameTo = logFile.replace(
-      '.log',
-      `_${format(new Date(), 'yyyy-MM-dd_HH-mm')}.log`,
-    )
-    renameSync(logFile, renameTo)
-  }
-  const allFiles = readdirSync('./')
-  const filePattern = new RegExp(`^debug-${env}.*\\.log$`)
-  const logFiles = allFiles.filter((file) => filePattern.test(file)).sort()
-  const allButLastThree = logFiles.slice(0, -3)
-
-  for (const file of allButLastThree) {
-    const filePath = resolve(file)
-    removeSync(filePath)
-  }
-}
