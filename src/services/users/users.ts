@@ -1,5 +1,6 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
-import { authenticate } from '@feathersjs/authentication'
+// import { authenticate } from '@feathersjs/authentication'
+import customAuthenticate from '../../hooks/customAuthenticate'
 
 import { hooks as schemaHooks } from '@feathersjs/schema'
 import { restrictUserFields } from '../../hooks/restrict-user-fields'
@@ -38,12 +39,12 @@ export const user = (app: Application) => {
         schemaHooks.resolveExternal(userExternalResolver),
         schemaHooks.resolveResult(userResolver),
       ],
-      find: [authenticate('jwt')],
-      get: [authenticate('jwt')],
+      find: [customAuthenticate('jwt')],
+      get: [customAuthenticate('jwt')],
       create: [],
-      update: [authenticate('jwt')],
-      patch: [authenticate('jwt')],
-      remove: [authenticate('jwt')],
+      update: [customAuthenticate('jwt')],
+      patch: [customAuthenticate('jwt')],
+      remove: [customAuthenticate('jwt')],
     },
     before: {
       all: [
