@@ -37,7 +37,7 @@
     },
     "refreshToken": {
       "secret": "H82jKLm5Rn7PqA3Xt4zCvS6wByE9DfGu",
-      "expiresIn": "365d"
+      "expiresIn": "30d"
     },
     "local": {
       "usernameField": "email",
