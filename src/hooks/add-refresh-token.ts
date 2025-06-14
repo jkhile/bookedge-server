@@ -86,7 +86,26 @@ export const addRefreshToken = async (
     // Generate a cryptographically secure unique token
     const tokenValue = uuidv4()
 
-    // Store the token in the database
+    // Remove any existing refresh tokens for this user before creating a new one
+    // This ensures only one refresh token per user
+    logger.info(`Removing existing refresh tokens for user ${userId}`)
+    const existingTokens = await app.service('refresh-token').find({
+      query: {
+        userId,
+      },
+      paginate: false,
+    })
+
+    const tokensToDelete = Array.isArray(existingTokens)
+      ? existingTokens
+      : (existingTokens as any).data || []
+
+    // Delete all existing tokens for this user
+    for (const token of tokensToDelete) {
+      await app.service('refresh-token').remove(token.id)
+    }
+
+    // Store the new token in the database
     await app.service('refresh-token').create({
       userId,
       token: tokenValue,

@@ -5,6 +5,7 @@ import type { KnexAdapterParams, KnexAdapterOptions } from '@feathersjs/knex'
 import { NotAuthenticated } from '@feathersjs/errors'
 import { AuthenticationService } from '@feathersjs/authentication'
 import { addDays } from 'date-fns'
+import { v4 as uuidv4 } from 'uuid'
 import { logger } from '../../logger'
 
 import type { Application } from '../../declarations'
@@ -188,35 +189,43 @@ export class RefreshTokenService<
         }
       }
 
-      // If token is close to expiration, extend its lifetime
+      // Check if token is close to expiration and regenerate if needed
       const oneWeekFromNow = addDays(new Date(), 7)
+      let updatedRefreshToken = refreshToken
+      let updatedExpiresAt = tokenRecord.expiresAt
+
       if (new Date(tokenRecord.expiresAt) < oneWeekFromNow) {
-        logger.info('Refresh token close to expiration, extending lifetime')
+        logger.info('Refresh token close to expiration, regenerating token')
 
         // Get refresh token config
         const refreshTokenConfig = authConfig.refreshToken
 
         if (refreshTokenConfig) {
+          // Generate a new token
+          updatedRefreshToken = uuidv4()
+
           // Parse expiration days from config (default to 30 if not specified or invalid)
           const expirationDays = parseInt(refreshTokenConfig.expiresIn) || 30
-          const newExpiresAt = addDays(new Date(), expirationDays).toISOString()
+          updatedExpiresAt = addDays(new Date(), expirationDays).toISOString()
 
-          // Update the existing token's expiration
+          // Update the token record with new token and expiration
           await super.patch(tokenRecord.id, {
-            expiresAt: newExpiresAt,
+            token: updatedRefreshToken,
+            expiresAt: updatedExpiresAt,
           })
 
-          // Update the expiration for the return value
-          tokenRecord.expiresAt = newExpiresAt
+          logger.info(`Regenerated refresh token for user ${userId}`)
         }
       }
 
       // Add authentication fields to the token record for the response
       const enhancedResponse: EnhancedRefreshToken = {
         ...tokenRecord,
+        token: updatedRefreshToken,
+        expiresAt: updatedExpiresAt,
         accessToken,
-        refreshToken,
-        refreshTokenExpires: tokenRecord.expiresAt,
+        refreshToken: updatedRefreshToken,
+        refreshTokenExpires: updatedExpiresAt,
         accessTokenExpires,
         user,
       }
