@@ -49,6 +49,7 @@
     "check": "pnpm prettier && pnpm lint && pnpm compile",
     "dev": "dotenvx run --env-file=.env -- nodemon  -x ts-node src/index.ts",
     "dev:test": "pnpm make-test-db && dotenvx run --env-file=.env.test -- nodemon -x ts-node src/index",
+    "reset-log": "cp ./reset.log ./debug-development.log && echo \"Log reset\"",
     "lint": "eslint ./src",
     "compile": "shx rm -rf lib/ && tsc",
     "build": "pnpm compile",
