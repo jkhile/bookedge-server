@@ -29,7 +29,7 @@ const winstonConfig = {
     winston.format.json(),
   ),
   transports:
-    env === 'development'
+    env === 'development' || env === 'test'
       ? [
           new winston.transports.File({ filename: logFile }),
           // new winston.transports.Console(),
