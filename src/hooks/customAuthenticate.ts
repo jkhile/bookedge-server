@@ -1,7 +1,5 @@
 import { HookContext, NextFunction } from '@feathersjs/feathers'
 import { NotAuthenticated } from '@feathersjs/errors'
-import { logger } from '../logger'
-import { format as prettyFormat } from 'pretty-format'
 
 export interface AuthenticateHookSettings {
   service?: string
@@ -22,7 +20,6 @@ export default (
   }
 
   return async (context: HookContext, _next?: NextFunction) => {
-    logger.debug(`customAuthenticate, ${prettyFormat(context)}`)
     const next = typeof _next === 'function' ? _next : async () => context
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { app, params, type, path, service } = context
@@ -32,7 +29,6 @@ export default (
     if (app.defaultAuthentication) {
       authService = app.defaultAuthentication(settings.service)
     }
-    logger.debug(`  authService: ${prettyFormat(authService)}`)
     if (type && type !== 'before' && type !== 'around') {
       throw new NotAuthenticated(
         'The authenticate hook must be used as a before hook',
@@ -52,13 +48,9 @@ export default (
     }
 
     if (params.authenticated === true) {
-      logger.debug(`  params.authenticated: ${params.authenticated}`)
       return next()
     }
 
-    logger.debug(
-      `  not params.authenticated, authentication: ${prettyFormat(authentication)}`,
-    )
     if (authentication) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { provider, authentication, ...authParams } = params
@@ -68,19 +60,16 @@ export default (
         authParams,
         ...(strategies ?? []),
       )
-      logger.debug(`  authResult: prettyFormat(authResult)`)
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { accessToken, ...authResultWithoutToken } = authResult
 
-      logger.debug(`  setting context.params with authenticated:true`)
       context.params = {
         ...params,
         ...authResultWithoutToken,
         authenticated: true,
       }
     } else if (provider) {
-      logger.debug(`  no authentication, but has provide`)
       throw new NotAuthenticated('Not authenticated')
     }
 
