@@ -99,12 +99,8 @@ export class RefreshTokenService<
   private async refreshToken(
     refreshToken: string,
   ): Promise<EnhancedRefreshToken> {
-    logger.info('Token refresh request received')
-
     try {
       // Find the specific refresh token using FeathersJS service methods
-      logger.info(`Searching for refresh token: ${refreshToken}`)
-
       // Use super.find() to call the parent KnexService method directly
       const result = await super.find({
         query: {
@@ -116,10 +112,9 @@ export class RefreshTokenService<
       const tokenRecords = Array.isArray(result)
         ? result
         : (result as any).data || []
-      logger.info(`Found ${tokenRecords.length} token records`)
 
       if (!tokenRecords || tokenRecords.length === 0) {
-        logger.error('No refresh token found')
+        logger.error('In refreshToken, no refresh token found')
         throw new NotAuthenticated('Invalid refresh token')
       }
 
@@ -129,13 +124,9 @@ export class RefreshTokenService<
       )
 
       if (!tokenRecord) {
-        logger.error('Exact token match not found')
+        logger.error('In refreshToken, Exact token match not found')
         throw new NotAuthenticated('Invalid refresh token')
       }
-
-      logger.info(
-        `Found token record: ID ${tokenRecord.id}, userId: ${tokenRecord.userId}`,
-      )
 
       // Check if the token has expired
       if (new Date(tokenRecord.expiresAt) < new Date()) {
@@ -146,17 +137,14 @@ export class RefreshTokenService<
 
       // Get the user associated with this token
       const userId = tokenRecord.userId
-      logger.info(`Looking up user with ID: ${userId} for refresh token`)
       const userService = this.app.service('users')
       // Use internal service call (provider: undefined) to bypass authentication
       const user = await userService.get(userId, { provider: undefined })
 
       if (!user) {
-        logger.error(`User not found for ID: ${userId}`)
+        logger.error(`In refreshToken, User not found for ID: ${userId}`)
         throw new NotAuthenticated('User not found')
       }
-
-      logger.info(`Successfully retrieved user: ${user.email} (ID: ${user.id})`)
 
       // Get the authentication service and configuration
       const authService = this.app.service(
@@ -195,8 +183,6 @@ export class RefreshTokenService<
       let updatedExpiresAt = tokenRecord.expiresAt
 
       if (new Date(tokenRecord.expiresAt) < oneWeekFromNow) {
-        logger.info('Refresh token close to expiration, regenerating token')
-
         // Get refresh token config
         const refreshTokenConfig = authConfig.refreshToken
 
@@ -213,8 +199,6 @@ export class RefreshTokenService<
             token: updatedRefreshToken,
             expiresAt: updatedExpiresAt,
           })
-
-          logger.info(`Regenerated refresh token for user ${userId}`)
         }
       }
 
