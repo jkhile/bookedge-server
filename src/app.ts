@@ -38,8 +38,8 @@ app.use(
     origin: function (ctx) {
       const requestOrigin = ctx.request.header.origin || ''
       const origins = app.get('origins') as string[]
-      logger.debug('origins:', origins)
-      logger.debug('requestOrigin:', requestOrigin)
+      logger.debug(`origins: ${origins}`)
+      logger.debug(`requestOrigin: ${requestOrigin}`)
       if (origins.includes(requestOrigin)) {
         return requestOrigin
       }
