@@ -6,8 +6,6 @@
     "http://localhost:3000",
     "http://localhost:3001",
     "http://localhost:3002",
-    "https://bookedge.surge.sh",
-    "https://bookedge-staging.surge.sh",
     "https://bookedge-production.netlify.app",
     "https://bookedge-staging.netlify.app"
   ],

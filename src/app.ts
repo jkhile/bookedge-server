@@ -38,8 +38,6 @@ app.use(
     origin: function (ctx) {
       const requestOrigin = ctx.request.header.origin || ''
       const origins = app.get('origins') as string[]
-      logger.debug(`origins: ${origins}`)
-      logger.debug(`requestOrigin: ${requestOrigin}`)
       if (origins.includes(requestOrigin)) {
         return requestOrigin
       }
@@ -55,22 +53,17 @@ app.use(bodyParser())
 
 // Configure services and transports
 app.configure(rest())
-// app.configure(
-//   socketio({
-//     cors: {
-//       origin: app.get('origins'),
-//       methods: ['GET', 'POST'],
-//     },
-//   }),
-// )
 app.configure(
   socketio({
     cors: {
       origin: function (origin, callback) {
+        logger.debug(`origin: ${origin}`)
         const origins = app.get('origins') as string[]
+        logger.debug(`origins: ${origins}`)
         if (!origin || origins.includes(origin)) {
           callback(null, true)
         } else {
+          logger.error('cors callback returning error')
           callback(new Error(`Origin ${origin} not allowed by CORS`))
         }
       },
