@@ -99,6 +99,7 @@ export class RefreshTokenService<
   private async refreshToken(
     refreshToken: string,
   ): Promise<EnhancedRefreshToken> {
+    logger.debug(`refreshToken(${refreshToken})`)
     try {
       // Find the specific refresh token using FeathersJS service methods
       // Use super.find() to call the parent KnexService method directly
@@ -108,7 +109,7 @@ export class RefreshTokenService<
         },
         paginate: false,
       })
-
+      logger.debug(`Found refresh tokens: ${result}`)
       const tokenRecords = Array.isArray(result)
         ? result
         : (result as any).data || []
