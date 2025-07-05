@@ -45,12 +45,6 @@ export const createBookFolder = async (context: HookContext) => {
       .service('books')
       .patch(book.id, { file_storage_id: bookFolder.id })
 
-    logger.info('Created Google Drive folder for book', {
-      bookId: book.id,
-      folderId: bookFolder.id,
-      folderName: `${book.id}_${sanitizedTitle}`,
-    })
-
     return context
   } catch (error) {
     // Log the error but don't fail the request
@@ -123,12 +117,6 @@ export const handleFileUpload = async (context: HookContext) => {
         thumbnailLink: uploadedFile.thumbnailLink,
       },
     }
-
-    logger.info('Uploaded file to Google Drive', {
-      bookId,
-      fileId: uploadedFile.id,
-      fileName: uploadedFile.name,
-    })
 
     return context
   } catch (error) {

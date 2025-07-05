@@ -101,7 +101,7 @@ export const addRefreshToken = async (
 
     // Delete all existing tokens for this user
     for (const token of tokensToDelete) {
-      logger.debug(`in hook, removing existing token ${token.id}`)
+      logger.debug(`in hook, removing existing token ${token.token}`)
       await app.service('refresh-token').remove(token.id)
     }
 

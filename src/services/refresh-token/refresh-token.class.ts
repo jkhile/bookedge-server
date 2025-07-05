@@ -102,9 +102,9 @@ export class RefreshTokenService<
   ): Promise<EnhancedRefreshToken> {
     logger.debug(`refreshToken(${refreshToken})`)
     try {
-      logger.debug(`refreshToken(${refreshToken})`)
       // Find the specific refresh token using FeathersJS service methods
       // Use super.find() to call the parent KnexService method directly
+      logger.debug(`finding token ${refreshToken}`)
       const result = await super.find({
         query: {
           token: refreshToken,
@@ -117,6 +117,8 @@ export class RefreshTokenService<
       logger.debug(`found tokenRecords: ${prettyFormat(tokenRecords)}`)
       if (!tokenRecords || tokenRecords.length === 0) {
         logger.error('In refreshToken, no refresh token found')
+        const allTokenRecords = await super.find({ query: {} })
+        logger.debug(`allTokenRecords: ${prettyFormat(allTokenRecords)}`)
         throw new NotAuthenticated('Invalid refresh token')
       }
 
@@ -133,7 +135,9 @@ export class RefreshTokenService<
       // Check if the token has expired
       if (new Date(tokenRecord.expiresAt) < new Date()) {
         // Remove the expired token
-        logger.debug(`removing expired tokenRecord: ${tokenRecord}`)
+        logger.debug(
+          `removing expired tokenRecord: ${prettyFormat(tokenRecord)}`,
+        )
         await super.remove(tokenRecord.id)
         throw new NotAuthenticated('Refresh token has expired')
       }
@@ -200,7 +204,7 @@ export class RefreshTokenService<
 
           // Update the token record with new token and expiration
           logger.debug(
-            `updating token record ${tokenRecord.id} with new refreshToken`,
+            `updating token record ${tokenRecord.id} with new refreshToken, ${updatedRefreshToken}`,
           )
           await super.patch(tokenRecord.id, {
             token: updatedRefreshToken,
