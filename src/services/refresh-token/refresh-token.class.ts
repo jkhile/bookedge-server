@@ -7,6 +7,7 @@ import { AuthenticationService } from '@feathersjs/authentication'
 import { addDays } from 'date-fns'
 import { v4 as uuidv4 } from 'uuid'
 import { logger } from '../../logger'
+import { format as prettyFormat } from 'pretty-format'
 
 import type { Application } from '../../declarations'
 import type {
@@ -113,7 +114,7 @@ export class RefreshTokenService<
       const tokenRecords = Array.isArray(result)
         ? result
         : (result as any).data || []
-      logger.debug(`found tokenRecords: ${tokenRecords}`)
+      logger.debug(`found tokenRecords: ${prettyFormat(tokenRecords)}`)
       if (!tokenRecords || tokenRecords.length === 0) {
         logger.error('In refreshToken, no refresh token found')
         throw new NotAuthenticated('Invalid refresh token')
@@ -184,7 +185,6 @@ export class RefreshTokenService<
       const oneWeekFromNow = addDays(new Date(), 7)
       let updatedRefreshToken = refreshToken
       let updatedExpiresAt = tokenRecord.expiresAt
-
       if (new Date(tokenRecord.expiresAt) < oneWeekFromNow) {
         // Get refresh token config
         const refreshTokenConfig = authConfig.refreshToken

@@ -57,9 +57,7 @@ app.configure(
   socketio({
     cors: {
       origin: function (origin, callback) {
-        logger.debug(`origin: ${origin}`)
         const origins = app.get('origins') as string[]
-        logger.debug(`origins: ${origins}`)
         if (!origin || origins.includes(origin)) {
           callback(null, true)
         } else {
