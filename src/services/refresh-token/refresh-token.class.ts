@@ -101,6 +101,7 @@ export class RefreshTokenService<
   ): Promise<EnhancedRefreshToken> {
     logger.debug(`refreshToken(${refreshToken})`)
     try {
+      logger.debug(`refreshToken(${refreshToken})`)
       // Find the specific refresh token using FeathersJS service methods
       // Use super.find() to call the parent KnexService method directly
       const result = await super.find({
@@ -109,11 +110,10 @@ export class RefreshTokenService<
         },
         paginate: false,
       })
-      logger.debug(`Found refresh tokens: ${result}`)
       const tokenRecords = Array.isArray(result)
         ? result
         : (result as any).data || []
-
+      logger.debug(`found tokenRecords: ${tokenRecords}`)
       if (!tokenRecords || tokenRecords.length === 0) {
         logger.error('In refreshToken, no refresh token found')
         throw new NotAuthenticated('Invalid refresh token')
@@ -132,6 +132,7 @@ export class RefreshTokenService<
       // Check if the token has expired
       if (new Date(tokenRecord.expiresAt) < new Date()) {
         // Remove the expired token
+        logger.debug(`removing expired tokenRecord: ${tokenRecord}`)
         await super.remove(tokenRecord.id)
         throw new NotAuthenticated('Refresh token has expired')
       }
@@ -161,6 +162,7 @@ export class RefreshTokenService<
       }
 
       // Generate the JWT token using the authentication service
+      logger.debug('generating new accessToken')
       const accessToken = await authService.createAccessToken(payload)
 
       // Calculate access token expiration
@@ -178,7 +180,7 @@ export class RefreshTokenService<
         }
       }
 
-      // Check if token is close to expiration and regenerate if needed
+      // Check if refresh token is close to expiration and regenerate if needed
       const oneWeekFromNow = addDays(new Date(), 7)
       let updatedRefreshToken = refreshToken
       let updatedExpiresAt = tokenRecord.expiresAt
@@ -189,6 +191,7 @@ export class RefreshTokenService<
 
         if (refreshTokenConfig) {
           // Generate a new token
+          logger.debug('generating new refreshToken')
           updatedRefreshToken = uuidv4()
 
           // Parse expiration days from config (default to 30 if not specified or invalid)
@@ -196,6 +199,9 @@ export class RefreshTokenService<
           updatedExpiresAt = addDays(new Date(), expirationDays).toISOString()
 
           // Update the token record with new token and expiration
+          logger.debug(
+            `updating token record ${tokenRecord.id} with new refreshToken`,
+          )
           await super.patch(tokenRecord.id, {
             token: updatedRefreshToken,
             expiresAt: updatedExpiresAt,

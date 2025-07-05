@@ -88,7 +88,6 @@ export const addRefreshToken = async (
 
     // Remove any existing refresh tokens for this user before creating a new one
     // This ensures only one refresh token per user
-    logger.info(`Removing existing refresh tokens for user ${userId}`)
     const existingTokens = await app.service('refresh-token').find({
       query: {
         userId,
@@ -102,10 +101,12 @@ export const addRefreshToken = async (
 
     // Delete all existing tokens for this user
     for (const token of tokensToDelete) {
+      logger.debug(`in hook, removing existing token ${token.id}`)
       await app.service('refresh-token').remove(token.id)
     }
 
     // Store the new token in the database
+    logger.debug(`in hook, creating refresh token: ${tokenValue}`)
     await app.service('refresh-token').create({
       userId,
       token: tokenValue,
@@ -157,6 +158,6 @@ export const addRefreshToken = async (
     // Log error but don't fail authentication if refresh token creation fails
     logger.error('Error creating refresh token:', error)
   }
-
+  logger.debug('addRefreshToken hook returning')
   return context
 }
