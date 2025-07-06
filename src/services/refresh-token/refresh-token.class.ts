@@ -100,11 +100,11 @@ export class RefreshTokenService<
   private async refreshToken(
     refreshToken: string,
   ): Promise<EnhancedRefreshToken> {
-    logger.debug(`refreshToken(${refreshToken})`)
+    logger.debug(`calling refreshToken(${refreshToken})`)
     try {
       // Find the specific refresh token using FeathersJS service methods
       // Use super.find() to call the parent KnexService method directly
-      logger.debug(`finding token ${refreshToken}`)
+      logger.debug(`finding refreshToken ${refreshToken}`)
       const result = await super.find({
         query: {
           token: refreshToken,
@@ -116,7 +116,9 @@ export class RefreshTokenService<
         : (result as any).data || []
       logger.debug(`found tokenRecords: ${prettyFormat(tokenRecords)}`)
       if (!tokenRecords || tokenRecords.length === 0) {
-        logger.error('In refreshToken, no refresh token found')
+        logger.error(
+          `In refreshToken, no refresh token found for token: ${refreshToken}`,
+        )
         const allTokenRecords = await super.find({ query: {} })
         logger.debug(`allTokenRecords: ${prettyFormat(allTokenRecords)}`)
         throw new NotAuthenticated('Invalid refresh token')
@@ -195,8 +197,8 @@ export class RefreshTokenService<
 
         if (refreshTokenConfig) {
           // Generate a new token
-          logger.debug('generating new refreshToken')
           updatedRefreshToken = uuidv4()
+          logger.debug(`generated new refreshToken: ${updatedRefreshToken}`)
 
           // Parse expiration days from config (default to 30 if not specified or invalid)
           const expirationDays = parseInt(refreshTokenConfig.expiresIn) || 30
@@ -204,7 +206,7 @@ export class RefreshTokenService<
 
           // Update the token record with new token and expiration
           logger.debug(
-            `updating token record ${tokenRecord.id} with new refreshToken, ${updatedRefreshToken}`,
+            `updating refreshtToken record ${tokenRecord.id} with new refreshToken, ${updatedRefreshToken}`,
           )
           await super.patch(tokenRecord.id, {
             token: updatedRefreshToken,
@@ -227,7 +229,7 @@ export class RefreshTokenService<
 
       return enhancedResponse
     } catch (error) {
-      logger.error('Error refreshing token:', error)
+      logger.error('Error refreshing refreshToken:', error)
       throw error
     }
   }
