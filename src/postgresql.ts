@@ -1,4 +1,5 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/databases.html
+import { logger } from './logger'
 import knex from 'knex'
 import type { Knex } from 'knex'
 import type { Application } from './declarations'
@@ -26,6 +27,6 @@ export const postgresql = (app: Application) => {
     const db = knex(config!)
     app.set('postgresqlClient', db)
   } catch (error: any) {
-    console.error('error creating db:', error)
+    logger.error('error creating db:', error)
   }
 }

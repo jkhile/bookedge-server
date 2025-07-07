@@ -7,7 +7,6 @@ import { AuthenticationService } from '@feathersjs/authentication'
 import { addDays } from 'date-fns'
 import { v4 as uuidv4 } from 'uuid'
 import { logger } from '../../logger'
-import { format as prettyFormat } from 'pretty-format'
 
 import type { Application } from '../../declarations'
 import type {
@@ -100,11 +99,9 @@ export class RefreshTokenService<
   private async refreshToken(
     refreshToken: string,
   ): Promise<EnhancedRefreshToken> {
-    logger.debug(`calling refreshToken(${refreshToken})`)
     try {
       // Find the specific refresh token using FeathersJS service methods
       // Use super.find() to call the parent KnexService method directly
-      logger.debug(`finding refreshToken ${refreshToken}`)
       const result = await super.find({
         query: {
           token: refreshToken,
@@ -114,13 +111,10 @@ export class RefreshTokenService<
       const tokenRecords = Array.isArray(result)
         ? result
         : (result as any).data || []
-      logger.debug(`found tokenRecords: ${prettyFormat(tokenRecords)}`)
       if (!tokenRecords || tokenRecords.length === 0) {
         logger.error(
           `In refreshToken, no refresh token found for token: ${refreshToken}`,
         )
-        const allTokenRecords = await super.find({ query: {} })
-        logger.debug(`allTokenRecords: ${prettyFormat(allTokenRecords)}`)
         throw new NotAuthenticated('Invalid refresh token')
       }
 
@@ -137,9 +131,6 @@ export class RefreshTokenService<
       // Check if the token has expired
       if (new Date(tokenRecord.expiresAt) < new Date()) {
         // Remove the expired token
-        logger.debug(
-          `removing expired tokenRecord: ${prettyFormat(tokenRecord)}`,
-        )
         await super.remove(tokenRecord.id)
         throw new NotAuthenticated('Refresh token has expired')
       }
@@ -169,7 +160,6 @@ export class RefreshTokenService<
       }
 
       // Generate the JWT token using the authentication service
-      logger.debug('generating new accessToken')
       const accessToken = await authService.createAccessToken(payload)
 
       // Calculate access token expiration
@@ -198,16 +188,12 @@ export class RefreshTokenService<
         if (refreshTokenConfig) {
           // Generate a new token
           updatedRefreshToken = uuidv4()
-          logger.debug(`generated new refreshToken: ${updatedRefreshToken}`)
 
           // Parse expiration days from config (default to 30 if not specified or invalid)
           const expirationDays = parseInt(refreshTokenConfig.expiresIn) || 30
           updatedExpiresAt = addDays(new Date(), expirationDays).toISOString()
 
           // Update the token record with new token and expiration
-          logger.debug(
-            `updating refreshtToken record ${tokenRecord.id} with new refreshToken, ${updatedRefreshToken}`,
-          )
           await super.patch(tokenRecord.id, {
             token: updatedRefreshToken,
             expiresAt: updatedExpiresAt,

@@ -1,4 +1,5 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.class.html#database-services
+import { logger } from '../../logger'
 import type { Knex } from 'knex'
 import type { Params, ServiceInterface } from '@feathersjs/feathers'
 import type { Application } from '../../declarations'
@@ -80,7 +81,7 @@ export class MetadataSearchService
       ])
       return result.rows
     } catch (error: any) {
-      console.error('Error searching metadata:', error.message)
+      logger.error('Error searching metadata:', error.message)
       throw error
     }
   }

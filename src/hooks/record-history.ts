@@ -1,5 +1,6 @@
 import { format } from 'date-fns'
 import { diff, Operation } from 'just-diff'
+import { logger } from '../logger'
 import type { HookContext, NextFunction } from '../declarations'
 // For more information about this file see https://dove.feathersjs.com/guides/cli/hook.html
 
@@ -79,7 +80,7 @@ export function recordHistoryHook(
           const app = context.app as any
           await app.service(historyService).create(historyRecord)
         } catch (error: any) {
-          console.error(`Error recording history for ${entityType}:`, error)
+          logger.error(`Error recording history for ${entityType}:`, error)
         }
       }
     }
