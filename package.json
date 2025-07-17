@@ -68,7 +68,9 @@
     "migrate:make": "knex migrate:make",
     "import-authors": "ts-node src/scripts/import-author-contacts.ts",
     "test-parser": "ts-node src/scripts/test-parser.ts",
-    "cleanup-tokens": "tsx src/scripts/cleanup-refresh-tokens.ts"
+    "cleanup-tokens": "tsx src/scripts/cleanup-refresh-tokens.ts",
+    "backup-heroku-db": "ts-node src/scripts/backup-heroku-db.ts",
+    "restore-heroku-db": "ts-node src/scripts/restore-heroku-db.ts"
   },
   "dependencies": {
     "@feathersjs/adapter-commons": "^5.0.34",
@@ -103,24 +105,24 @@
     "winston-transport": "^4.9.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.30.1",
+    "@eslint/js": "^9.31.0",
     "@feathersjs/cli": "5.0.22",
     "@types/debug": "^4.1.12",
     "@types/fs-extra": "^11.0.4",
     "@types/lodash": "^4.17.20",
-    "@types/node": "^22.16.3",
+    "@types/node": "^22.16.4",
     "@vitest/coverage-v8": "^2.1.9",
     "@vitest/ui": "^2.1.9",
     "axios": "^1.10.0",
     "cross-env": "^7.0.3",
-    "eslint": "^9.30.1",
+    "eslint": "^9.31.0",
     "globals": "^15.15.0",
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
     "shx": "^0.3.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.36.0",
+    "typescript-eslint": "^8.37.0",
     "vitest": "^2.1.9"
   },
   "pnpm": {
