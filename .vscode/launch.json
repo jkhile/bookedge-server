@@ -45,6 +45,43 @@
         "${workspaceFolder}/lib/**/*.js"
       ]
     },
-
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Backup Heroku DB",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}/src/scripts/backup-heroku-db.ts",
+      "preLaunchTask": "tsc: build - tsconfig.json",
+      "outFiles": [
+        "${workspaceFolder}/lib/**/*.js"
+      ],
+      "env": {
+        "HEROKU_APP_NAME": "fep-bookedge-production",
+        "BACKUP_DIR": "./backups"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Backup Heroku DB (ts-node)",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register"
+      ],
+      "args": [
+        "${workspaceFolder}/src/scripts/backup-heroku-db.ts"
+      ],
+      "env": {
+        "HEROKU_APP_NAME": "fep-bookedge-production",
+        "BACKUP_DIR": "./backups"
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    }
   ]
 }
