@@ -59,10 +59,7 @@ export const addRefreshToken = async (
   const { result } = context
 
   // Only proceed if authentication was successful and a user exists
-  if (!result?.user) {
-    console.log(
-      'add-refresh-token - No user in result, skipping token creation',
-    )
+  if (!result?.user?.id) {
     return context
   }
 
@@ -72,7 +69,6 @@ export const addRefreshToken = async (
   // Get refresh token configuration from app settings
   const authConfig = app.get('authentication') as AuthenticationConfig
   if (!authConfig?.refreshToken) {
-    console.log('No refreshToken configuration found')
     return context
   }
 
