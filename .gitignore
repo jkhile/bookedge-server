@@ -126,3 +126,5 @@ lib/
 bookedge-server-schema.sql
 
 Bookedge 158217.json
+
+backups/
