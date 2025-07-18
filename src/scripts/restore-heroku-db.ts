@@ -21,7 +21,7 @@ const statAsync = promisify(stat)
 const pipelineAsync = promisify(pipeline)
 
 // Configuration
-const HEROKU_APP_NAME = process.env.HEROKU_APP_NAME || 'bookedge'
+const HEROKU_APP_NAME = process.env.HEROKU_APP_NAME || 'fep-bookedge-production'
 const BACKUP_DIR = process.env.BACKUP_DIR || './backups'
 
 // Colors for output
