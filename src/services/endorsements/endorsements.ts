@@ -1,5 +1,6 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
 import { authenticate } from '@feathersjs/authentication'
+import { recordHistoryHook } from '../../hooks/record-history'
 
 import { hooks as schemaHooks } from '@feathersjs/schema'
 
@@ -37,6 +38,27 @@ export const endorsement = (app: Application) => {
         authenticate('jwt'),
         schemaHooks.resolveExternal(endorsementExternalResolver),
         schemaHooks.resolveResult(endorsementResolver),
+      ],
+      create: [
+        recordHistoryHook({
+          entityType: 'endorsement',
+          fields: ['text'],
+          defaultValues: {
+            text: '',
+          },
+        }),
+      ],
+      update: [
+        recordHistoryHook({
+          entityType: 'endorsement',
+          fields: ['text'],
+        }),
+      ],
+      patch: [
+        recordHistoryHook({
+          entityType: 'endorsement',
+          fields: ['text'],
+        }),
       ],
     },
     before: {
