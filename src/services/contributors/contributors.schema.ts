@@ -22,6 +22,7 @@ export const contributorSchema = Type.Object(
     biography: Type.String(),
     biography_finalized: Type.Boolean(),
     email: Type.String(),
+    public_email: Type.String({ default: '' }),
     address: Type.String(),
     phone: Type.String(),
     wikipedia_page: Type.String(),
