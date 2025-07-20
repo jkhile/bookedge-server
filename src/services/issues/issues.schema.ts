@@ -15,6 +15,7 @@ export const issueSchema = Type.Object(
     date: Type.String(),
     issue: Type.String(),
     entered_by: Type.String(),
+    assigned_to: Type.String({ default: '' }),
     resolved: Type.Boolean(),
     fk_created_by: Type.Optional(Type.Integer()),
     created_at: Type.Optional(Type.String({ format: 'date-time' })),
