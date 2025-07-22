@@ -35,6 +35,7 @@ export const bookSchema = Type.Object(
     fep_fixed_share_pb: Type.Number(),
     status: Type.Union([
       Type.Literal('archived'),
+      Type.Literal('pre-contract'),
       Type.Literal('contract negotiation'),
       Type.Literal('contract signed'),
       Type.Literal('content editing'),
