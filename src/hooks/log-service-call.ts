@@ -29,7 +29,7 @@ export const logServiceCall = async (
     simplifiedContext.params = simplifyParams(context.params)
     simplifiedContext.data = context.data
     const { method, path, _type } = simplifiedContext
-    logger.debug(
+    logger.info(
       `${_type || 'unknown'} ${method || 'unknown'} ${path || 'unknown'}`,
       {
         context: stringifyAndRemoveProperties(
@@ -46,7 +46,7 @@ export const logServiceCall = async (
     simplifiedContext = pick(context, ['method', 'path', 'result'])
     simplifiedContext._type = 'after'
     const { method, path, _type } = simplifiedContext
-    logger.debug(
+    logger.info(
       `${_type || 'unknown'} ${method || 'unknown'} ${path || 'unknown'} `,
       {
         context: stringifyAndRemoveProperties(
