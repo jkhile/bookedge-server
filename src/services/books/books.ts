@@ -1,6 +1,7 @@
 import { authenticate } from '@feathersjs/authentication'
 import { hooks as schemaHooks } from '@feathersjs/schema'
 import { recordHistoryHook } from '../../hooks/record-history'
+import { initializeProjectPriorities } from '../../hooks/initialize-project-priorities'
 import { BookService, getOptions } from './books.class'
 import { bookMethods, bookPath } from './books.shared'
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
@@ -126,6 +127,7 @@ export const book = (app: Application) => {
       find: [],
       get: [],
       create: [
+        initializeProjectPriorities,
         schemaHooks.validateData(bookDataValidator),
         schemaHooks.resolveData(bookDataResolver),
       ],
