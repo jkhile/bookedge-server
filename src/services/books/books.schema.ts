@@ -137,6 +137,8 @@ export const bookSchema = Type.Object(
     amazon_author_bio_finalized: Type.Boolean(),
     one_line_author_bio: Type.String(),
     one_line_author_bio_finalized: Type.Boolean(),
+    bisac_notes: Type.String(),
+    mentions_notes: Type.String(),
     audio_book_percentage: Type.Number(),
     ebook_percentage: Type.Number(),
     file_storage_id: Type.Optional(Type.String()),
