@@ -53,6 +53,9 @@ importers:
       '@feathersjs/typebox':
         specifier: ^5.0.34
         version: 5.0.34(typescript@5.8.3)
+      bookedge-server:
+        specifier: http://localhost:3030/bookedge-server-1.2.0.tgz
+        version: http://localhost:3030/bookedge-server-1.2.0.tgz(typescript@5.8.3)
       coralogix-logger:
         specifier: ^1.1.30
         version: 1.1.30(debug@4.4.1)
@@ -1179,6 +1182,11 @@ packages:
   body-parser@1.20.3:
     resolution: {integrity: sha512-7rAxByjUMqQ3/bHJy7D6OGXvx/MMc4IqBn/X0fcM1QUcAItpZrBEYhWGem+tzXH90c+G01ypMcYJBO9Y30203g==}
     engines: {node: '>= 0.8', npm: 1.2.8000 || >= 1.4.16}
+
+  bookedge-server@http://localhost:3030/bookedge-server-1.2.0.tgz:
+    resolution: {tarball: http://localhost:3030/bookedge-server-1.2.0.tgz}
+    version: 1.2.0
+    engines: {node: '>= 20.15.1'}
 
   brace-expansion@1.1.12:
     resolution: {integrity: sha512-9T9UjW3r0UW5c1Q7GTwllptXwhvYmEzFhzMfZ9H7FQWt+uZePjZPjBP/W1ZEyZ1twGWom5/56TF4lPcqjnDHcg==}
@@ -4071,6 +4079,51 @@ snapshots:
       unpipe: 1.0.0
     transitivePeerDependencies:
       - supports-color
+
+  bookedge-server@http://localhost:3030/bookedge-server-1.2.0.tgz(typescript@5.8.3):
+    dependencies:
+      '@feathersjs/adapter-commons': 5.0.34
+      '@feathersjs/authentication': 5.0.34(typescript@5.8.3)
+      '@feathersjs/authentication-client': 5.0.34(typescript@5.8.3)
+      '@feathersjs/authentication-local': 5.0.34(typescript@5.8.3)
+      '@feathersjs/authentication-oauth': 5.0.34(typescript@5.8.3)
+      '@feathersjs/configuration': 5.0.34(typescript@5.8.3)
+      '@feathersjs/errors': 5.0.34
+      '@feathersjs/feathers': 5.0.34
+      '@feathersjs/knex': 5.0.34(knex@3.1.0(pg@8.16.3))
+      '@feathersjs/koa': 5.0.34(typescript@5.8.3)
+      '@feathersjs/rest-client': 5.0.34
+      '@feathersjs/schema': 5.0.34(typescript@5.8.3)
+      '@feathersjs/socketio': 5.0.34
+      '@feathersjs/transport-commons': 5.0.34
+      '@feathersjs/typebox': 5.0.34(typescript@5.8.3)
+      coralogix-logger: 1.1.30(debug@4.4.1)
+      csv-parse: 5.6.0
+      date-fns: 4.1.0
+      debug: 4.4.1(supports-color@5.5.0)
+      fs-extra: 11.3.0
+      google-auth-library: 9.15.1
+      googleapis: 144.0.0
+      just-diff: 6.0.2
+      knex: 3.1.0(pg@8.16.3)
+      lodash: 4.17.21
+      pg: 8.16.3
+      pretty-format: 29.7.0
+      uuid: 11.1.0
+      winston: 3.17.0
+      winston-transport: 4.9.0
+    transitivePeerDependencies:
+      - better-sqlite3
+      - bufferutil
+      - encoding
+      - mysql
+      - mysql2
+      - pg-native
+      - sqlite3
+      - supports-color
+      - tedious
+      - typescript
+      - utf-8-validate
 
   brace-expansion@1.1.12:
     dependencies:
