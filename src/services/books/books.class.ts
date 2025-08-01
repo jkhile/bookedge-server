@@ -24,12 +24,13 @@ export class BookService<
   createQuery(params: KnexAdapterParams<BookQuery>) {
     const query = super.createQuery(params)
 
-    // Subquery to get the author name from contributors table
+    // Subquery to get the author name from contributors table through book_contributors
     // First trying to find one with contributor_role 'Author', falling back to first contributor
-    const authorSubquery = this.Model.select('published_name')
-      .from('contributors')
-      .whereRaw('contributors.fk_book = books.id')
-      .orderByRaw("CASE WHEN contributor_role = 'Author' THEN 0 ELSE 1 END")
+    const authorSubquery = this.Model.select('c.published_name')
+      .from('contributors as c')
+      .join('book_contributors as bc', 'bc.fk_contributor', 'c.id')
+      .whereRaw('bc.fk_book = books.id')
+      .orderByRaw("CASE WHEN bc.contributor_role = 'Author' THEN 0 ELSE 1 END")
       .limit(1)
 
     // Add the author as a field via subquery

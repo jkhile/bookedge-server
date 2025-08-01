@@ -2,6 +2,7 @@ import authenticationClient from '@feathersjs/authentication-client'
 import { bookClient } from './services/books/books.shared'
 import { booksHistoryClient } from './services/books-history/books-history.shared'
 import { contributorClient } from './services/contributors/contributors.shared'
+import { bookContributorClient } from './services/book-contributors/book-contributors.shared'
 import { feathers } from '@feathersjs/feathers'
 import { imprintClient } from './services/imprints/imprints.shared'
 import { logMessageClient } from './services/log-messages/log-messages.shared'
@@ -76,6 +77,13 @@ export type {
 } from './services/contributors/contributors.shared'
 
 export type {
+  BookContributor,
+  BookContributorData,
+  BookContributorQuery,
+  BookContributorPatch,
+} from './services/book-contributors/book-contributors.shared'
+
+export type {
   BooksHistory,
   BooksHistoryData,
   BooksHistoryQuery,
@@ -135,6 +143,7 @@ export const createClient = <Configuration = any>(
   client.configure(bookClient)
   client.configure(booksHistoryClient)
   client.configure(contributorClient)
+  client.configure(bookContributorClient)
   client.configure(releaseClient)
   client.configure(logMessageClient)
   client.configure(endorsementClient)

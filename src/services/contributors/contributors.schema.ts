@@ -15,8 +15,6 @@ import type { ContributorService } from './contributors.class'
 export const contributorSchema = Type.Object(
   {
     id: Type.Integer(),
-    fk_book: Type.Integer(),
-    contributor_role: Type.String(),
     legal_name: Type.String(),
     published_name: Type.String(),
     biography: Type.String(),
@@ -75,7 +73,16 @@ export const contributorDataValidator = getValidator(
 export const contributorDataResolver = resolve<
   Contributor,
   HookContext<ContributorService>
->(createDataResolver<Contributor>())
+>({
+  ...createDataResolver<Contributor>(),
+  // Sanitize published_name by removing trailing commas and whitespace
+  published_name: async (value: string | undefined) => {
+    if (typeof value === 'string') {
+      return value.replace(/[,\s]+$/, '').trim()
+    }
+    return value
+  },
+})
 
 // Schema for updating existing entries
 export const contributorPatchSchema = Type.Partial(contributorSchema, {
@@ -89,7 +96,16 @@ export const contributorPatchValidator = getValidator(
 export const contributorPatchResolver = resolve<
   Contributor,
   HookContext<ContributorService>
->(createUpdateResolver<Contributor>())
+>({
+  ...createUpdateResolver<Contributor>(),
+  // Sanitize published_name by removing trailing commas and whitespace
+  published_name: async (value: string | undefined) => {
+    if (typeof value === 'string') {
+      return value.replace(/[,\s]+$/, '').trim()
+    }
+    return value
+  },
+})
 
 // Schema for allowed query properties
 export const contributorQueryProperties = Type.Omit(contributorSchema, [])

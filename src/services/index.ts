@@ -8,6 +8,7 @@ import { endorsement } from './endorsements/endorsements'
 import { logMessage } from './log-messages/log-messages'
 import { release } from './releases/releases'
 import { contributor } from './contributors/contributors'
+import { bookContributor } from './book-contributors/book-contributors'
 import { booksHistory } from './books-history/books-history'
 import { book } from './books/books'
 import { imprint } from './imprints/imprints'
@@ -25,6 +26,7 @@ export const services = (app: Application) => {
   app.configure(logMessage)
   app.configure(release)
   app.configure(contributor)
+  app.configure(bookContributor)
   app.configure(booksHistory)
   app.configure(book)
   app.configure(imprint)
