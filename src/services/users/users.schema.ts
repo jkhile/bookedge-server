@@ -3,6 +3,7 @@ import { resolve } from '@feathersjs/schema'
 import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
 import { formatISO } from 'date-fns'
 import { dataValidator, queryValidator } from '../../validators'
+import { timestampSchema } from '../../utils/timestamp-schema'
 // // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
 import type { Static } from '@feathersjs/typebox'
 
@@ -39,9 +40,9 @@ export const userSchema = Type.Object(
     allowed_books: Type.Array(Type.Integer()),
     pinned_books: Type.Array(Type.Integer()),
     fk_created_by: Type.Optional(Type.Integer()),
-    created_at: Type.Optional(Type.String()),
+    created_at: Type.Optional(timestampSchema()),
     fk_updated_by: Type.Optional(Type.Integer()),
-    updated_at: Type.Optional(Type.String()),
+    updated_at: Type.Optional(timestampSchema()),
   },
   { $id: 'User', additionalProperties: false },
 )

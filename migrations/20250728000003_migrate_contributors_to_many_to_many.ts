@@ -1,7 +1,24 @@
 import type { Knex } from 'knex'
 
 export async function up(knex: Knex): Promise<void> {
-  // Step 1: Create temporary table to store deduplicated contributors
+  // Check if we've already run this migration
+  const hasBookColumn = await knex.raw(`
+    SELECT column_name 
+    FROM information_schema.columns 
+    WHERE table_name = 'contributors' 
+    AND column_name = 'fk_book'
+  `)
+
+  if (hasBookColumn.rows.length === 0) {
+    console.log(
+      'Migration appears to have already been run (fk_book column not found). Skipping...',
+    )
+    return
+  }
+
+  console.log('Starting contributor many-to-many migration...')
+
+  // Step 1: Create the simple deduplication - just use DISTINCT ON with published_name
   await knex.raw(`
     CREATE TEMPORARY TABLE temp_unique_contributors AS
     SELECT DISTINCT ON (published_name)
@@ -32,10 +49,10 @@ export async function up(knex: Knex): Promise<void> {
       updated_at
     FROM contributors
     WHERE published_name IS NOT NULL AND published_name != ''
-    ORDER BY published_name, updated_at DESC NULLS LAST, id DESC
+    ORDER BY published_name, id DESC
   `)
 
-  // Step 2: Create mapping table for old IDs to new IDs
+  // Step 2: Create mapping table
   await knex.raw(`
     CREATE TEMPORARY TABLE contributor_id_mapping AS
     SELECT
@@ -47,29 +64,25 @@ export async function up(knex: Knex): Promise<void> {
     JOIN temp_unique_contributors tuc ON c.published_name = tuc.published_name
   `)
 
-  // Step 3: Insert into book_contributors join table
-  // Use DISTINCT ON to handle cases where the same person has multiple records for the same book/role
+  // Step 3: Insert into book_contributors
   await knex.raw(`
-    INSERT INTO book_contributors (fk_book, fk_contributor, contributor_role, fk_created_by, created_at, fk_updated_by, updated_at)
+    INSERT INTO book_contributors (fk_book, fk_contributor, contributor_role, display_order, fk_created_by, created_at, fk_updated_by, updated_at)
     SELECT DISTINCT ON (cim.fk_book, cim.new_id, cim.contributor_role)
       cim.fk_book,
       cim.new_id,
       cim.contributor_role,
+      0,
       c.fk_created_by,
-      CASE 
-        WHEN c.created_at IS NULL OR c.created_at = '' THEN NULL
-        ELSE c.created_at::timestamp with time zone
-      END as created_at,
+      c.created_at,
       c.fk_updated_by,
       c.updated_at
     FROM contributor_id_mapping cim
     JOIN contributors c ON c.id = cim.old_id
     WHERE cim.fk_book IS NOT NULL
-    ORDER BY cim.fk_book, cim.new_id, cim.contributor_role, c.updated_at DESC NULLS LAST, c.id DESC
+    ORDER BY cim.fk_book, cim.new_id, cim.contributor_role, c.id DESC
   `)
 
-  // Step 4: Migrate biography history records from duplicate contributors
-  // First, copy biography history from contributors that will be deleted
+  // Step 4: Migrate history
   await knex.raw(`
     INSERT INTO "books-history" (entity_type, entity_id, fk_book, fk_user, user_email, change_date, op, path, value)
     SELECT
@@ -87,25 +100,26 @@ export async function up(knex: Knex): Promise<void> {
     WHERE bh.entity_type = 'contributor'
       AND bh.path = '/biography'
       AND cim.old_id != cim.new_id
+    ON CONFLICT DO NOTHING
   `)
 
-  // Step 5: Delete duplicate contributors (keeping only the unique ones)
+  // Step 5: Delete duplicate contributors
   await knex.raw(`
     DELETE FROM contributors
     WHERE id NOT IN (SELECT id FROM temp_unique_contributors)
   `)
 
-  // Step 6: Remove fk_book column from contributors table
+  // Step 6: Remove columns
   await knex.schema.alterTable('contributors', (table) => {
     table.dropColumn('fk_book')
     table.dropColumn('contributor_role')
   })
 
-  // Clean up temporary tables (happens automatically at end of session)
+  console.log('✅ Contributor migration complete!')
 }
 
 export async function down(knex: Knex): Promise<void> {
-  // Step 1: Add back the columns to contributors table
+  // Add back the columns
   await knex.schema.alterTable('contributors', (table) => {
     table
       .integer('fk_book')
@@ -115,8 +129,7 @@ export async function down(knex: Knex): Promise<void> {
     table.text('contributor_role').defaultTo('')
   })
 
-  // Step 2: Restore contributor records from book_contributors
-  // This will create duplicate contributors if one person contributed to multiple books
+  // Restore from book_contributors
   await knex.raw(`
     INSERT INTO contributors (
       fk_book,
@@ -177,12 +190,9 @@ export async function down(knex: Knex): Promise<void> {
     JOIN contributors c ON c.id = bc.fk_contributor
   `)
 
-  // Step 3: Delete the deduplicated contributors
+  // Delete the deduplicated contributors
   await knex.raw(`
     DELETE FROM contributors
     WHERE fk_book IS NULL
   `)
-
-  // Note: We cannot fully restore the original history records as some data may be lost
-  // This is why it's important to backup before running migrations
 }
