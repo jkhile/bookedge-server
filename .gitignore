@@ -128,3 +128,6 @@ bookedge-server-schema.sql
 Bookedge 158217.json
 
 backups/
+
+# Test data files with credentials
+insert-test-users.sql
