@@ -49,9 +49,6 @@ export class MetadataSearchService
       throw new Error('Fields must be an array of strings')
     }
 
-    // Create a comma-separated list of fields to search
-    const fieldList = fields.map((field) => `${field}`).join(', ')
-
     // Get user information for permission check
     const user = params?.user
     const isAdmin = user?.roles.includes('admin')
@@ -60,20 +57,62 @@ export class MetadataSearchService
     // Build the imprints access control phrase
     const imprintsPhrase = isAdmin
       ? ''
-      : `AND fk_imprint IN (${allowedImprints?.join(', ')})`
+      : `AND b.fk_imprint IN (${allowedImprints?.join(', ')})`
 
-    // Build and execute the search query
-    const sql = `
-      SELECT id, title, ts_headline('english', concat_ws(' ', ${fieldList}), websearch_to_tsquery('english', ?),
-        'ShortWord=0, MaxFragments=5, FragmentDelimiter="</br></br>"') AS headline
-      FROM books
-      WHERE to_tsvector('english', concat_ws(' ', ${fieldList})) @@ websearch_to_tsquery('english', ?)
-      ${imprintsPhrase}
-      ORDER BY ts_rank_cd(to_tsvector('english', concat_ws(' ', ${fieldList})), websearch_to_tsquery('english', ?)) DESC
-      LIMIT 500;
-    `
+    // Separate fields into book fields and contributor fields
+    const bookFields: string[] = []
+    const contributorFields: string[] = []
+
+    for (const field of fields) {
+      if (field === 'author') {
+        contributorFields.push('c.published_name')
+      } else {
+        bookFields.push(`b.${field}`)
+      }
+    }
+
+    // Build the search fields list
+    const allFields = [...bookFields, ...contributorFields]
+    const fieldList = allFields.join(', ')
+
+    // Build the query with proper joins for contributor data
+    let sql: string
+    if (contributorFields.length > 0) {
+      // Include contributor data when searching for author
+      // Use a subquery to handle DISTINCT properly with ORDER BY
+      sql = `
+        SELECT ranked_results.id, ranked_results.title, ranked_results.headline
+        FROM (
+          SELECT DISTINCT b.id, b.title, 
+            ts_headline('english', concat_ws(' ', ${fieldList}), websearch_to_tsquery('english', ?),
+              'ShortWord=0, MaxFragments=5, FragmentDelimiter="</br></br>"') AS headline,
+            ts_rank_cd(to_tsvector('english', concat_ws(' ', ${fieldList})), websearch_to_tsquery('english', ?)) AS rank
+          FROM books b
+          LEFT JOIN book_contributors bc ON bc.fk_book = b.id
+          LEFT JOIN contributors c ON c.id = bc.fk_contributor
+          WHERE to_tsvector('english', concat_ws(' ', ${fieldList})) @@ websearch_to_tsquery('english', ?)
+          ${imprintsPhrase}
+        ) AS ranked_results
+        ORDER BY ranked_results.rank DESC
+        LIMIT 500;
+      `
+    } else {
+      // Only search book fields when no author field is selected
+      sql = `
+        SELECT b.id, b.title, 
+          ts_headline('english', concat_ws(' ', ${fieldList}), websearch_to_tsquery('english', ?),
+            'ShortWord=0, MaxFragments=5, FragmentDelimiter="</br></br>"') AS headline
+        FROM books b
+        WHERE to_tsvector('english', concat_ws(' ', ${fieldList})) @@ websearch_to_tsquery('english', ?)
+        ${imprintsPhrase}
+        ORDER BY ts_rank_cd(to_tsvector('english', concat_ws(' ', ${fieldList})), websearch_to_tsquery('english', ?)) DESC
+        LIMIT 500;
+      `
+    }
 
     try {
+      // For the contributor query, we need 3 parameters: headline, rank, and where clause
+      // For the book-only query, we need 3 parameters: headline, where clause, and order by
       const result = await this.knex.raw(sql, [
         searchTerm,
         searchTerm,
