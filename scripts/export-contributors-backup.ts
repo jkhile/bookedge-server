@@ -68,7 +68,7 @@ async function exportContributorsToCSV() {
       'amazon_author_page',
       'author_website',
       'twitter',
-      'threads',
+      'substack',
       'bluesky',
       'instagram',
       'facebook',
