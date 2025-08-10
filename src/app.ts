@@ -77,6 +77,9 @@ app.configure(authentication)
 app.configure(services)
 app.configure(channels)
 
+// Debug: Log all registered services
+console.log('Registered services:', Object.keys(app.services).sort())
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.on('login', (authResult, { connection }) => {
   logger.info(

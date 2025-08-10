@@ -26,6 +26,7 @@ export * from './book-contributors.schema'
 
 // A configure function that registers the service and its hooks via `app.configure`
 export const bookContributor = (app: Application) => {
+  console.log(`Registering book-contributors service at path: ${bookContributorPath}`)
   // Register our service on the Feathers application
   app.use(bookContributorPath, new BookContributorService(getOptions(app)), {
     // A list of all methods this service exposes externally
@@ -33,6 +34,7 @@ export const bookContributor = (app: Application) => {
     // You can add additional custom events to be sent to clients here
     events: [],
   })
+  console.log(`book-contributors service registered successfully`)
   // Initialize hooks
   app.service(bookContributorPath).hooks({
     around: {
