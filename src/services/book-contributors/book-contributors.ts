@@ -35,6 +35,15 @@ export const bookContributor = (app: Application) => {
     events: [],
   })
   console.log(`book-contributors service registered successfully`)
+  
+  // Test that the service is accessible
+  try {
+    const testService = app.service(bookContributorPath)
+    console.log(`book-contributors service test access successful:`, testService ? 'exists' : 'not found')
+  } catch (error) {
+    console.error(`book-contributors service test access failed:`, error)
+  }
+  
   // Initialize hooks
   app.service(bookContributorPath).hooks({
     around: {

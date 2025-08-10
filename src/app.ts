@@ -80,6 +80,22 @@ app.configure(channels)
 // Debug: Log all registered services
 console.log('Registered services:', Object.keys(app.services).sort())
 
+// Debug endpoint to test service availability
+app.use(async (ctx, next) => {
+  if (ctx.path === '/debug/services' && ctx.method === 'GET') {
+    const services = Object.keys(app.services).sort()
+    const bookContributorsExists = services.includes('book-contributors')
+    ctx.body = {
+      totalServices: services.length,
+      services: services,
+      bookContributorsExists: bookContributorsExists,
+      bookContributorsServiceDirect: app.service('book-contributors') ? 'accessible' : 'not accessible'
+    }
+  } else {
+    await next()
+  }
+})
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.on('login', (authResult, { connection }) => {
   logger.info(
