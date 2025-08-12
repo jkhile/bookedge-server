@@ -54,22 +54,70 @@ app.use(bodyParser())
 // Configure services and transports
 app.configure(rest())
 app.configure(
-  socketio({
-    cors: {
-      origin: function (origin, callback) {
-        const origins = app.get('origins') as string[]
-        if (!origin || origins.includes(origin)) {
-          callback(null, true)
-        } else {
-          logger.error('cors callback returning error')
-          callback(new Error(`Origin ${origin} not allowed by CORS`))
-        }
+  socketio(
+    {
+      cors: {
+        origin: function (origin, callback) {
+          const origins = app.get('origins') as string[]
+          if (!origin || origins.includes(origin)) {
+            callback(null, true)
+          } else {
+            logger.error('cors callback returning error')
+            callback(new Error(`Origin ${origin} not allowed by CORS`))
+          }
+        },
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
       },
-      credentials: true,
-      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
     },
-  }),
+    (io) => {
+      // Add logging middleware for incoming Socket.IO events
+      io.use((socket, next) => {
+        logger.info(
+          `[Socket.IO] New connection: ${socket.id} from ${socket.handshake.address}`,
+        )
+
+        // Store original event handler registration method
+        const originalOn = socket.on.bind(socket)
+
+        // Override socket.on to wrap event handlers with logging
+        socket.on = function (
+          event: string,
+          handler: (...args: any[]) => void,
+        ) {
+          const wrappedHandler = (...args: any[]) => {
+            // Extract callback function if present (usually last argument)
+            const hasCallback =
+              args.length > 0 && typeof args[args.length - 1] === 'function'
+            const logArgs = hasCallback ? args.slice(0, -1) : args
+
+            logger.info(`[Socket.IO] Incoming event: ${event}`, {
+              socketId: socket.id,
+              args: logArgs,
+              timestamp: new Date().toISOString(),
+              argCount: args.length,
+            })
+            if (args[0] === 'book-contributors') {
+              logger.info(`app.services: ${Object.keys(app.services)}`)
+            }
+
+            return handler.apply(this, args)
+          }
+          return originalOn(event, wrappedHandler)
+        }
+
+        // Log disconnection
+        socket.on('disconnect', (reason) => {
+          logger.info(
+            `[Socket.IO] Disconnection: ${socket.id}, reason: ${reason}`,
+          )
+        })
+
+        next()
+      })
+    },
+  ),
 )
 app.configure(postgresql)
 app.configure(googleDrive)
@@ -89,7 +137,9 @@ app.use(async (ctx, next) => {
       totalServices: services.length,
       services: services,
       bookContributorsExists: bookContributorsExists,
-      bookContributorsServiceDirect: app.service('book-contributors') ? 'accessible' : 'not accessible'
+      bookContributorsServiceDirect: app.service('book-contributors')
+        ? 'accessible'
+        : 'not accessible',
     }
   } else {
     await next()
