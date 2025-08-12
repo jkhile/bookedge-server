@@ -92,14 +92,14 @@ app.configure(
               args.length > 0 && typeof args[args.length - 1] === 'function'
             const logArgs = hasCallback ? args.slice(0, -1) : args
 
-            logger.info(`[Socket.IO] Incoming event: ${event}`, {
+            console.log(`[Socket.IO] Incoming event: ${event}`, {
               socketId: socket.id,
               args: logArgs,
               timestamp: new Date().toISOString(),
               argCount: args.length,
             })
             if (args[0] === 'book-contributors') {
-              logger.info(`app.services: ${Object.keys(app.services)}`)
+              console.log(`app.services: ${Object.keys(app.services)}`)
             }
 
             return handler.apply(this, args)
