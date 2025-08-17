@@ -91,6 +91,7 @@ app.on('login', (authResult, { connection }) => {
     user_name: authResult.user.name,
     datetime: new Date().toISOString(),
   })
+  console.log('app.services:', Object.keys(app.services))
 })
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
