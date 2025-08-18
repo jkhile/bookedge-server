@@ -29,8 +29,8 @@ export const contributorSchema = Type.Object(
     amazon_author_page: Type.String(),
     author_website: Type.String(),
     twitter: Type.String(),
-    threads: Type.String(),
     bluesky: Type.String(),
+    substack: Type.String(),
     instagram: Type.String(),
     facebook: Type.String(),
     linkedin: Type.String(),
@@ -75,7 +75,16 @@ export const contributorDataValidator = getValidator(
 export const contributorDataResolver = resolve<
   Contributor,
   HookContext<ContributorService>
->(createDataResolver<Contributor>())
+>({
+  ...createDataResolver<Contributor>(),
+  // Sanitize published_name by removing trailing commas and whitespace
+  published_name: async (value: string | undefined) => {
+    if (typeof value === 'string') {
+      return value.replace(/[,\s]+$/, '').trim()
+    }
+    return value
+  },
+})
 
 // Schema for updating existing entries
 export const contributorPatchSchema = Type.Partial(contributorSchema, {
@@ -89,7 +98,16 @@ export const contributorPatchValidator = getValidator(
 export const contributorPatchResolver = resolve<
   Contributor,
   HookContext<ContributorService>
->(createUpdateResolver<Contributor>())
+>({
+  ...createUpdateResolver<Contributor>(),
+  // Sanitize published_name by removing trailing commas and whitespace
+  published_name: async (value: string | undefined) => {
+    if (typeof value === 'string') {
+      return value.replace(/[,\s]+$/, '').trim()
+    }
+    return value
+  },
+})
 
 // Schema for allowed query properties
 export const contributorQueryProperties = Type.Omit(contributorSchema, [])
