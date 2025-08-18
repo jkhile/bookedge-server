@@ -16,7 +16,7 @@ INSERT INTO users (
  'active',
  ARRAY['admin'],
  1,
- '2023-01-18T19:44:58-5.00',
+ '2023-01-18T19:44:58-5:00',
  'Test Admin'
 ), (
  'projectmanager@test.com',
@@ -26,7 +26,7 @@ INSERT INTO users (
  'active',
  ARRAY['productManager'],
  1,
- '2023-01-18T19:44:58-5.00',
+ '2023-01-18T19:44:58-5:00',
  'Test Project Manager'
 ), (
  'editor@test.com',
@@ -36,7 +36,7 @@ INSERT INTO users (
  'active',
  ARRAY['editor'],
  1,
- '2023-01-18T19:44:58-5.00',
+ '2023-01-18T19:44:58-5:00',
  'Test Editor'
 ), (
  'author@test.com',
@@ -46,6 +46,6 @@ INSERT INTO users (
  'active',
  ARRAY['author'],
  1,
- '2023-01-18T19:44:58-5.00',
+ '2023-01-18T19:44:58-5:00',
  'Test Author'
 )
