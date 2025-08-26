@@ -30,6 +30,12 @@ export async function up(knex: Knex): Promise<void> {
       .inTable('users')
       .onDelete('RESTRICT')
     table.text('updated_at').defaultTo('')
+    // Create unique constraint to prevent duplicate book-contributor-role combinations
+    table.unique(['fk_book', 'fk_contributor', 'contributor_role'])
+
+    // Create indexes for foreign keys
+    table.index('fk_book')
+    table.index('fk_contributor')
   })
 }
 
