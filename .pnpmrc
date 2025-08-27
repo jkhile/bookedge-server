@@ -1,7 +1,3 @@
-# pnpm configuration
-verify-deps-before-run=false
-store-dir=
-global-bin-dir=
-global-dir=
-cache-dir=
-state-dir=
+auto-install-peers=true
+strict-peer-dependencies=false
+node-linker=isolated
