@@ -1,0 +1,7 @@
+# pnpm configuration
+verify-deps-before-run=false
+store-dir=
+global-bin-dir=
+global-dir=
+cache-dir=
+state-dir=
