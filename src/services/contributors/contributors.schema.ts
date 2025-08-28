@@ -15,8 +15,6 @@ import type { ContributorService } from './contributors.class'
 export const contributorSchema = Type.Object(
   {
     id: Type.Integer(),
-    fk_book: Type.Integer(),
-    contributor_role: Type.String(),
     legal_name: Type.String(),
     published_name: Type.String(),
     biography: Type.String(),
