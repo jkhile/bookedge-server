@@ -47,8 +47,8 @@
   "main": "lib/client",
   "scripts": {
     "check": "pnpm prettier && pnpm lint && pnpm compile",
-    "dev": "dotenvx run --env-file=.env -- nodemon  -x ts-node src/index.ts",
-    "dev:test": "pnpm make-test-db && dotenvx run --env-file=.env.test -- nodemon -x ts-node src/index",
+    "dev": "dotenvx run --env-file=.env -- nodemon  -x tsx src/index.ts",
+    "dev:test": "pnpm make-test-db && dotenvx run --env-file=.env.test -- nodemon -x tsx src/index",
     "reset-log": "cp ./reset.log ./debug-development.log && echo \"Log reset\"",
     "lint": "eslint ./src",
     "compile": "shx rm -rf lib/ && tsc",
@@ -66,11 +66,11 @@
     "migrate": "dotenvx run -- knex migrate:latest",
     "migrate:down": "dotenvx run -- knex migrate:down",
     "migrate:make": "knex migrate:make",
-    "import-authors": "ts-node src/scripts/import-author-contacts.ts",
-    "test-parser": "ts-node src/scripts/test-parser.ts",
+    "import-authors": "tsx src/scripts/import-author-contacts.ts",
+    "test-parser": "tsx src/scripts/test-parser.ts",
     "cleanup-tokens": "tsx src/scripts/cleanup-refresh-tokens.ts",
-    "backup-heroku-db": "ts-node src/scripts/backup-heroku-db.ts",
-    "restore-heroku-db": "ts-node src/scripts/restore-heroku-db.ts"
+    "backup-heroku-db": "tsx src/scripts/backup-heroku-db.ts",
+    "restore-heroku-db": "tsx src/scripts/restore-heroku-db.ts"
   },
   "dependencies": {
     "@feathersjs/adapter-commons": "^5.0.34",
@@ -121,6 +121,7 @@
     "prettier": "^3.6.2",
     "shx": "^0.3.4",
     "ts-node": "^10.9.2",
+    "tsx": "^4.20.5",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.41.0",
     "vitest": "^2.1.9"
