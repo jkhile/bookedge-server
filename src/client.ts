@@ -11,6 +11,14 @@ import { userClient } from './services/users/users.shared'
 import type { TransportConnection, Application } from '@feathersjs/feathers'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
+import { bookContributorRolesClient } from './services/book-contributor-roles/book-contributor-roles.shared'
+export type {
+  BookContributorRoles,
+  BookContributorRolesData,
+  BookContributorRolesQuery,
+  BookContributorRolesPatch,
+} from './services/book-contributor-roles/book-contributor-roles.shared'
+
 import { refreshTokenClient } from './services/refresh-token/refresh-token.shared'
 export type {
   RefreshToken,
@@ -143,5 +151,6 @@ export const createClient = <Configuration = any>(
   client.configure(mentionsClient)
   client.configure(signinHistoryClient)
   client.configure(refreshTokenClient)
+  client.configure(bookContributorRolesClient)
   return client
 }

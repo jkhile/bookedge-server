@@ -24,16 +24,19 @@ export class BookService<
   createQuery(params: KnexAdapterParams<BookQuery>) {
     const query = super.createQuery(params)
 
-    // Subquery to get the author name from contributors table
-    // First trying to find one with contributor_role 'Author', falling back to first contributor
-    const authorSubquery = this.Model.select('published_name')
-      .from('contributors')
-      .whereRaw('contributors.fk_book = books.id')
-      .orderByRaw("CASE WHEN contributor_role = 'Author' THEN 0 ELSE 1 END")
-      .limit(1)
+    // Subquery to get the author name from contributors table via book-contributor-roles
+    // Using raw SQL for better control over quoting with hyphenated table names
+    const authorSubquery = `
+      SELECT contributors.published_name 
+      FROM contributors 
+      INNER JOIN "book-contributor-roles" ON contributors.id = "book-contributor-roles".fk_contributor 
+      WHERE "book-contributor-roles".fk_book = books.id 
+      ORDER BY CASE WHEN "book-contributor-roles".contributor_role = 'Author' THEN 0 ELSE 1 END 
+      LIMIT 1
+    `
 
     // Add the author as a field via subquery
-    query.select(this.Model.raw(`(${authorSubquery.toQuery()}) as author`))
+    query.select(this.Model.raw(`(${authorSubquery}) as author`))
 
     // Subquery to get the earliest publication date from releases table
     // Only considering non-empty publication dates

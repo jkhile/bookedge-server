@@ -47,14 +47,14 @@
   "main": "lib/client",
   "scripts": {
     "check": "pnpm prettier && pnpm lint && pnpm compile",
-    "dev": "dotenvx run --env-file=.env -- nodemon  -x ts-node src/index.ts",
-    "dev:test": "pnpm make-test-db && dotenvx run --env-file=.env.test -- nodemon -x ts-node src/index",
+    "dev": "dotenvx run --env-file=.env -- nodemon  -x tsx src/index.ts",
+    "dev:test": "pnpm make-test-db && dotenvx run --env-file=.env.test -- nodemon -x tsx src/index",
     "reset-log": "cp ./reset.log ./debug-development.log && echo \"Log reset\"",
     "lint": "eslint ./src",
     "compile": "shx rm -rf lib/ && tsc",
     "build": "pnpm compile",
     "start": "node lib/",
-    "prettier": "npx prettier \"**/*.ts\" --write --log-level warn",
+    "prettier": "pnpm exec prettier \"**/*.ts\" --write --log-level warn",
     "test": "cross-env NODE_ENV=test vitest run",
     "test:watch": "cross-env NODE_ENV=test vitest",
     "test:coverage": "cross-env NODE_ENV=test vitest run --coverage",
@@ -66,11 +66,11 @@
     "migrate": "dotenvx run -- knex migrate:latest",
     "migrate:down": "dotenvx run -- knex migrate:down",
     "migrate:make": "knex migrate:make",
-    "import-authors": "ts-node src/scripts/import-author-contacts.ts",
-    "test-parser": "ts-node src/scripts/test-parser.ts",
+    "import-authors": "tsx src/scripts/import-author-contacts.ts",
+    "test-parser": "tsx src/scripts/test-parser.ts",
     "cleanup-tokens": "tsx src/scripts/cleanup-refresh-tokens.ts",
-    "backup-heroku-db": "ts-node src/scripts/backup-heroku-db.ts",
-    "restore-heroku-db": "ts-node src/scripts/restore-heroku-db.ts"
+    "backup-heroku-db": "tsx src/scripts/backup-heroku-db.ts",
+    "restore-heroku-db": "tsx src/scripts/restore-heroku-db.ts"
   },
   "dependencies": {
     "@feathersjs/adapter-commons": "^5.0.34",
@@ -105,28 +105,30 @@
     "winston-transport": "^4.9.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.32.0",
+    "@eslint/js": "^9.34.0",
     "@feathersjs/cli": "5.0.22",
     "@types/debug": "^4.1.12",
     "@types/fs-extra": "^11.0.4",
     "@types/lodash": "^4.17.20",
-    "@types/node": "^22.16.5",
+    "@types/node": "^22.18.0",
     "@vitest/coverage-v8": "^2.1.9",
     "@vitest/ui": "^2.1.9",
     "axios": "^1.11.0",
     "cross-env": "^7.0.3",
-    "eslint": "^9.32.0",
+    "eslint": "^9.34.0",
     "globals": "^15.15.0",
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
     "shx": "^0.3.4",
     "ts-node": "^10.9.2",
+    "tsx": "^4.20.5",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.38.0",
+    "typescript-eslint": "^8.41.0",
     "vitest": "^2.1.9"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
+      "es5-ext",
       "esbuild"
     ]
   }
