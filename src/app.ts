@@ -7,6 +7,7 @@ import { configurationValidator } from './configuration'
 import { googleDrive } from './google-drive'
 import { logError } from './hooks/log-error'
 import { logServiceCall } from './hooks/log-service-call'
+import { handleDatabaseErrors } from './hooks/database-error-handler'
 // import { measurePerformance } from './hooks/measure-performance'
 import { postgresql } from './postgresql'
 import { services } from './services/index'
@@ -117,7 +118,9 @@ app.hooks({
   },
   before: {},
   after: {},
-  error: {},
+  error: {
+    all: [handleDatabaseErrors],
+  },
 })
 // Register application setup and teardown hooks here
 app.hooks({
