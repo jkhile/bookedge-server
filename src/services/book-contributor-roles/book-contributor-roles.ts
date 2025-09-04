@@ -23,6 +23,7 @@ import {
   bookContributorRolesPath,
   bookContributorRolesMethods,
 } from './book-contributor-roles.shared'
+import { checkUniqueContributorRole } from './book-contributor-roles.hooks'
 
 export * from './book-contributor-roles.class'
 export * from './book-contributor-roles.schema'
@@ -59,10 +60,12 @@ export const bookContributorRoles = (app: Application) => {
       create: [
         schemaHooks.validateData(bookContributorRolesDataValidator),
         schemaHooks.resolveData(bookContributorRolesDataResolver),
+        checkUniqueContributorRole,
       ],
       patch: [
         schemaHooks.validateData(bookContributorRolesPatchValidator),
         schemaHooks.resolveData(bookContributorRolesPatchResolver),
+        checkUniqueContributorRole,
       ],
       remove: [],
     },

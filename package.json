@@ -2,7 +2,7 @@
   "name": "bookedge-server",
   "description": "Server component of the FEP BookEdge system",
   "version": "1.4.0",
-  "packageManager": "pnpm@10.4.1",
+  "packageManager": "pnpm@10.15.1+sha512.34e538c329b5553014ca8e8f4535997f96180a1d0f614339357449935350d924e22f8614682191264ec33d1462ac21561aff97f6bb18065351c162c7e8f6de67",
   "homepage": "",
   "private": true,
   "keywords": [
@@ -110,7 +110,7 @@
     "@types/debug": "^4.1.12",
     "@types/fs-extra": "^11.0.4",
     "@types/lodash": "^4.17.20",
-    "@types/node": "^22.18.0",
+    "@types/node": "^22.18.1",
     "@vitest/coverage-v8": "^2.1.9",
     "@vitest/ui": "^2.1.9",
     "axios": "^1.11.0",
@@ -123,7 +123,7 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.20.5",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.41.0",
+    "typescript-eslint": "^8.42.0",
     "vitest": "^2.1.9"
   },
   "pnpm": {
