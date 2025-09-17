@@ -7,14 +7,14 @@ import { Application as FeathersApplication } from '@feathersjs/koa'
 import { ApplicationConfiguration } from './configuration'
 
 import { User } from './services/users/users'
-import { GoogleDriveService } from './utils/google-drive-service'
+import type { GoogleDriveManager } from './utils/google-drive-manager'
 
 export type { NextFunction }
 
 // The types for app.get(name) and app.set(name)
 
 export interface Configuration extends ApplicationConfiguration {
-  driveService?: GoogleDriveService
+  driveManager?: GoogleDriveManager
 }
 
 // A mapping of service names to types. Will be extended in service files.
@@ -48,5 +48,8 @@ export interface ServiceTypesMap {
   mentions: 'mentions'
   pricings: 'pricings'
   endorsements: 'endorsements'
+  'file-storage': 'file-storage'
+  'file-downloads': 'file-downloads'
+  'file-access-logs': 'file-access-logs'
   'metadata-search': 'metadata-search'
 }
