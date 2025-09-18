@@ -9,6 +9,7 @@ import type {
 import { logger } from '../../logger'
 import type { Application } from '../../declarations'
 import { GoogleDriveManager } from '../../utils/google-drive-manager'
+import { toReadableStream } from '../../utils/stream-helpers'
 import type {
   FileStorage,
   FileStorageData,
@@ -261,11 +262,14 @@ export class FileOperationsService
       }
 
       // Upload file to Google Drive
+      // Convert Buffer to stream for Google Drive API
+      const fileStream = toReadableStream(fileBuffer)
+
       const uploadResult = await driveClient.uploadFile({
         fileName: file.name,
         mimeType: file.type,
         folderId: targetFolderId,
-        fileContent: fileBuffer,
+        fileContent: fileStream,
         description: description,
       })
 

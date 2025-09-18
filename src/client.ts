@@ -12,6 +12,10 @@ import type { TransportConnection, Application } from '@feathersjs/feathers'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
 import { bookContributorRolesClient } from './services/book-contributor-roles/book-contributor-roles.shared'
+import { fileStorageClient } from './services/file-storage/file-storage.shared'
+import { fileDownloadsClient } from './services/file-downloads/file-downloads.shared'
+import { fileAccessLogsClient } from './services/file-access-logs/file-access-logs.shared'
+import { fileOperationsClient } from './services/file-operations/file-operations.shared'
 export type {
   BookContributorRoles,
   BookContributorRolesData,
@@ -111,6 +115,36 @@ export type {
   UserPatch,
 } from './services/users/users.shared'
 
+export type {
+  FileStorage,
+  FileStorageData,
+  FileStorageQuery,
+  FileStoragePatch,
+} from './services/file-storage/file-storage.shared'
+
+export type {
+  FileDownloads,
+  FileDownloadsData,
+  FileDownloadsQuery,
+  FileDownloadsPatch,
+} from './services/file-downloads/file-downloads.shared'
+
+export type {
+  FileAccessLogs,
+  FileAccessLogsData,
+  FileAccessLogsQuery,
+  FileAccessLogsPatch,
+} from './services/file-access-logs/file-access-logs.shared'
+
+export type {
+  FileStorage as FileOperations,
+  FileUploadData,
+  FileDownloadResult,
+  FileMoveData,
+  GalleryQuery,
+  GalleryItem,
+} from './services/file-operations/file-operations.shared'
+
 export interface Configuration {
   connection: TransportConnection<ServiceTypes>
 }
@@ -152,5 +186,9 @@ export const createClient = <Configuration = any>(
   client.configure(signinHistoryClient)
   client.configure(refreshTokenClient)
   client.configure(bookContributorRolesClient)
+  client.configure(fileStorageClient)
+  client.configure(fileDownloadsClient)
+  client.configure(fileAccessLogsClient)
+  client.configure(fileOperationsClient)
   return client
 }

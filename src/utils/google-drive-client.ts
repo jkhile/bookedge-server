@@ -259,7 +259,11 @@ export class GoogleDriveClient {
         fileName: options.fileName,
         error,
       })
-      throw new GeneralError(`Failed to upload file: ${options.fileName}`)
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error'
+      throw new GeneralError(
+        `Failed to upload file: ${options.fileName}. ${errorMessage}`,
+      )
     }
   }
 

@@ -1,10 +1,7 @@
 import { resolve } from '@feathersjs/schema'
 import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
 import { dataValidator, queryValidator } from '../../validators'
-import {
-  createDataResolver,
-  createUpdateResolver,
-} from '../../utils/update-resolver'
+import { formatISO } from 'date-fns'
 
 import type { Static } from '@feathersjs/typebox'
 import type { HookContext } from '../../declarations'
@@ -83,7 +80,12 @@ export const fileStorageDataValidator = getValidator(
 export const fileStorageDataResolver = resolve<
   FileStorage,
   HookContext<FileStorageService>
->(createDataResolver<FileStorage>())
+>({
+  uploaded_at: async () => formatISO(new Date()),
+  uploaded_by: async (value, data, context) => context.params.user?.id || 0,
+  updated_at: async () => formatISO(new Date()),
+  updated_by: async (value, data, context) => context.params.user?.id || 0,
+})
 
 // Schema for updating existing entries
 export const fileStoragePatchSchema = Type.Partial(
@@ -105,7 +107,10 @@ export const fileStoragePatchValidator = getValidator(
 export const fileStoragePatchResolver = resolve<
   FileStorage,
   HookContext<FileStorageService>
->(createUpdateResolver<FileStorage>())
+>({
+  updated_at: async () => formatISO(new Date()),
+  updated_by: async (value, data, context) => context.params.user?.id || 0,
+})
 
 // Schema for allowed query properties
 export const fileStorageQueryProperties = Type.Pick(fileStorageSchema, [
