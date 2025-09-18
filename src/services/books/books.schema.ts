@@ -145,6 +145,7 @@ export const bookSchema = Type.Object(
     audio_book_percentage: Type.Number(),
     ebook_percentage: Type.Number(),
     file_storage_id: Type.Optional(Type.String()),
+    drive_folder_id: Type.Optional(Type.String()),
     fk_created_by: Type.Optional(Type.Integer()),
     created_at: Type.Optional(Type.String({ format: 'date-time' })),
     fk_updated_by: Type.Optional(Type.Integer()),

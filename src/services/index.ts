@@ -16,6 +16,7 @@ import { user } from './users/users'
 import { fileStorage } from './file-storage/file-storage'
 import { fileDownloads } from './file-downloads/file-downloads'
 import { fileAccessLogs } from './file-access-logs/file-access-logs'
+import { fileOperations } from './file-operations/file-operations'
 // For more information about this file see https://dove.feathersjs.com/guides/cli/application.html#configure-functions
 import type { Application } from '../declarations'
 
@@ -39,5 +40,6 @@ export const services = (app: Application) => {
   app.configure(fileAccessLogs) // Register this first as it's used by other services
   app.configure(fileStorage)
   app.configure(fileDownloads)
+  app.configure(fileOperations) // Register file operations last as it depends on other services
   // All services will be registered here
 }
