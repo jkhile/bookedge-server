@@ -63,21 +63,37 @@ export class GoogleDriveClient {
   }
 
   /**
+   * Get the shared drive ID
+   */
+  getSharedDriveId(): string | undefined {
+    return this.sharedDriveId
+  }
+
+  /**
    * Create a GoogleDriveClient using service account credentials
    */
   static async createServiceAccountClient(): Promise<GoogleDriveClient> {
     try {
+      logger.debug('Creating service account client')
       const serviceAccountJson = process.env.GOOGLE_DRIVE_SERVICE_ACCOUNT
       if (!serviceAccountJson) {
+        logger.error(
+          'GOOGLE_DRIVE_SERVICE_ACCOUNT environment variable not set',
+        )
         throw new GeneralError(
           'Google Drive service account credentials not configured',
         )
       }
 
       const serviceAccount = JSON.parse(serviceAccountJson)
+      logger.debug('Service account parsed', {
+        client_email: serviceAccount.client_email,
+        has_private_key: !!serviceAccount.private_key,
+      })
 
       // Create JWT client for service account
-      const auth = new google.auth.JWT({
+      const impersonateEmail = process.env.GOOGLE_WORKSPACE_IMPERSONATE_EMAIL
+      const authConfig: any = {
         email: serviceAccount.client_email,
         key: serviceAccount.private_key,
         scopes: [
@@ -85,13 +101,24 @@ export class GoogleDriveClient {
           'https://www.googleapis.com/auth/drive.file',
           'https://www.googleapis.com/auth/drive.metadata',
         ],
-      })
+      }
+
+      // Only add subject if impersonation email is configured
+      if (impersonateEmail && impersonateEmail.trim() !== '') {
+        authConfig.subject = impersonateEmail
+        logger.debug('Using impersonation for:', impersonateEmail)
+      }
+
+      const auth = new google.auth.JWT(authConfig)
 
       await auth.authorize()
-      logger.info('Google Drive service account client created successfully')
+      logger.info('Google Drive service account authenticated successfully')
 
       // Get or create the shared drive
       const sharedDriveId = await GoogleDriveClient.getOrCreateSharedDrive(auth)
+      logger.debug('Service account client initialized', {
+        sharedDriveId,
+      })
 
       return new GoogleDriveClient(auth, sharedDriveId)
     } catch (error) {
@@ -129,27 +156,67 @@ export class GoogleDriveClient {
     auth: OAuth2Client,
   ): Promise<string> {
     const drive = google.drive({ version: 'v3', auth })
+
+    // Use the GOOGLE_DRIVE_SHARED_DRIVE_ID if provided
+    const sharedDriveId = process.env.GOOGLE_DRIVE_SHARED_DRIVE_ID
+    if (sharedDriveId) {
+      logger.info(`Using configured shared drive ID: ${sharedDriveId}`)
+      return sharedDriveId
+    }
+
     const rootFolderName =
       process.env.GOOGLE_DRIVE_ROOT_FOLDER || 'FEP_BookEdge'
 
     try {
-      // First, try to find existing shared drive
+      // Try to find an existing shared drive named "books" or the configured name
       const drivesList = await drive.drives.list({
         pageSize: 100,
         fields: 'drives(id, name)',
       })
 
-      const existingDrive = drivesList.data.drives?.find(
-        (d) => d.name === rootFolderName,
+      // First look for "books" shared drive
+      let existingDrive = drivesList.data.drives?.find(
+        (d) => d.name === 'books',
       )
 
+      // If not found, look for the configured name
+      if (!existingDrive) {
+        existingDrive = drivesList.data.drives?.find(
+          (d) => d.name === rootFolderName,
+        )
+      }
+
       if (existingDrive?.id) {
-        logger.info(`Found existing shared drive: ${rootFolderName}`)
+        logger.info(
+          `Found existing shared drive: ${existingDrive.name} (${existingDrive.id})`,
+        )
         return existingDrive.id
       }
 
-      // If not found, create the root folder in My Drive instead
-      // (Creating shared drives requires Google Workspace admin permissions)
+      // Search for the FEP_BookEdge folder in shared drives
+      logger.info('Searching for FEP_BookEdge folder in shared drives...')
+      const searchResponse = await drive.files.list({
+        q: `name='${rootFolderName}' and mimeType='application/vnd.google-apps.folder'`,
+        fields: 'files(id, name, driveId)',
+        supportsAllDrives: true,
+        includeItemsFromAllDrives: true,
+      })
+
+      // Find one that's in a shared drive
+      const sharedDriveFolder = searchResponse.data.files?.find(
+        (f) => f.driveId,
+      )
+      if (sharedDriveFolder?.driveId) {
+        logger.info(
+          `Found ${rootFolderName} in shared drive: ${sharedDriveFolder.driveId}`,
+        )
+        return sharedDriveFolder.driveId
+      }
+
+      // As a last resort, create a folder in My Drive (but log a warning)
+      logger.warn(
+        `No shared drive found. Creating folder in My Drive as fallback.`,
+      )
       const folderResponse = await drive.files.create({
         requestBody: {
           name: rootFolderName,
@@ -162,7 +229,7 @@ export class GoogleDriveClient {
         throw new GeneralError('Failed to create root folder')
       }
 
-      logger.info(`Created root folder: ${rootFolderName}`)
+      logger.info(`Created root folder in My Drive: ${rootFolderName}`)
       return folderResponse.data.id
     } catch (error) {
       logger.error('Failed to get or create shared drive', error)
@@ -175,14 +242,23 @@ export class GoogleDriveClient {
    */
   async createFolder(options: CreateFolderOptions): Promise<DriveFile> {
     try {
+      const parentIds = options.parentId
+        ? [options.parentId]
+        : this.sharedDriveId
+          ? [this.sharedDriveId]
+          : undefined
+
+      logger.debug('Creating folder in Google Drive', {
+        name: options.name,
+        parents: parentIds,
+        sharedDriveId: this.sharedDriveId,
+        description: options.description,
+      })
+
       const fileMetadata: drive_v3.Schema$File = {
         name: options.name,
         mimeType: MIME_TYPES.FOLDER,
-        parents: options.parentId
-          ? [options.parentId]
-          : this.sharedDriveId
-            ? [this.sharedDriveId]
-            : undefined,
+        parents: parentIds,
         description: options.description,
       }
 
@@ -192,7 +268,18 @@ export class GoogleDriveClient {
         supportsAllDrives: true,
       })
 
+      logger.debug('Google Drive API response for folder creation', {
+        id: response.data.id,
+        name: response.data.name,
+        parents: response.data.parents,
+        status: response.status,
+      })
+
       if (!response.data.id) {
+        logger.error('Failed to create folder - no ID returned', {
+          requestBody: fileMetadata,
+          response: response.data,
+        })
         throw new GeneralError('Failed to create folder')
       }
 
@@ -217,6 +304,13 @@ export class GoogleDriveClient {
    */
   async uploadFile(options: UploadFileOptions): Promise<DriveFile> {
     try {
+      logger.debug('Uploading file to Google Drive', {
+        fileName: options.fileName,
+        folderId: options.folderId,
+        mimeType: options.mimeType,
+        description: options.description,
+      })
+
       const fileMetadata: drive_v3.Schema$File = {
         name: options.fileName,
         parents: [options.folderId],
@@ -236,7 +330,20 @@ export class GoogleDriveClient {
         supportsAllDrives: true,
       })
 
+      logger.debug('Google Drive API response for file upload', {
+        id: response.data.id,
+        name: response.data.name,
+        size: response.data.size,
+        parents: response.data.parents,
+        webViewLink: response.data.webViewLink,
+        status: response.status,
+      })
+
       if (!response.data.id) {
+        logger.error('Failed to upload file - no ID returned', {
+          fileName: options.fileName,
+          response: response.data,
+        })
         throw new GeneralError('Failed to upload file')
       }
 
@@ -432,15 +539,32 @@ export class GoogleDriveClient {
     bookTitle: string,
   ): Promise<{ folderId: string; subfolders: Record<string, string> }> {
     try {
+      logger.debug('Creating book folder structure', {
+        bookId,
+        bookTitle,
+        sharedDriveId: this.sharedDriveId,
+      })
+
       // Create main book folder
       const sanitizedTitle = bookTitle
         .replace(/[<>:"/\\|?*]/g, '_')
         .substring(0, 100)
       const bookFolderName = `${bookId}_${sanitizedTitle}`
 
+      logger.debug('Creating main book folder', {
+        folderName: bookFolderName,
+        parentId: this.sharedDriveId,
+      })
+
       const bookFolder = await this.createFolder({
         name: bookFolderName,
         description: `Files for book: ${bookTitle} (ID: ${bookId})`,
+      })
+
+      logger.debug('Main book folder created', {
+        folderId: bookFolder.id,
+        folderName: bookFolder.name,
+        parents: bookFolder.parents,
       })
 
       // Create standard subfolders
@@ -455,12 +579,20 @@ export class GoogleDriveClient {
       const subfolders: Record<string, string> = {}
 
       for (const folderName of subfolderNames) {
+        logger.debug('Creating subfolder', {
+          name: folderName,
+          parentId: bookFolder.id,
+        })
         const subfolder = await this.createFolder({
           name: folderName,
           parentId: bookFolder.id,
           description: `${folderName} files for ${bookTitle}`,
         })
         subfolders[folderName] = subfolder.id
+        logger.debug('Subfolder created', {
+          name: folderName,
+          id: subfolder.id,
+        })
       }
 
       logger.info(`Created folder structure for book ${bookId}`)

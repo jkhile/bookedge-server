@@ -213,57 +213,160 @@ export class FileOperationsService
    */
   async upload(data: FileUploadData, params: Params): Promise<FileStorage> {
     try {
+      logger.debug('Upload started', {
+        book_id: data.book_id,
+        fileName: data.file?.name,
+        fileType: data.file?.type,
+        fileSize: data.file?.size,
+        purpose: data.purpose,
+        user: params.user?.email,
+      })
+
       if (!data.file) {
         throw new BadRequest('No file provided')
       }
 
       const { file, book_id, purpose, description, finalized, metadata } = data
 
+      // Map purpose to standard subfolder names
+      const purposeToSubfolder: Record<string, string> = {
+        cover_image: 'cover',
+        cover_file: 'cover',
+        interior_file: 'interior',
+        marketing_material: 'marketing',
+        editorial_material: 'editorial',
+        production_file: 'production',
+        archive_file: 'archives',
+        other: 'archives',
+      }
+      const targetSubfolder =
+        purposeToSubfolder[purpose || 'other'] || 'archives'
+
       // Convert base64 to Buffer
       const fileBuffer = Buffer.from(file.data, 'base64')
+      logger.debug('File buffer created', {
+        bufferSize: fileBuffer.length,
+        originalSize: file.size,
+      })
 
       // Get the book to ensure it exists and get folder ID
       const book = await this.app.service('books').get(book_id)
+      logger.debug('Book retrieved', {
+        book_id: book.id,
+        title: book.title,
+        existing_folder_id: book.drive_folder_id,
+      })
+
+      // Check if existing folder is in the new FEP_BookEdge structure
+      let bookFolderId = book.drive_folder_id
+      const driveClient = await this.driveManager.getServiceAccountClient()
+
+      if (bookFolderId) {
+        // Check if the folder is in the correct shared drive
+        try {
+          const folderDetails = await driveClient.getFile(bookFolderId)
+          const sharedDriveId = driveClient.getSharedDriveId()
+          const isInNewStructure = folderDetails.parents?.includes(
+            sharedDriveId || '',
+          )
+
+          if (!isInNewStructure) {
+            logger.debug(
+              'Existing folder is not in FEP_BookEdge structure, will create new folder',
+              {
+                existingFolderId: bookFolderId,
+                existingParents: folderDetails.parents,
+                expectedParent: sharedDriveId,
+              },
+            )
+            bookFolderId = undefined // Force creation of new folder
+          }
+        } catch (error) {
+          logger.debug(
+            'Could not verify existing folder, will create new one',
+            {
+              existingFolderId: bookFolderId,
+              error,
+            },
+          )
+          bookFolderId = undefined
+        }
+      }
 
       // Get or create book folder in Google Drive
-      let bookFolderId = book.drive_folder_id
       if (!bookFolderId) {
+        logger.debug('Creating book folder structure in Google Drive', {
+          book_id,
+          title: book.title,
+        })
         const driveClient = await this.driveManager.getServiceAccountClient()
         const folderStructure = await driveClient.createBookFolderStructure(
           book_id,
           book.title,
         )
         bookFolderId = folderStructure.folderId
+        logger.debug('Book folder created', {
+          bookFolderId,
+          subfolders: Object.keys(folderStructure.subfolders),
+        })
 
         // Update book with folder ID
         await this.app.service('books').patch(book_id, {
           drive_folder_id: bookFolderId,
         })
+        logger.debug('Book updated with folder ID', { book_id, bookFolderId })
       }
 
       // Get the purpose-specific subfolder
-      const driveClient = await this.driveManager.getServiceAccountClient()
+      logger.debug('Looking for purpose subfolder', {
+        bookFolderId,
+        originalPurpose: purpose,
+        targetSubfolder,
+      })
       const subfolders = await driveClient.listFiles({
         folderId: bookFolderId,
-        query: `mimeType='application/vnd.google-apps.folder' and name='${purpose}'`,
+        query: `mimeType='application/vnd.google-apps.folder' and name='${targetSubfolder}'`,
+      })
+      logger.debug('Subfolder search results', {
+        found: subfolders.files.length,
+        folders: subfolders.files.map((f) => ({ id: f.id, name: f.name })),
       })
 
       let targetFolderId = bookFolderId
       if (subfolders.files.length > 0) {
         targetFolderId = subfolders.files[0].id
-      } else if (purpose) {
-        // Create purpose folder if it doesn't exist
-        const newFolder = await driveClient.createFolder({
-          name: purpose,
+        logger.debug('Using existing subfolder', {
+          targetFolderId,
+          subfolder: targetSubfolder,
+        })
+      } else {
+        // Create subfolder if it doesn't exist
+        logger.debug('Creating new subfolder', {
+          subfolder: targetSubfolder,
           parentId: bookFolderId,
-          description: `${purpose} files for ${book.title}`,
+        })
+        const newFolder = await driveClient.createFolder({
+          name: targetSubfolder,
+          parentId: bookFolderId,
+          description: `${targetSubfolder} files for ${book.title}`,
         })
         targetFolderId = newFolder.id
+        logger.debug('Subfolder created', {
+          targetFolderId,
+          subfolder: targetSubfolder,
+        })
       }
 
       // Upload file to Google Drive
       // Convert Buffer to stream for Google Drive API
       const fileStream = toReadableStream(fileBuffer)
+
+      logger.debug('Starting Google Drive upload', {
+        fileName: file.name,
+        mimeType: file.type,
+        targetFolderId,
+        bufferSize: fileBuffer.length,
+      })
 
       const uploadResult = await driveClient.uploadFile({
         fileName: file.name,
@@ -273,13 +376,21 @@ export class FileOperationsService
         description: description,
       })
 
+      logger.debug('Google Drive upload completed', {
+        driveFileId: uploadResult.id,
+        fileName: uploadResult.name,
+        size: uploadResult.size,
+        webViewLink: uploadResult.webViewLink,
+        parents: uploadResult.parents,
+      })
+
       // Store metadata in database
       const fileStorageData: FileStorageData = {
         book_id,
         drive_id: uploadResult.id,
         drive_folder_id: targetFolderId,
         file_name: uploadResult.name,
-        file_path: `/${book.title}/${purpose || ''}/${uploadResult.name}`,
+        file_path: `/${book.title}/${targetSubfolder}/${uploadResult.name}`,
         original_name: file.name,
         file_size: parseInt(uploadResult.size || file.size.toString()),
         file_type: uploadResult.mimeType,
@@ -295,12 +406,19 @@ export class FileOperationsService
         } as Record<string, any>,
       }
 
+      logger.debug('Saving file metadata to database', fileStorageData)
+
       const result = await this.app
         .service('file-storage')
         .create(fileStorageData, {
           ...params,
           provider: undefined, // Internal call
         })
+
+      logger.debug('File metadata saved', {
+        fileStorageId: result.id,
+        driveId: result.drive_id,
+      })
 
       logger.info(
         `File uploaded successfully: ${file.name} (${uploadResult.id})`,
