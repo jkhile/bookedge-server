@@ -97,9 +97,9 @@ export class GoogleDriveClient {
         email: serviceAccount.client_email,
         key: serviceAccount.private_key,
         scopes: [
-          'https://www.googleapis.com/auth/drive',
+          // 'https://www.googleapis.com/auth/drive',
           'https://www.googleapis.com/auth/drive.file',
-          'https://www.googleapis.com/auth/drive.metadata',
+          // 'https://www.googleapis.com/auth/drive.metadata',
         ],
       }
 
@@ -114,8 +114,8 @@ export class GoogleDriveClient {
       await auth.authorize()
       logger.info('Google Drive service account authenticated successfully')
 
-      // Get or create the shared drive
-      const sharedDriveId = await GoogleDriveClient.getOrCreateSharedDrive(auth)
+      // Get the configured shared drive ID
+      const sharedDriveId = await GoogleDriveClient.getSharedDriveId()
       logger.debug('Service account client initialized', {
         sharedDriveId,
       })
@@ -150,91 +150,19 @@ export class GoogleDriveClient {
   }
 
   /**
-   * Get or create the BookEdge shared drive
+   * Get the configured shared drive ID
    */
-  private static async getOrCreateSharedDrive(
-    auth: OAuth2Client,
-  ): Promise<string> {
-    const drive = google.drive({ version: 'v3', auth })
-
-    // Use the GOOGLE_DRIVE_SHARED_DRIVE_ID if provided
+  private static async getSharedDriveId(): Promise<string> {
     const sharedDriveId = process.env.GOOGLE_DRIVE_SHARED_DRIVE_ID
-    if (sharedDriveId) {
-      logger.info(`Using configured shared drive ID: ${sharedDriveId}`)
-      return sharedDriveId
+    if (!sharedDriveId) {
+      logger.error('GOOGLE_DRIVE_SHARED_DRIVE_ID environment variable not set')
+      throw new GeneralError(
+        'Google Drive shared drive ID not configured. Please set GOOGLE_DRIVE_SHARED_DRIVE_ID environment variable.',
+      )
     }
 
-    const rootFolderName =
-      process.env.GOOGLE_DRIVE_ROOT_FOLDER || 'FEP_BookEdge'
-
-    try {
-      // Try to find an existing shared drive named "books" or the configured name
-      const drivesList = await drive.drives.list({
-        pageSize: 100,
-        fields: 'drives(id, name)',
-      })
-
-      // First look for "books" shared drive
-      let existingDrive = drivesList.data.drives?.find(
-        (d) => d.name === 'books',
-      )
-
-      // If not found, look for the configured name
-      if (!existingDrive) {
-        existingDrive = drivesList.data.drives?.find(
-          (d) => d.name === rootFolderName,
-        )
-      }
-
-      if (existingDrive?.id) {
-        logger.info(
-          `Found existing shared drive: ${existingDrive.name} (${existingDrive.id})`,
-        )
-        return existingDrive.id
-      }
-
-      // Search for the FEP_BookEdge folder in shared drives
-      logger.info('Searching for FEP_BookEdge folder in shared drives...')
-      const searchResponse = await drive.files.list({
-        q: `name='${rootFolderName}' and mimeType='application/vnd.google-apps.folder'`,
-        fields: 'files(id, name, driveId)',
-        supportsAllDrives: true,
-        includeItemsFromAllDrives: true,
-      })
-
-      // Find one that's in a shared drive
-      const sharedDriveFolder = searchResponse.data.files?.find(
-        (f) => f.driveId,
-      )
-      if (sharedDriveFolder?.driveId) {
-        logger.info(
-          `Found ${rootFolderName} in shared drive: ${sharedDriveFolder.driveId}`,
-        )
-        return sharedDriveFolder.driveId
-      }
-
-      // As a last resort, create a folder in My Drive (but log a warning)
-      logger.warn(
-        `No shared drive found. Creating folder in My Drive as fallback.`,
-      )
-      const folderResponse = await drive.files.create({
-        requestBody: {
-          name: rootFolderName,
-          mimeType: MIME_TYPES.FOLDER,
-        },
-        fields: 'id',
-      })
-
-      if (!folderResponse.data.id) {
-        throw new GeneralError('Failed to create root folder')
-      }
-
-      logger.info(`Created root folder in My Drive: ${rootFolderName}`)
-      return folderResponse.data.id
-    } catch (error) {
-      logger.error('Failed to get or create shared drive', error)
-      throw error
-    }
+    logger.info(`Using configured shared drive ID: ${sharedDriveId}`)
+    return sharedDriveId
   }
 
   /**
