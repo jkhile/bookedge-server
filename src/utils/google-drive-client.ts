@@ -495,39 +495,12 @@ export class GoogleDriveClient {
         parents: bookFolder.parents,
       })
 
-      // Create standard subfolders
-      const subfolderNames = [
-        'cover',
-        'interior',
-        'marketing',
-        'editorial',
-        'production',
-        'archives',
-      ]
-      const subfolders: Record<string, string> = {}
-
-      for (const folderName of subfolderNames) {
-        logger.debug('Creating subfolder', {
-          name: folderName,
-          parentId: bookFolder.id,
-        })
-        const subfolder = await this.createFolder({
-          name: folderName,
-          parentId: bookFolder.id,
-          description: `${folderName} files for ${bookTitle}`,
-        })
-        subfolders[folderName] = subfolder.id
-        logger.debug('Subfolder created', {
-          name: folderName,
-          id: subfolder.id,
-        })
-      }
-
       logger.info(`Created folder structure for book ${bookId}`)
 
+      // Return just the main folder ID - subfolders will be created on-demand during file uploads
       return {
         folderId: bookFolder.id,
-        subfolders,
+        subfolders: {}, // Empty since we're not pre-creating subfolders
       }
     } catch (error) {
       logger.error('Failed to create book folder structure', {

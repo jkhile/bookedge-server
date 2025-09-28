@@ -228,19 +228,8 @@ export class FileOperationsService
 
       const { file, book_id, purpose, description, finalized, metadata } = data
 
-      // Map purpose to standard subfolder names
-      const purposeToSubfolder: Record<string, string> = {
-        cover_image: 'cover',
-        cover_file: 'cover',
-        interior_file: 'interior',
-        marketing_material: 'marketing',
-        editorial_material: 'editorial',
-        production_file: 'production',
-        archive_file: 'archives',
-        other: 'archives',
-      }
-      const targetSubfolder =
-        purposeToSubfolder[purpose || 'other'] || 'archives'
+      // Use purpose directly as subfolder name, default to 'other' if not provided
+      const targetSubfolder = purpose || 'other'
 
       // Convert base64 to Buffer
       const fileBuffer = Buffer.from(file.data, 'base64')
