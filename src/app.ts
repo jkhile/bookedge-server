@@ -56,6 +56,7 @@ app.use(bodyParser())
 app.configure(rest())
 app.configure(
   socketio({
+    maxHttpBufferSize: 200 * 1024 * 1024, // 200MB to support large file uploads
     cors: {
       origin: function (origin, callback) {
         const origins = app.get('origins') as string[]
