@@ -246,49 +246,15 @@ export class FileOperationsService
         existing_folder_id: book.drive_folder_id,
       })
 
-      // Check if existing folder is in the new FEP_BookEdge structure
+      // Get or create book folder in Google Drive
       let bookFolderId = book.drive_folder_id
       const driveClient = await this.driveManager.getServiceAccountClient()
 
-      if (bookFolderId) {
-        // Check if the folder is in the correct shared drive
-        try {
-          const folderDetails = await driveClient.getFile(bookFolderId)
-          const sharedDriveId = driveClient.getSharedDriveId()
-          const isInNewStructure = folderDetails.parents?.includes(
-            sharedDriveId || '',
-          )
-
-          if (!isInNewStructure) {
-            logger.debug(
-              'Existing folder is not in FEP_BookEdge structure, will create new folder',
-              {
-                existingFolderId: bookFolderId,
-                existingParents: folderDetails.parents,
-                expectedParent: sharedDriveId,
-              },
-            )
-            bookFolderId = undefined // Force creation of new folder
-          }
-        } catch (error) {
-          logger.debug(
-            'Could not verify existing folder, will create new one',
-            {
-              existingFolderId: bookFolderId,
-              error,
-            },
-          )
-          bookFolderId = undefined
-        }
-      }
-
-      // Get or create book folder in Google Drive
       if (!bookFolderId) {
         logger.debug('Creating book folder structure in Google Drive', {
           book_id,
           title: book.title,
         })
-        const driveClient = await this.driveManager.getServiceAccountClient()
         const folderStructure = await driveClient.createBookFolderStructure(
           book_id,
           book.title,

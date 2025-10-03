@@ -321,7 +321,14 @@ export class GoogleDriveClient {
         query += ` and ${options.query}`
       }
 
-      const response = await this.drive.files.list({
+      logger.debug('Listing files with query', {
+        query,
+        folderId: options.folderId,
+        sharedDriveId: this.sharedDriveId,
+        hasSharedDrive: !!this.sharedDriveId,
+      })
+
+      const requestParams: any = {
         q: query,
         pageSize: options.pageSize || 100,
         pageToken: options.pageToken,
@@ -330,7 +337,15 @@ export class GoogleDriveClient {
           'nextPageToken, files(id, name, mimeType, size, parents, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink)',
         supportsAllDrives: true,
         includeItemsFromAllDrives: true,
-      })
+      }
+
+      // When searching in a shared drive, we need to specify the drive and use the correct corpora
+      if (this.sharedDriveId && !options.folderId) {
+        requestParams.driveId = this.sharedDriveId
+        requestParams.corpora = 'drive'
+      }
+
+      const response = await this.drive.files.list(requestParams)
 
       const files: DriveFile[] =
         response.data.files?.map((file) => ({
@@ -345,6 +360,15 @@ export class GoogleDriveClient {
           webContentLink: file.webContentLink || undefined,
           thumbnailLink: file.thumbnailLink || undefined,
         })) || []
+
+      logger.debug('List files response', {
+        fileCount: files.length,
+        files: files.map((f) => ({
+          id: f.id,
+          name: f.name,
+          parents: f.parents,
+        })),
+      })
 
       return {
         files,
@@ -473,15 +497,15 @@ export class GoogleDriveClient {
         sharedDriveId: this.sharedDriveId,
       })
 
-      // Create main book folder
+      // Create main book folder directly in the shared drive root
       const sanitizedTitle = bookTitle
         .replace(/[<>:"/\\|?*]/g, '_')
         .substring(0, 100)
-      const bookFolderName = `${bookId}_${sanitizedTitle}`
+      const bookFolderName = `${bookId}-${sanitizedTitle}`
 
-      logger.debug('Creating main book folder', {
+      logger.debug('Creating main book folder in shared drive root', {
         folderName: bookFolderName,
-        parentId: this.sharedDriveId,
+        sharedDriveId: this.sharedDriveId,
       })
 
       const bookFolder = await this.createFolder({
