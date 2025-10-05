@@ -1,7 +1,8 @@
 import { google, drive_v3 } from 'googleapis'
 import type { OAuth2Client } from 'google-auth-library'
-import { GeneralError, BadRequest } from '@feathersjs/errors'
+import { GeneralError } from '@feathersjs/errors'
 import { logger } from '../logger'
+import axios from 'axios'
 
 // Types for Google Drive operations
 export interface DriveFile {
@@ -303,6 +304,180 @@ export class GoogleDriveClient {
   }
 
   /**
+   * Initiate a resumable upload session
+   * Returns the session URI for uploading chunks
+   */
+  async initiateResumableUpload(options: {
+    fileName: string
+    mimeType: string
+    folderId: string
+    fileSize: number
+    description?: string
+  }): Promise<string> {
+    try {
+      const fileMetadata: drive_v3.Schema$File = {
+        name: options.fileName,
+        parents: [options.folderId],
+        description: options.description,
+      }
+
+      const accessToken = await this.auth.getAccessToken()
+      if (!accessToken.token) {
+        throw new GeneralError('Failed to get access token')
+      }
+
+      const response = await axios.post(
+        'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&supportsAllDrives=true',
+        fileMetadata,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken.token}`,
+            'Content-Type': 'application/json; charset=UTF-8',
+            'X-Upload-Content-Type': options.mimeType,
+            'X-Upload-Content-Length': options.fileSize.toString(),
+          },
+        },
+      )
+
+      const sessionUri = response.headers['location']
+      if (!sessionUri) {
+        throw new GeneralError('Failed to get resumable session URI')
+      }
+
+      logger.info('Resumable upload session initiated', {
+        fileName: options.fileName,
+      })
+
+      return sessionUri
+    } catch (error) {
+      logger.error('Failed to initiate resumable upload', {
+        fileName: options.fileName,
+        error,
+      })
+      throw error
+    }
+  }
+
+  /**
+   * Upload a chunk to a resumable session
+   */
+  async uploadChunkToSession(
+    sessionUri: string,
+    chunkData: Buffer,
+    startByte: number,
+    totalSize: number,
+  ): Promise<{ complete: boolean; fileId?: string; progress: number }> {
+    try {
+      const endByte = startByte + chunkData.length - 1
+      const contentRange = `bytes ${startByte}-${endByte}/${totalSize}`
+
+      const response = await axios.put(sessionUri, chunkData, {
+        headers: {
+          'Content-Length': chunkData.length.toString(),
+          'Content-Range': contentRange,
+        },
+        validateStatus: (status) =>
+          status === 200 || status === 201 || status === 308,
+      })
+
+      const progress = Math.round(((endByte + 1) / totalSize) * 100)
+
+      // 200/201 = upload complete, 308 = more chunks needed
+      if (response.status === 200 || response.status === 201) {
+        return {
+          complete: true,
+          fileId: response.data?.id,
+          progress: 100,
+        }
+      }
+
+      return {
+        complete: false,
+        progress,
+      }
+    } catch (error) {
+      logger.error('Failed to upload chunk', {
+        startByte,
+        error,
+      })
+      throw error
+    }
+  }
+
+  /**
+   * Get the upload status of a resumable session
+   */
+  async getResumableUploadStatus(
+    sessionUri: string,
+    totalSize: number,
+  ): Promise<number> {
+    try {
+      const response = await axios.put(sessionUri, null, {
+        headers: {
+          'Content-Length': '0',
+          'Content-Range': `bytes */${totalSize}`,
+        },
+        validateStatus: (status) => status === 200 || status === 308,
+      })
+
+      if (response.status === 200) {
+        return totalSize // Upload complete
+      }
+
+      // Parse Range header to get last uploaded byte
+      const rangeHeader = response.headers['range']
+      if (rangeHeader) {
+        const match = rangeHeader.match(/bytes=0-(\d+)/)
+        if (match) {
+          return parseInt(match[1]) + 1
+        }
+      }
+
+      return 0
+    } catch (error) {
+      logger.error('Failed to get resumable upload status', {
+        sessionUri,
+        error,
+      })
+      throw error
+    }
+  }
+
+  /**
+   * Get file details by ID
+   */
+  async getFile(fileId: string): Promise<DriveFile> {
+    try {
+      const response = await this.drive.files.get({
+        fileId,
+        fields:
+          'id, name, mimeType, size, parents, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink',
+        supportsAllDrives: true,
+      })
+
+      if (!response.data.id) {
+        throw new GeneralError(`File not found: ${fileId}`)
+      }
+
+      return {
+        id: response.data.id,
+        name: response.data.name || '',
+        mimeType: response.data.mimeType || '',
+        size: response.data.size || undefined,
+        parents: response.data.parents || undefined,
+        createdTime: response.data.createdTime || undefined,
+        modifiedTime: response.data.modifiedTime || undefined,
+        webViewLink: response.data.webViewLink || undefined,
+        webContentLink: response.data.webContentLink || undefined,
+        thumbnailLink: response.data.thumbnailLink || undefined,
+      }
+    } catch (error) {
+      logger.error('Failed to get file', { fileId, error })
+      throw error
+    }
+  }
+
+  /**
    * List files in a folder
    */
   async listFiles(
@@ -383,33 +558,6 @@ export class GoogleDriveClient {
   /**
    * Get a file by ID
    */
-  async getFile(fileId: string): Promise<DriveFile> {
-    try {
-      const response = await this.drive.files.get({
-        fileId,
-        fields:
-          'id, name, mimeType, size, parents, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink',
-        supportsAllDrives: true,
-      })
-
-      return {
-        id: response.data.id!,
-        name: response.data.name!,
-        mimeType: response.data.mimeType!,
-        size: response.data.size || undefined,
-        parents: response.data.parents || [],
-        createdTime: response.data.createdTime || undefined,
-        modifiedTime: response.data.modifiedTime || undefined,
-        webViewLink: response.data.webViewLink || undefined,
-        webContentLink: response.data.webContentLink || undefined,
-        thumbnailLink: response.data.thumbnailLink || undefined,
-      }
-    } catch (error) {
-      logger.error('Failed to get file', { fileId, error })
-      throw new BadRequest(`File not found: ${fileId}`)
-    }
-  }
-
   /**
    * Download a file from Google Drive
    */

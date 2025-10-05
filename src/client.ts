@@ -143,6 +143,13 @@ export type {
   FileMoveData,
   GalleryQuery,
   GalleryItem,
+  ChunkUploadInitData,
+  ChunkUploadData,
+  ChunkUploadInitResult,
+  ChunkUploadResult,
+  ChunkDownloadInitResult,
+  ChunkDownloadRequest,
+  ChunkDownloadResult,
 } from './services/file-operations/file-operations.shared'
 
 export interface Configuration {

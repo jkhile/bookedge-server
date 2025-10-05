@@ -14,6 +14,10 @@ import type {
   FileStorage,
   FileStorageData,
 } from '../file-storage/file-storage.schema'
+import {
+  getUploadSessionManager,
+  type ChunkUploadInitData,
+} from '../../utils/upload-session-manager'
 
 // Re-export types for shared module
 export type { FileStorage } from '../file-storage/file-storage.schema'
@@ -78,9 +82,50 @@ export interface GalleryItem {
   uploadedAt: string
 }
 
+// Chunked upload/download interfaces
+export interface ChunkUploadData {
+  uploadId: string
+  chunkIndex: number
+  totalChunks: number
+  data: string // base64 chunk
+}
+
+export interface ChunkUploadInitResult {
+  uploadId: string
+  chunkSize: number
+  totalChunks: number
+}
+
+export interface ChunkUploadResult {
+  progress: number
+  complete: boolean
+  receivedChunks: number
+  totalChunks: number
+}
+
+export interface ChunkDownloadInitResult {
+  totalChunks: number
+  chunkSize: number
+  fileInfo: FileStorage
+}
+
+export interface ChunkDownloadRequest {
+  fileId: number
+  chunkIndex: number
+}
+
+export interface ChunkDownloadResult {
+  data: string
+  chunkIndex: number
+  totalChunks: number
+}
+
 export interface FileOperationsParams extends Params {
   query?: FileListQuery | FileDownloadQuery | GalleryQuery | any
 }
+
+// Re-export for shared types
+export type { ChunkUploadInitData }
 
 // Custom methods for file operations
 export interface FileOperationsServiceMethods {
@@ -101,6 +146,26 @@ export interface FileOperationsServiceMethods {
     id: Id,
     params: Params,
   ): Promise<{ url: string; expiresAt?: Date }>
+
+  // Chunked upload methods
+  uploadChunkInit(
+    data: ChunkUploadInitData,
+    params: Params,
+  ): Promise<ChunkUploadInitResult>
+  uploadChunk(data: ChunkUploadData, params: Params): Promise<ChunkUploadResult>
+  uploadChunkComplete(uploadId: string, params: Params): Promise<FileStorage>
+  uploadChunkCancel(uploadId: string, params: Params): Promise<void>
+
+  // Chunked download methods
+  downloadChunkInit(
+    fileId: number,
+    params: Params,
+  ): Promise<ChunkDownloadInitResult>
+  downloadChunk(
+    request: ChunkDownloadRequest,
+    params: Params,
+  ): Promise<ChunkDownloadResult>
+  downloadChunkCancel(fileId: number, params: Params): Promise<void>
 }
 
 export class FileOperationsService
@@ -618,6 +683,587 @@ export class FileOperationsService
     } catch (error) {
       logger.error('Failed to get share link', error)
       throw error
+    }
+  }
+
+  /**
+   * Chunked Upload: Initialize a chunked upload session
+   */
+  async uploadChunkInit(
+    data: ChunkUploadInitData,
+    params: Params,
+  ): Promise<ChunkUploadInitResult> {
+    try {
+      if (!params.user?.id) {
+        throw new BadRequest('User authentication required')
+      }
+
+      const config = this.app.get('fileTransfer')
+      const chunkSize = config?.chunkSize || 1048576 // 1MB default
+      const sessionTimeout = config?.sessionTimeout || 3600000 // 1 hour default
+
+      const sessionManager = getUploadSessionManager(sessionTimeout)
+      const { uploadId, totalChunks } = sessionManager.createSession(
+        params.user.id,
+        data,
+        chunkSize,
+      )
+
+      // Set up Google Drive resumable upload session
+      try {
+        // Get the book and prepare folder structure
+        const { book_id, purpose, description } = data
+        const book = await this.app.service('books').get(book_id)
+        const targetSubfolder = purpose || 'other'
+
+        // Get or create book folder
+        let bookFolderId = book.drive_folder_id
+        const driveClient = await this.driveManager.getServiceAccountClient()
+
+        if (!bookFolderId) {
+          const folderStructure = await driveClient.createBookFolderStructure(
+            book_id,
+            book.title,
+          )
+          bookFolderId = folderStructure.folderId
+
+          await this.app.service('books').patch(book_id, {
+            drive_folder_id: bookFolderId,
+          })
+        }
+
+        // Get or create purpose subfolder
+        const subfolders = await driveClient.listFiles({
+          folderId: bookFolderId,
+          query: `mimeType='application/vnd.google-apps.folder' and name='${targetSubfolder}'`,
+        })
+
+        let targetFolderId = bookFolderId
+        if (subfolders.files.length > 0) {
+          targetFolderId = subfolders.files[0].id
+        } else {
+          const newFolder = await driveClient.createFolder({
+            name: targetSubfolder,
+            parentId: bookFolderId,
+            description: `${targetSubfolder} files for ${book.title}`,
+          })
+          targetFolderId = newFolder.id
+        }
+
+        // Initiate Google Drive resumable upload session
+        const driveSessionUri = await driveClient.initiateResumableUpload({
+          fileName: data.file.name,
+          mimeType: data.file.type,
+          folderId: targetFolderId,
+          fileSize: data.file.size,
+          description,
+        })
+
+        // Store the Drive session URI in the upload session
+        sessionManager.setDriveSessionUri(uploadId, driveSessionUri)
+
+        logger.info('Chunked upload initialized with Drive session', {
+          uploadId,
+          userId: params.user.id,
+          fileName: data.file.name,
+          fileSize: data.file.size,
+          totalChunks,
+          driveSessionUri,
+        })
+      } catch (error) {
+        logger.error('Failed to initialize Drive resumable session', error)
+        // Clean up the upload session
+        sessionManager.removeSession(uploadId)
+        throw error
+      }
+
+      return {
+        uploadId,
+        chunkSize,
+        totalChunks,
+      }
+    } catch (error) {
+      logger.error('Failed to initialize chunked upload', error)
+      throw error
+    }
+  }
+
+  /**
+   * Chunked Upload: Receive and store a chunk
+   */
+  async uploadChunk(
+    data: ChunkUploadData,
+    params: Params,
+  ): Promise<ChunkUploadResult> {
+    try {
+      const sessionManager = getUploadSessionManager()
+      const session = sessionManager.getSession(data.uploadId)
+
+      if (!session) {
+        throw new NotFound(`Upload session not found: ${data.uploadId}`)
+      }
+
+      // Verify user owns this session
+      if (session.userId !== params.user?.id) {
+        throw new BadRequest('Unauthorized access to upload session')
+      }
+
+      // Convert base64 chunk to Buffer
+      const chunkBuffer = Buffer.from(data.data, 'base64')
+
+      // Store chunk in memory (fallback)
+      const progress = sessionManager.storeChunk(
+        data.uploadId,
+        data.chunkIndex,
+        chunkBuffer,
+      )
+
+      const stats = sessionManager.getSessionStats(data.uploadId)
+      let complete = sessionManager.isComplete(data.uploadId)
+      let driveProgress = progress
+
+      // Upload chunk directly to Google Drive if resumable session exists
+      if (session.driveSessionUri) {
+        try {
+          const driveClient = await this.driveManager.getServiceAccountClient()
+          const startByte =
+            data.chunkIndex * (session.chunkSize || chunkBuffer.length)
+
+          const uploadResult = await driveClient.uploadChunkToSession(
+            session.driveSessionUri,
+            chunkBuffer,
+            startByte,
+            session.totalBytes,
+          )
+
+          sessionManager.updateDriveProgress(
+            data.uploadId,
+            startByte + chunkBuffer.length,
+            uploadResult.fileId,
+          )
+
+          driveProgress = uploadResult.progress
+          complete = uploadResult.complete
+        } catch (error) {
+          logger.error('Failed to upload chunk to Drive', {
+            uploadId: data.uploadId,
+            chunkIndex: data.chunkIndex,
+            error,
+          })
+          // Continue - we have the chunk in memory as fallback
+        }
+      }
+
+      // Emit progress event
+      if ((this.app as any).io) {
+        const eventData = {
+          type: 'upload-progress',
+          uploadId: data.uploadId,
+          progress: driveProgress,
+          receivedChunks: stats?.receivedChunks || 0,
+          totalChunks: stats?.totalChunks || 0,
+          receivedBytes: stats?.receivedBytes || 0,
+          totalBytes: stats?.totalBytes || 0,
+        }
+
+        ;(this.app as any).io.emit('upload-progress', eventData)
+      }
+
+      return {
+        progress: driveProgress,
+        complete,
+        receivedChunks: stats?.receivedChunks || 0,
+        totalChunks: stats?.totalChunks || 0,
+      }
+    } catch (error) {
+      logger.error('Failed to process chunk', error)
+      throw error
+    }
+  }
+
+  /**
+   * Chunked Upload: Complete the upload and process the file
+   */
+  async uploadChunkComplete(
+    uploadId: string,
+    params: Params,
+  ): Promise<FileStorage> {
+    try {
+      const sessionManager = getUploadSessionManager()
+      const session = sessionManager.getSession(uploadId)
+
+      if (!session) {
+        throw new NotFound(`Upload session not found: ${uploadId}`)
+      }
+
+      // Verify user owns this session
+      if (session.userId !== params.user?.id) {
+        throw new BadRequest('Unauthorized access to upload session')
+      }
+
+      // Verify all chunks received
+      if (!sessionManager.isComplete(uploadId)) {
+        throw new BadRequest('Not all chunks have been received')
+      }
+
+      // Get file metadata from session
+      const { fileMetadata } = session
+
+      logger.info('Completing chunked upload', {
+        uploadId,
+        fileName: fileMetadata.file.name,
+        totalSize: session.totalBytes,
+        receivedBytes: session.receivedBytes,
+      })
+
+      // Get book info for metadata
+      const { book_id, purpose, description, finalized, metadata } =
+        fileMetadata
+      const book = await this.app.service('books').get(book_id)
+      const targetSubfolder = purpose || 'other'
+      const driveClient = await this.driveManager.getServiceAccountClient()
+
+      let uploadResult: {
+        id: string
+        name: string
+        mimeType: string
+        size?: string
+        parents?: string[]
+        webViewLink?: string
+        webContentLink?: string
+        thumbnailLink?: string
+      }
+
+      // Check if file was already uploaded via resumable upload
+      if (session.driveFileId) {
+        // File already uploaded to Drive - just get the details
+        uploadResult = await driveClient.getFile(session.driveFileId)
+
+        logger.info('File uploaded via resumable upload', {
+          uploadId,
+          driveFileId: session.driveFileId,
+          fileName: fileMetadata.file.name,
+        })
+      } else {
+        // Fallback: assemble chunks and upload using traditional method
+        logger.info('Using fallback upload method', {
+          uploadId,
+          fileName: fileMetadata.file.name,
+        })
+
+        // Get or create book folder
+        let bookFolderId = book.drive_folder_id
+
+        if (!bookFolderId) {
+          const folderStructure = await driveClient.createBookFolderStructure(
+            book_id,
+            book.title,
+          )
+          bookFolderId = folderStructure.folderId
+
+          await this.app.service('books').patch(book_id, {
+            drive_folder_id: bookFolderId,
+          })
+        }
+
+        // Get or create purpose subfolder
+        const subfolders = await driveClient.listFiles({
+          folderId: bookFolderId,
+          query: `mimeType='application/vnd.google-apps.folder' and name='${targetSubfolder}'`,
+        })
+
+        let targetFolderId = bookFolderId
+        if (subfolders.files.length > 0) {
+          targetFolderId = subfolders.files[0].id
+        } else {
+          const newFolder = await driveClient.createFolder({
+            name: targetSubfolder,
+            parentId: bookFolderId,
+            description: `${targetSubfolder} files for ${book.title}`,
+          })
+          targetFolderId = newFolder.id
+        }
+
+        // Assemble chunks and upload
+        const fileContent = sessionManager.assembleChunks(uploadId)
+
+        uploadResult = await driveClient.uploadFile({
+          fileName: fileMetadata.file.name,
+          mimeType: fileMetadata.file.type,
+          folderId: targetFolderId,
+          fileContent,
+          description,
+        })
+      }
+
+      // Store metadata in database
+      const targetFolderId = uploadResult.parents?.[0] || ''
+      const fileStorageData: FileStorageData = {
+        book_id,
+        drive_id: uploadResult.id,
+        drive_folder_id: targetFolderId,
+        file_name: uploadResult.name,
+        file_path: `/${book.title}/${targetSubfolder}/${uploadResult.name}`,
+        original_name: fileMetadata.file.name,
+        file_size: parseInt(
+          uploadResult.size || fileMetadata.file.size.toString(),
+        ),
+        file_type: uploadResult.mimeType,
+        file_extension: fileMetadata.file.name.split('.').pop() || '',
+        purpose: purpose || '',
+        description: description || '',
+        finalized: finalized || false,
+        metadata: {
+          ...metadata,
+          webViewLink: uploadResult.webViewLink,
+          webContentLink: uploadResult.webContentLink,
+          thumbnailLink: uploadResult.thumbnailLink,
+        } as Record<string, any>,
+      }
+
+      const result = await this.app
+        .service('file-storage')
+        .create(fileStorageData, {
+          ...params,
+          provider: undefined,
+        })
+
+      // Clean up session
+      sessionManager.removeSession(uploadId)
+
+      logger.info('Chunked upload completed', {
+        uploadId,
+        fileStorageId: result.id,
+        fileName: result.file_name,
+      })
+
+      // Emit completion event to all connected sockets
+      if ((this.app as any).io) {
+        ;(this.app as any).io.emit('upload-complete', {
+          type: 'upload-complete',
+          uploadId,
+          fileStorage: result,
+        })
+      }
+
+      return result
+    } catch (error) {
+      logger.error('Failed to complete chunked upload', error)
+      throw error
+    }
+  }
+
+  /**
+   * Chunked Upload: Cancel an upload session
+   */
+  async uploadChunkCancel(uploadId: string, params: Params): Promise<void> {
+    try {
+      const sessionManager = getUploadSessionManager()
+      const session = sessionManager.getSession(uploadId)
+
+      if (!session) {
+        // Session already gone, nothing to do
+        return
+      }
+
+      // Verify user owns this session
+      if (session.userId !== params.user?.id) {
+        throw new BadRequest('Unauthorized access to upload session')
+      }
+
+      sessionManager.removeSession(uploadId)
+
+      logger.info('Chunked upload cancelled', {
+        uploadId,
+        userId: params.user?.id,
+        fileName: session.fileMetadata.file.name,
+      })
+
+      // Emit cancellation event to all connected sockets
+      if ((this.app as any).io) {
+        ;(this.app as any).io.emit('upload-cancelled', {
+          type: 'upload-cancelled',
+          uploadId,
+        })
+      }
+    } catch (error) {
+      logger.error('Failed to cancel chunked upload', error)
+      throw error
+    }
+  }
+
+  /**
+   * Chunked Download: Initialize a chunked download
+   */
+  async downloadChunkInit(
+    fileId: number,
+    params: Params,
+  ): Promise<ChunkDownloadInitResult> {
+    try {
+      // Get file metadata
+      const fileStorage = await this.app.service('file-storage').get(fileId, {
+        ...params,
+        provider: undefined,
+      })
+
+      const config = this.app.get('fileTransfer')
+      const chunkSize = config?.chunkSize || 1048576 // 1MB default
+      const threshold = config?.chunkedThreshold || 10485760 // 10MB default
+
+      // Check if file should use chunked download
+      if (fileStorage.file_size <= threshold) {
+        // Small file - return 0 chunks to indicate direct download should be used
+        return {
+          totalChunks: 0,
+          chunkSize: 0,
+          fileInfo: fileStorage,
+        }
+      }
+
+      const totalChunks = Math.ceil(fileStorage.file_size / chunkSize)
+
+      logger.info('Chunked download initialized', {
+        fileId,
+        fileName: fileStorage.file_name,
+        fileSize: fileStorage.file_size,
+        totalChunks,
+      })
+
+      return {
+        totalChunks,
+        chunkSize,
+        fileInfo: fileStorage,
+      }
+    } catch (error) {
+      logger.error('Failed to initialize chunked download', error)
+      throw error
+    }
+  }
+
+  /**
+   * Chunked Download: Download a specific chunk
+   */
+  async downloadChunk(
+    request: ChunkDownloadRequest,
+    params: Params,
+  ): Promise<ChunkDownloadResult> {
+    try {
+      const { fileId, chunkIndex } = request
+
+      // Get file metadata
+      const fileStorage = await this.app.service('file-storage').get(fileId, {
+        ...params,
+        provider: undefined,
+      })
+
+      const config = this.app.get('fileTransfer')
+      const chunkSize = config?.chunkSize || 1048576
+
+      const totalChunks = Math.ceil(fileStorage.file_size / chunkSize)
+
+      // Validate chunk index
+      if (chunkIndex < 0 || chunkIndex >= totalChunks) {
+        throw new BadRequest(
+          `Invalid chunk index: ${chunkIndex} (total: ${totalChunks})`,
+        )
+      }
+
+      // Calculate byte range for this chunk
+      const startByte = chunkIndex * chunkSize
+      const endByte = Math.min(startByte + chunkSize, fileStorage.file_size)
+      const bytesToRead = endByte - startByte
+
+      logger.debug('Downloading chunk', {
+        fileId,
+        chunkIndex,
+        startByte,
+        endByte,
+        bytesToRead,
+      })
+
+      // Download from Google Drive
+      const driveClient = await this.driveManager.getServiceAccountClient()
+      const stream = await driveClient.downloadFile(fileStorage.drive_id)
+
+      // Read the stream and extract the requested chunk
+      const chunks: Buffer[] = []
+      let bytesRead = 0
+
+      return new Promise((resolve, reject) => {
+        stream.on('data', (chunk: Buffer) => {
+          const chunkBuffer = Buffer.from(chunk)
+          const currentEnd = bytesRead + chunkBuffer.length
+
+          // Check if this chunk contains data we need
+          if (currentEnd > startByte && bytesRead < endByte) {
+            // Calculate the slice of this chunk we need
+            const sliceStart = Math.max(0, startByte - bytesRead)
+            const sliceEnd = Math.min(chunkBuffer.length, endByte - bytesRead)
+            const slice = chunkBuffer.slice(sliceStart, sliceEnd)
+            chunks.push(slice)
+          }
+
+          bytesRead = currentEnd
+
+          // If we've read past our target range, we can stop
+          if (bytesRead >= endByte) {
+            ;(stream as any).destroy() // Stop reading the stream
+          }
+        })
+
+        stream.on('error', reject)
+
+        stream.on('end', () => {
+          const buffer = Buffer.concat(chunks)
+          const base64Data = buffer.toString('base64')
+
+          logger.debug('Chunk downloaded', {
+            fileId,
+            chunkIndex,
+            chunkSize: buffer.length,
+          })
+
+          // Emit progress event to all connected sockets
+          if ((this.app as any).io) {
+            const progress = Math.round(((chunkIndex + 1) / totalChunks) * 100)
+            ;(this.app as any).io.emit('download-progress', {
+              type: 'download-progress',
+              fileId,
+              chunkIndex,
+              totalChunks,
+              progress,
+            })
+          }
+
+          resolve({
+            data: base64Data,
+            chunkIndex,
+            totalChunks,
+          })
+        })
+      })
+    } catch (error) {
+      logger.error('Failed to download chunk', error)
+      throw error
+    }
+  }
+
+  /**
+   * Chunked Download: Cancel a download (cleanup)
+   */
+  async downloadChunkCancel(fileId: number, params: Params): Promise<void> {
+    // For downloads, there's no persistent state to clean up
+    // This is mainly for client-side notification
+    logger.info('Chunked download cancelled', {
+      fileId,
+      userId: params.user?.id,
+    })
+
+    if (params.connection && (params.connection as any).emit) {
+      ;(params.connection as any).emit('download-cancelled', {
+        type: 'download-cancelled',
+        fileId,
+      })
     }
   }
 }

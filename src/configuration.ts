@@ -13,6 +13,15 @@ export const configurationSchema = Type.Intersect([
     host: Type.String(),
     port: Type.Number(),
     public: Type.String(),
+    fileTransfer: Type.Optional(
+      Type.Object({
+        chunkSize: Type.Number(),
+        chunkedThreshold: Type.Number(),
+        maxChunkRetries: Type.Number(),
+        chunkTimeout: Type.Number(),
+        sessionTimeout: Type.Number(),
+      }),
+    ),
   }),
 ])
 

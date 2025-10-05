@@ -53,5 +53,12 @@
     "serviceAccount": "",
     "rootFolder": "BookEdge",
     "workspaceDomain": "frontedgepublishing.com"
+  },
+  "fileTransfer": {
+    "chunkSize": 1048576,
+    "chunkedThreshold": 10485760,
+    "maxChunkRetries": 3,
+    "chunkTimeout": 30000,
+    "sessionTimeout": 3600000
   }
 }

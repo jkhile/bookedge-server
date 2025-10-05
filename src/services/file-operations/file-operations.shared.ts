@@ -10,6 +10,13 @@ import type {
   FileMoveData,
   GalleryQuery,
   GalleryItem,
+  ChunkUploadInitData,
+  ChunkUploadData,
+  ChunkUploadInitResult,
+  ChunkUploadResult,
+  ChunkDownloadInitResult,
+  ChunkDownloadRequest,
+  ChunkDownloadResult,
 } from './file-operations.class'
 
 export type {
@@ -21,6 +28,13 @@ export type {
   FileMoveData,
   GalleryQuery,
   GalleryItem,
+  ChunkUploadInitData,
+  ChunkUploadData,
+  ChunkUploadInitResult,
+  ChunkUploadResult,
+  ChunkDownloadInitResult,
+  ChunkDownloadRequest,
+  ChunkDownloadResult,
 }
 
 // FileStorageData is the input type for create operations
@@ -44,6 +58,13 @@ export const fileOperationsMethods = [
   'move',
   'gallery',
   'getShareLink',
+  'uploadChunkInit',
+  'uploadChunk',
+  'uploadChunkComplete',
+  'uploadChunkCancel',
+  'downloadChunkInit',
+  'downloadChunk',
+  'downloadChunkCancel',
 ] as const
 
 export const fileOperationsClient = (client: ClientApplication) => {
