@@ -2,7 +2,7 @@ import { randomUUID } from 'crypto'
 import { logger } from '../logger'
 
 export interface ChunkUploadInitData {
-  book_id: number
+  bookId: number
   purpose: string
   description?: string
   finalized?: boolean

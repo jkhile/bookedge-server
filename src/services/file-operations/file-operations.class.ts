@@ -607,7 +607,7 @@ export class FileOperationsService implements FileOperationsServiceMethods {
 
       // Create upload session with simplified data
       const sessionData = {
-        book_id: bookId,
+        bookId,
         purpose,
         file,
         // These fields are kept for compatibility but not used
@@ -823,7 +823,7 @@ export class FileOperationsService implements FileOperationsServiceMethods {
         throw new BadRequest('Not all chunks have been received')
       }
 
-      const { book_id: bookId, purpose, file } = session.fileMetadata
+      const { bookId, purpose, file } = session.fileMetadata
 
       logger.info('Completing chunked upload', {
         uploadId,
