@@ -21,7 +21,7 @@ export const restrictUserFields = async (context: HookContext) => {
   }
 
   // Skip restriction for internal calls (no user means it's called internally)
-  // This allows internal hooks like fileStorageHook to update user fields
+  // This allows internal services and hooks to update user fields
   if (!user) {
     return context
   }
