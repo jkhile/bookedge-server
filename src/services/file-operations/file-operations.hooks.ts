@@ -28,15 +28,21 @@ export const emitProgress = (eventName: string) => {
  * Validate file upload permissions
  */
 export const validateUploadPermissions = async (context: HookContext) => {
-  const { params } = context
+  const { params, data } = context
 
   if (!params.user) {
     throw new Error('Authentication required')
   }
 
+  // Get bookId from data (simplified structure uses bookId instead of book_id)
+  const bookId = data?.bookId || data?.book_id
+
+  if (!bookId) {
+    throw new Error('Book ID is required for upload')
+  }
+
   // Check if user has permission to upload to the specified book
-  // This is a placeholder - implement based on your permission model
-  const hasPermission = await checkBookPermission()
+  const hasPermission = await checkBookPermission(params.user.id, bookId)
 
   if (!hasPermission) {
     throw new Error('You do not have permission to upload files to this book')
@@ -48,10 +54,12 @@ export const validateUploadPermissions = async (context: HookContext) => {
 /**
  * Check if a user has permission for a book operation
  */
-async function checkBookPermission(): Promise<boolean> {
+async function checkBookPermission(
+  _userId: number,
+  _bookId: number,
+): Promise<boolean> {
   // For now, allow all authenticated users
-  // Implement your permission logic here based on:
-  // - app: Application instance
+  // TODO: Implement your permission logic here based on:
   // - userId: User making the request
   // - bookId: Book being accessed
   // - operation: Type of operation
@@ -69,9 +77,10 @@ export const auditFileOperation = (operation: string) => {
       operation,
       userId: params.user?.id,
       userEmail: params.user?.email,
-      fileId: result?.id || context.id,
-      fileName: result?.file_name || data?.file?.originalname,
-      bookId: result?.book_id || data?.book_id,
+      fileId: result?.fileId || context.id,
+      fileName: result?.fileName || data?.file?.name,
+      bookId: result?.bookId || data?.bookId,
+      purpose: result?.purpose || data?.purpose,
       timestamp: new Date().toISOString(),
     })
 

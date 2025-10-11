@@ -1,15 +1,11 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
 import type { ClientApplication } from '../../client'
 import type {
-  FileStorage,
-  FileStoragePatch,
-  FileStorageQuery,
   FileOperationsService,
   FileUploadData,
-  FileDownloadResult,
-  FileMoveData,
-  GalleryQuery,
-  GalleryItem,
+  FileOperationResult,
+  FileListQuery,
+  FileListResult,
   ChunkUploadInitData,
   ChunkUploadData,
   ChunkUploadInitResult,
@@ -20,14 +16,10 @@ import type {
 } from './file-operations.class'
 
 export type {
-  FileStorage,
-  FileStoragePatch,
-  FileStorageQuery,
   FileUploadData,
-  FileDownloadResult,
-  FileMoveData,
-  GalleryQuery,
-  GalleryItem,
+  FileOperationResult,
+  FileListQuery,
+  FileListResult,
   ChunkUploadInitData,
   ChunkUploadData,
   ChunkUploadInitResult,
@@ -36,6 +28,15 @@ export type {
   ChunkDownloadRequest,
   ChunkDownloadResult,
 }
+
+// Re-export for backward compatibility
+export type FileStorage = FileOperationResult
+export type FileStoragePatch = any
+export type FileStorageQuery = FileListQuery
+export type FileDownloadResult = FileOperationResult
+export type FileMoveData = any
+export type GalleryQuery = any
+export type GalleryItem = any
 
 // FileStorageData is the input type for create operations
 export type FileStorageData = FileUploadData
