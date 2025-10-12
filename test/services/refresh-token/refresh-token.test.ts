@@ -9,7 +9,7 @@ describe('refresh-token service', () => {
   const testPassword = 'testpassword123'
 
   beforeEach(async () => {
-    // Clean up any existing test user
+    // Clean up any existing test user and their tokens
     try {
       const existingUsers = await app.service('users').find({
         query: { email: testEmail },
@@ -18,17 +18,39 @@ describe('refresh-token service', () => {
       const users = Array.isArray(existingUsers)
         ? existingUsers
         : existingUsers.data || []
+
       for (const user of users) {
+        // First delete all refresh tokens for this user
+        try {
+          const tokens = await app.service('refresh-token').find({
+            query: { userId: user.id },
+            paginate: false,
+          })
+          const tokenList = Array.isArray(tokens) ? tokens : tokens.data || []
+          for (const token of tokenList) {
+            await app.service('refresh-token').remove(token.id)
+          }
+        } catch (error) {
+          // Tokens might not exist, that's fine
+        }
+
+        // Then delete the user
         await app.service('users').remove(user.id)
       }
     } catch (error) {
       // User might not exist, that's fine
     }
 
-    // Create a test user
+    // Create a test user with all required fields
     testUser = await app.service('users').create({
       email: testEmail,
       password: testPassword,
+      name: 'Test User',
+      status: 'active',
+      roles: ['editor'],
+      allowed_imprints: [],
+      allowed_books: [],
+      pinned_books: [],
     })
   })
 

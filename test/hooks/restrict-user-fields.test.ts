@@ -92,8 +92,8 @@ describe('restrictUserFields hook', () => {
   })
 
   it('allows internal calls to modify any field', async () => {
-    // Remove provider to simulate an internal call
-    delete context.params.provider
+    // Remove user to simulate an internal call
+    delete context.params.user
 
     context.data = {
       name: 'New Name',
@@ -113,8 +113,8 @@ describe('restrictUserFields hook', () => {
   })
 
   it('allows internal calls to modify other user records', async () => {
-    // Remove provider to simulate an internal call
-    delete context.params.provider
+    // Remove user to simulate an internal call
+    delete context.params.user
 
     // Different user ID
     context.id = 999
