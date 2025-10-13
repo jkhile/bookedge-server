@@ -1,4 +1,5 @@
 import { bookContributorRoles } from './book-contributor-roles/book-contributor-roles'
+import { bookImages } from './book-images/book-images'
 import { refreshToken } from './refresh-token/refresh-token'
 import { metadataSearch } from './metadata-search/metadata-search'
 import { signinHistory } from './signin-history/signin-history'
@@ -19,6 +20,7 @@ import type { Application } from '../declarations'
 
 export const services = (app: Application) => {
   app.configure(bookContributorRoles)
+  app.configure(bookImages)
   app.configure(refreshToken)
   app.configure(signinHistory)
   app.configure(mentions)

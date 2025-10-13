@@ -12,6 +12,7 @@ import type { TransportConnection, Application } from '@feathersjs/feathers'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
 import { bookContributorRolesClient } from './services/book-contributor-roles/book-contributor-roles.shared'
+import { bookImagesClient } from './services/book-images/book-images.shared'
 import { fileOperationsClient } from './services/file-operations/file-operations.shared'
 export type {
   BookContributorRoles,
@@ -19,6 +20,13 @@ export type {
   BookContributorRolesQuery,
   BookContributorRolesPatch,
 } from './services/book-contributor-roles/book-contributor-roles.shared'
+
+export type {
+  BookImages,
+  BookImagesData,
+  BookImagesQuery,
+  BookImagesPatch,
+} from './services/book-images/book-images.shared'
 
 import { refreshTokenClient } from './services/refresh-token/refresh-token.shared'
 export type {
@@ -170,6 +178,7 @@ export const createClient = <Configuration = any>(
   client.configure(signinHistoryClient)
   client.configure(refreshTokenClient)
   client.configure(bookContributorRolesClient)
+  client.configure(bookImagesClient)
   client.configure(fileOperationsClient)
   return client
 }
