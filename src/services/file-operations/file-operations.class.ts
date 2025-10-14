@@ -368,6 +368,9 @@ export class FileOperationsService implements FileOperationsServiceMethods {
         webViewLink: uploadResult.webViewLink,
       })
 
+      // Make the file publicly accessible so thumbnails can be displayed
+      await driveClient.makeFilePublic(uploadResult.id)
+
       // Update book with file URL
       await this.app.service('books').patch(bookId, {
         [column]: uploadResult.webViewLink,
@@ -895,6 +898,14 @@ export class FileOperationsService implements FileOperationsServiceMethods {
           fileContent,
           description: `${purpose} file for ${book.title}`,
         })
+
+        // Make the file publicly accessible
+        await driveClient.makeFilePublic(uploadResult.id)
+      }
+
+      // If file was uploaded via resumable upload, ensure it's public
+      if (session.driveFileId) {
+        await driveClient.makeFilePublic(session.driveFileId)
       }
 
       // Update book with file URL
