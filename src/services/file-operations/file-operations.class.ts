@@ -6,6 +6,10 @@ import { GoogleDriveManager } from '../../utils/google-drive-manager'
 import { toReadableStream } from '../../utils/stream-helpers'
 import type { Book } from '../books/books.schema'
 import { getUploadSessionManager } from '../../utils/upload-session-manager'
+import {
+  generateThumbnail,
+  isSupportedFileType,
+} from '../../utils/thumbnail-generator'
 
 // Purpose to book column mapping
 const PURPOSE_TO_COLUMN: Record<string, keyof Book> = {
@@ -65,6 +69,9 @@ export interface FileOperationResult {
   purpose?: string
   data?: string // base64 for downloads
   url?: string // for large file downloads
+  thumbnailData?: string // base64 thumbnail for images/PDFs
+  thumbnailWidth?: number
+  thumbnailHeight?: number
 }
 
 export interface FileListQuery {
@@ -368,8 +375,26 @@ export class FileOperationsService implements FileOperationsServiceMethods {
         webViewLink: uploadResult.webViewLink,
       })
 
-      // Make the file publicly accessible so thumbnails can be displayed
-      await driveClient.makeFilePublic(uploadResult.id)
+      // Generate thumbnail if it's an image or PDF
+      let thumbnailData: string | undefined
+      let thumbnailWidth: number | undefined
+      let thumbnailHeight: number | undefined
+
+      if (isSupportedFileType(file.type)) {
+        try {
+          const thumbnail = await generateThumbnail(fileBuffer, file.type)
+          thumbnailData = thumbnail.data
+          thumbnailWidth = thumbnail.width
+          thumbnailHeight = thumbnail.height
+          logger.info('Generated thumbnail for file', {
+            fileName: file.name,
+            thumbnailSize: thumbnail.data.length,
+          })
+        } catch (error) {
+          logger.error('Failed to generate thumbnail', { error })
+          // Continue without thumbnail
+        }
+      }
 
       // Update book with file URL
       await this.app.service('books').patch(bookId, {
@@ -388,6 +413,9 @@ export class FileOperationsService implements FileOperationsServiceMethods {
         webContentLink: uploadResult.webContentLink,
         bookId,
         purpose,
+        thumbnailData,
+        thumbnailWidth,
+        thumbnailHeight,
       }
     } catch (error) {
       logger.error('Upload failed', error)
@@ -898,14 +926,6 @@ export class FileOperationsService implements FileOperationsServiceMethods {
           fileContent,
           description: `${purpose} file for ${book.title}`,
         })
-
-        // Make the file publicly accessible
-        await driveClient.makeFilePublic(uploadResult.id)
-      }
-
-      // If file was uploaded via resumable upload, ensure it's public
-      if (session.driveFileId) {
-        await driveClient.makeFilePublic(session.driveFileId)
       }
 
       // Update book with file URL

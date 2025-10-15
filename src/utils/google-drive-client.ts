@@ -304,58 +304,6 @@ export class GoogleDriveClient {
   }
 
   /**
-   * Make a file publicly accessible by anyone with the link
-   * Falls back to domain sharing if the Shared Drive has restrictions
-   */
-  async makeFilePublic(fileId: string): Promise<void> {
-    try {
-      logger.debug('Making file publicly accessible', { fileId })
-
-      // First try to share with anyone (for regular Drive)
-      try {
-        await this.drive.permissions.create({
-          fileId,
-          requestBody: {
-            role: 'reader',
-            type: 'anyone',
-          },
-          supportsAllDrives: true,
-        })
-        logger.info(`File made publicly accessible: ${fileId}`)
-        return
-      } catch (error: any) {
-        // If it fails due to Shared Drive restrictions, try domain sharing
-        if (
-          error.code === 400 &&
-          error.errors?.[0]?.reason === 'teamDriveTeamMembersOnlyRestriction'
-        ) {
-          logger.info(
-            'Shared Drive restricts public sharing, trying domain sharing',
-            { fileId },
-          )
-
-          await this.drive.permissions.create({
-            fileId,
-            requestBody: {
-              role: 'reader',
-              type: 'domain',
-              domain: 'frontedgepublishing.com', // Your Google Workspace domain
-            },
-            supportsAllDrives: true,
-          })
-          logger.info(`File shared with domain: ${fileId}`)
-          return
-        }
-        throw error
-      }
-    } catch (error) {
-      logger.error('Failed to make file accessible', { fileId, error })
-      // Don't throw - this is not critical, just log it
-      logger.warn(`File ${fileId} may not be accessible`)
-    }
-  }
-
-  /**
    * Initiate a resumable upload session
    * Returns the session URI for uploading chunks
    */

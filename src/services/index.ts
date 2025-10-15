@@ -15,7 +15,6 @@ import { book } from './books/books'
 import { imprint } from './imprints/imprints'
 import { user } from './users/users'
 import { fileOperations } from './file-operations/file-operations'
-import { imageProxy } from './image-proxy/image-proxy'
 // For more information about this file see https://dove.feathersjs.com/guides/cli/application.html#configure-functions
 import type { Application } from '../declarations'
 
@@ -38,7 +37,5 @@ export const services = (app: Application) => {
   app.configure(metadataSearch)
   // File operations service (simplified - no longer depends on deprecated services)
   app.configure(fileOperations)
-  // Image proxy service for serving Google Drive images
-  app.configure(imageProxy)
   // All services will be registered here
 }

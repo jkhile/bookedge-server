@@ -116,7 +116,7 @@ describe('FileOperationsService - Upload', () => {
 
       const result = await service.upload(uploadData, mockParams)
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         success: true,
         fileId: 'file-123',
         fileName: 'cover.pdf',
@@ -125,6 +125,11 @@ describe('FileOperationsService - Upload', () => {
         bookId: 1,
         purpose: 'cover',
       })
+
+      // Verify thumbnail fields exist for PDF
+      expect(result.thumbnailData).toBeDefined()
+      expect(result.thumbnailWidth).toBeDefined()
+      expect(result.thumbnailHeight).toBeDefined()
 
       expect(mockBooksService.patch).toHaveBeenCalledWith(1, {
         cover_file: 'https://drive.google.com/file/d/file-123/view',

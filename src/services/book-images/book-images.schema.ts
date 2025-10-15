@@ -16,6 +16,7 @@ export const bookImagesSchema = Type.Object(
     drive_file_id: Type.String({ maxLength: 255 }),
     drive_url: Type.String(),
     thumbnail_url: Type.Optional(Type.String()),
+    thumbnail_data: Type.Optional(Type.String()), // Base64 encoded thumbnail
     original_filename: Type.String({ maxLength: 255 }),
     file_size_bytes: Type.Optional(Type.Number()),
     mime_type: Type.Optional(Type.String({ maxLength: 100 })),
@@ -49,6 +50,7 @@ export const bookImagesDataSchema = Type.Pick(
     'drive_file_id',
     'drive_url',
     'thumbnail_url',
+    'thumbnail_data',
     'original_filename',
     'file_size_bytes',
     'mime_type',

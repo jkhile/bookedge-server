@@ -53,6 +53,9 @@ importers:
       '@feathersjs/typebox':
         specifier: ^5.0.35
         version: 5.0.35(typescript@5.9.3)
+      '@types/sharp':
+        specifier: ^0.32.0
+        version: 0.32.0
       axios:
         specifier: ^1.12.2
         version: 1.12.2(debug@4.4.3)
@@ -1098,6 +1101,10 @@ packages:
 
   '@types/serve-static@1.15.8':
     resolution: {integrity: sha512-roei0UY3LhpOJvjbIP6ZZFngyLKl5dskOtDhxY5THRSpO+ZI+nzJ+m5yUMzGrp89YRa7lvknKkMYjqQFGwA7Sg==}
+
+  '@types/sharp@0.32.0':
+    resolution: {integrity: sha512-OOi3kL+FZDnPhVzsfD37J88FNeZh6gQsGcLc95NbeURRGvmSjeXiDcyWzF2o3yh/gQAUn2uhh/e+CPCa5nwAxw==}
+    deprecated: This is a stub types definition. sharp provides its own type definitions, so you do not need this installed.
 
   '@types/superagent@8.1.9':
     resolution: {integrity: sha512-pTVjI73witn+9ILmoJdajHGW2jkSaOzhiFYF1Rd3EQ94kymLqB9PjD9ISg7WaALC7+dCHT0FGe9T2LktLq/3GQ==}
@@ -4070,6 +4077,10 @@ snapshots:
       '@types/http-errors': 2.0.5
       '@types/node': 22.18.10
       '@types/send': 0.17.5
+
+  '@types/sharp@0.32.0':
+    dependencies:
+      sharp: 0.34.4
 
   '@types/superagent@8.1.9':
     dependencies:
