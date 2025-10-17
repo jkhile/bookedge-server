@@ -582,6 +582,64 @@ export class GoogleDriveClient {
   }
 
   /**
+   * Download a partial chunk of a file using HTTP Range headers
+   * @param fileId The Google Drive file ID
+   * @param startByte The starting byte position (inclusive)
+   * @param endByte The ending byte position (inclusive)
+   * @returns Buffer containing the requested byte range
+   */
+  async downloadFileChunk(
+    fileId: string,
+    startByte: number,
+    endByte: number,
+  ): Promise<Buffer> {
+    try {
+      const accessToken = await this.auth.getAccessToken()
+      if (!accessToken.token) {
+        throw new GeneralError('Failed to get access token')
+      }
+
+      logger.debug('Downloading file chunk with range request', {
+        fileId,
+        startByte,
+        endByte,
+        rangeSize: endByte - startByte + 1,
+      })
+
+      const response = await axios.get(
+        `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&supportsAllDrives=true`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken.token}`,
+            Range: `bytes=${startByte}-${endByte}`,
+          },
+          responseType: 'arraybuffer',
+        },
+      )
+
+      logger.debug('File chunk downloaded', {
+        fileId,
+        startByte,
+        endByte,
+        bytesReceived: response.data.byteLength,
+        status: response.status,
+      })
+
+      return Buffer.from(response.data)
+    } catch (error) {
+      logger.error('Failed to download file chunk', {
+        fileId,
+        startByte,
+        endByte,
+        error,
+      })
+      throw new GeneralError(
+        `Failed to download file chunk: ${fileId} (${startByte}-${endByte})`,
+      )
+    }
+  }
+
+  /**
    * Delete a file from Google Drive
    */
   async deleteFile(fileId: string): Promise<void> {

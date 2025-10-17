@@ -132,6 +132,7 @@ export type {
   ChunkUploadData,
   ChunkUploadInitResult,
   ChunkUploadResult,
+  ChunkDownloadInitData,
   ChunkDownloadInitResult,
   ChunkDownloadRequest,
   ChunkDownloadResult,

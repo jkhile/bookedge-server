@@ -49,6 +49,15 @@ export const fileOperations = (app: Application) => {
       move: [auditFileOperation('move')],
       gallery: [],
       getShareLink: [auditFileOperation('share')],
+      // Chunked upload methods
+      uploadChunkInit: [],
+      uploadChunk: [],
+      uploadChunkComplete: [],
+      uploadChunkCancel: [],
+      // Chunked download methods
+      downloadChunkInit: [],
+      downloadChunk: [],
+      downloadChunkCancel: [],
     },
     after: {
       all: [],

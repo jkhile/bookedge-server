@@ -159,6 +159,12 @@ interface DownloadSession {
 // Export for backward compatibility
 export type FileOperationsParams = Params
 
+// Add interface for download init data
+export interface ChunkDownloadInitData {
+  bookId: number
+  purpose: string
+}
+
 // Export interfaces for service methods
 export interface FileOperationsServiceMethods {
   find(params?: Params): Promise<FileListResult>
@@ -186,8 +192,7 @@ export interface FileOperationsServiceMethods {
   ): Promise<FileOperationResult>
   uploadChunkCancel(uploadId: string, params?: Params): Promise<void>
   downloadChunkInit(
-    bookId: number,
-    purpose: string,
+    data: ChunkDownloadInitData,
     params?: Params,
   ): Promise<ChunkDownloadInitResult>
   downloadChunk(
@@ -1020,12 +1025,26 @@ export class FileOperationsService implements FileOperationsServiceMethods {
    * Initialize a chunked download
    */
   async downloadChunkInit(
-    bookId: number,
-    purpose: string,
+    data: ChunkDownloadInitData,
     params: Params,
   ): Promise<ChunkDownloadInitResult> {
     try {
-      if (!params.user?.id) {
+      const { bookId, purpose } = data
+
+      logger.info('downloadChunkInit called', {
+        bookId,
+        purpose,
+        hasParams: !!params,
+        hasUser: !!params?.user,
+        userId: params?.user?.id,
+        paramKeys: params ? Object.keys(params) : [],
+      })
+
+      if (!params?.user?.id) {
+        logger.error('No user in params', {
+          params: JSON.stringify(params, null, 2),
+          data,
+        })
         throw new BadRequest('User authentication required')
       }
 
@@ -1058,8 +1077,13 @@ export class FileOperationsService implements FileOperationsServiceMethods {
       const chunkSize = config?.chunkSize || 1048576 // 1MB default
       const threshold = config?.chunkedThreshold || 10485760 // 10MB default
 
-      // For small files, don't use chunked download
+      // For small files, use direct download (no chunking needed)
       if (fileSize <= threshold) {
+        logger.info('Using direct download for small file', {
+          fileSize,
+          fileSizeMB: (fileSize / (1024 * 1024)).toFixed(2),
+          threshold,
+        })
         return {
           totalChunks: 0,
           chunkSize: 0,
@@ -1095,7 +1119,10 @@ export class FileOperationsService implements FileOperationsServiceMethods {
         purpose,
         fileName: fileMetadata.name,
         fileSize,
+        fileSizeMB: (fileSize / (1024 * 1024)).toFixed(2),
         totalChunks,
+        chunkSize,
+        threshold,
       })
 
       // Emit initialization event
@@ -1135,6 +1162,13 @@ export class FileOperationsService implements FileOperationsServiceMethods {
     try {
       const { downloadId, chunkIndex } = request
 
+      logger.info('downloadChunk called', {
+        downloadId,
+        chunkIndex,
+        hasParams: !!params,
+        hasUser: !!params?.user,
+      })
+
       // Get download session
       const session = this.downloadSessions.get(downloadId)
       if (!session) {
@@ -1170,93 +1204,60 @@ export class FileOperationsService implements FileOperationsServiceMethods {
         chunkIndex,
         startByte,
         endByte,
+        fileSize: session.fileSize,
+        fileSizeMB: (session.fileSize / (1024 * 1024)).toFixed(2),
       })
 
-      // Download chunk from Google Drive
+      // Download chunk from Google Drive using HTTP range request
       const driveClient = await this.driveManager.getServiceAccountClient()
-      // Note: Current implementation doesn't support partial downloads
-      // We'll download the full file and extract the chunk (not optimal for large files)
-      // TODO: Add support for Range header in google-drive-client.ts
-      const stream = await driveClient.downloadFile(session.fileId)
+      const chunkBuffer = await driveClient.downloadFileChunk(
+        session.fileId,
+        startByte,
+        endByte,
+      )
 
-      // Read the stream and extract only the requested chunk
-      const chunks: Buffer[] = []
-      let bytesRead = 0
+      const base64Data = chunkBuffer.toString('base64')
 
-      return new Promise((resolve, reject) => {
-        stream.on('data', (chunk: Buffer) => {
-          const currentEnd = bytesRead + chunk.length
+      // Update session
+      session.lastChunkSent = chunkIndex
+      session.lastActivityAt = new Date()
 
-          // Check if this chunk contains data we need
-          if (currentEnd > startByte && bytesRead <= endByte) {
-            // Calculate the slice of this chunk we need
-            const sliceStart = Math.max(0, startByte - bytesRead)
-            const sliceEnd = Math.min(chunk.length, endByte - bytesRead + 1)
-            const slice = chunk.slice(sliceStart, sliceEnd)
-            chunks.push(slice)
-          }
+      const complete = chunkIndex === session.totalChunks - 1
 
-          bytesRead = currentEnd
-
-          // If we've read past our target range, we can stop
-          if (bytesRead > endByte) {
-            // Try to stop reading the stream (method may vary)
-            if (typeof (stream as any).destroy === 'function') {
-              ;(stream as any).destroy()
-            } else if (typeof (stream as any).pause === 'function') {
-              ;(stream as any).pause()
-            }
-          }
-        })
-
-        stream.on('error', reject)
-
-        stream.on('end', () => {
-          const buffer = Buffer.concat(chunks)
-          const base64Data = buffer.toString('base64')
-
-          // Update session
-          session.lastChunkSent = chunkIndex
-          session.lastActivityAt = new Date()
-
-          const complete = chunkIndex === session.totalChunks - 1
-
-          logger.debug('Chunk downloaded', {
-            downloadId,
-            chunkIndex,
-            chunkSize: buffer.length,
-            complete,
-          })
-
-          // Emit progress event
-          if (params.connection) {
-            const progress = Math.round(
-              ((chunkIndex + 1) / session.totalChunks) * 100,
-            )
-            this.app.channel(`user/${params.user?.id}`).send({
-              type: 'download-progress',
-              downloadId,
-              chunkIndex,
-              totalChunks: session.totalChunks,
-              progress,
-              complete,
-            })
-          }
-
-          // Clean up session if complete
-          if (complete) {
-            this.downloadSessions.delete(downloadId)
-            logger.info('Download completed', { downloadId })
-          }
-
-          resolve({
-            data: base64Data,
-            chunkIndex,
-            totalChunks: session.totalChunks,
-            complete,
-          })
-        })
+      logger.debug('Chunk downloaded', {
+        downloadId,
+        chunkIndex,
+        chunkSize: chunkBuffer.length,
+        complete,
       })
+
+      // Emit progress event
+      if (params.connection) {
+        const progress = Math.round(
+          ((chunkIndex + 1) / session.totalChunks) * 100,
+        )
+        this.app.channel(`user/${params.user?.id}`).send({
+          type: 'download-progress',
+          downloadId,
+          chunkIndex,
+          totalChunks: session.totalChunks,
+          progress,
+          complete,
+        })
+      }
+
+      // Clean up session if complete
+      if (complete) {
+        this.downloadSessions.delete(downloadId)
+        logger.info('Download completed', { downloadId })
+      }
+
+      return {
+        data: base64Data,
+        chunkIndex,
+        totalChunks: session.totalChunks,
+        complete,
+      }
     } catch (error) {
       logger.error('Failed to download chunk', error)
       throw error
