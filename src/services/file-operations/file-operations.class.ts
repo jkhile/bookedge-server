@@ -433,6 +433,54 @@ export class FileOperationsService implements FileOperationsServiceMethods {
    */
   async download(id: Id, params: Params): Promise<FileOperationResult> {
     try {
+      // Check if this is a direct Google Drive file ID (for gallery images)
+      // Gallery file IDs are long alphanumeric strings without hyphens at certain positions
+      const idStr = String(id)
+      const isDriveFileId = idStr.length > 20 && !idStr.match(/^\d+-\w+$/)
+
+      if (isDriveFileId) {
+        // Download directly by Google Drive file ID (for gallery images)
+        logger.debug('Starting direct download by file ID', { fileId: id })
+
+        const driveClient = await this.driveManager.getServiceAccountClient()
+
+        // Get file metadata first
+        const fileMetadata = await driveClient.getFile(idStr)
+        const fileSize = parseInt(fileMetadata.size || '0')
+
+        // For files under 10MB, return base64 data
+        const MAX_DIRECT_SIZE = 10 * 1024 * 1024 // 10MB
+
+        if (fileSize <= MAX_DIRECT_SIZE) {
+          const stream = await driveClient.downloadFile(idStr)
+
+          // Convert stream to base64
+          const chunks: Buffer[] = []
+
+          return new Promise((resolve, reject) => {
+            stream.on('data', (chunk) => chunks.push(Buffer.from(chunk)))
+            stream.on('error', reject)
+            stream.on('end', () => {
+              const buffer = Buffer.concat(chunks)
+              resolve({
+                success: true,
+                fileId: idStr,
+                fileName: fileMetadata.name,
+                data: buffer.toString('base64'),
+              })
+            })
+          })
+        } else {
+          // For large files, return download URL
+          return {
+            success: true,
+            fileId: idStr,
+            fileName: fileMetadata.name,
+            url: fileMetadata.webContentLink,
+          }
+        }
+      }
+
       // Parse ID (format: bookId-purpose or just bookId with purpose in query)
       let bookId: number
       let purpose: string
