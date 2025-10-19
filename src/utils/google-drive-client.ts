@@ -709,6 +709,27 @@ export class GoogleDriveClient {
         .substring(0, 100)
       const bookFolderName = `${bookId}-${sanitizedTitle}`
 
+      // First check if a book folder already exists for this book ID
+      // Search for folders with name starting with "bookId-"
+      const existingFolders = await this.listFiles({
+        query: `mimeType='application/vnd.google-apps.folder' and name contains '${bookId}-'`,
+      })
+
+      // Filter to exact match on book ID prefix (in case other books have IDs like 2731, 2732, etc)
+      const existingBookFolder = existingFolders.files.find((folder) =>
+        folder.name.match(new RegExp(`^${bookId}-`)),
+      )
+
+      if (existingBookFolder) {
+        logger.info(
+          `Found existing book folder for book ${bookId}: ${existingBookFolder.name}`,
+        )
+        return {
+          folderId: existingBookFolder.id,
+          subfolders: {}, // Empty since we're not pre-creating subfolders
+        }
+      }
+
       logger.debug('Creating main book folder in shared drive root', {
         folderName: bookFolderName,
         sharedDriveId: this.sharedDriveId,
