@@ -18,8 +18,25 @@ const PURPOSE_TO_COLUMN: Record<string, keyof Book> = {
   marketing: 'media_kit_link',
   media_kit: 'media_kit_link',
   discussion_guide: 'discussion_guide_link',
+  'book-trailer': 'book_trailer_link',
   book_trailer: 'book_trailer_link',
+  'cover-reveal': 'cover_reveal_link',
   cover_reveal: 'cover_reveal_link',
+  'media-list': 'media_list',
+  media_list: 'media_list',
+}
+
+// Purpose to filename column mapping
+const PURPOSE_TO_FILENAME_COLUMN: Record<string, keyof Book> = {
+  interior: 'interior_file_name',
+  media_kit: 'media_kit_file_name',
+  discussion_guide: 'discussion_guide_file_name',
+  'book-trailer': 'book_trailer_file_name',
+  book_trailer: 'book_trailer_file_name',
+  'cover-reveal': 'cover_reveal_file_name',
+  cover_reveal: 'cover_reveal_file_name',
+  'media-list': 'media_list_file_name',
+  media_list: 'media_list_file_name',
 }
 
 // Helper to extract file ID from Google Drive URL
@@ -401,10 +418,15 @@ export class FileOperationsService implements FileOperationsServiceMethods {
         }
       }
 
-      // Update book with file URL
-      await this.app.service('books').patch(bookId, {
+      // Update book with file URL and filename
+      const filenameColumn = PURPOSE_TO_FILENAME_COLUMN[purpose]
+      const patchData: any = {
         [column]: uploadResult.webViewLink,
-      })
+      }
+      if (filenameColumn) {
+        patchData[filenameColumn] = uploadResult.name
+      }
+      await this.app.service('books').patch(bookId, patchData)
 
       logger.info(
         `File uploaded successfully: ${file.name} for book ${bookId} (${purpose})`,
@@ -981,12 +1003,17 @@ export class FileOperationsService implements FileOperationsServiceMethods {
         })
       }
 
-      // Update book with file URL
+      // Update book with file URL and filename
       const column = PURPOSE_TO_COLUMN[purpose]
       if (column) {
-        await this.app.service('books').patch(bookId, {
+        const filenameColumn = PURPOSE_TO_FILENAME_COLUMN[purpose]
+        const patchData: any = {
           [column]: uploadResult.webViewLink,
-        })
+        }
+        if (filenameColumn) {
+          patchData[filenameColumn] = uploadResult.name
+        }
+        await this.app.service('books').patch(bookId, patchData)
       }
 
       // Clean up session
