@@ -312,18 +312,10 @@ export class FileOperationsService implements FileOperationsServiceMethods {
    */
   async upload(
     data: FileUploadData,
-    params: Params,
+    _params: Params,
   ): Promise<FileOperationResult> {
     try {
       const { bookId, purpose, file } = data
-
-      logger.debug('Starting simplified upload', {
-        bookId,
-        purpose,
-        fileName: file.name,
-        fileSize: file.size,
-        user: params.user?.email,
-      })
 
       // Validate purpose
       const column = PURPOSE_TO_COLUMN[purpose]
@@ -344,11 +336,6 @@ export class FileOperationsService implements FileOperationsServiceMethods {
       const driveClient = await this.driveManager.getServiceAccountClient()
 
       if (!bookFolderId) {
-        logger.debug('Creating book folder in Google Drive', {
-          bookId,
-          title: book.title,
-        })
-
         const folderStructure = await driveClient.createBookFolderStructure(
           bookId,
           book.title,
@@ -359,8 +346,6 @@ export class FileOperationsService implements FileOperationsServiceMethods {
         await this.app.service('books').patch(bookId, {
           drive_folder_id: bookFolderId,
         })
-
-        logger.debug('Book folder created', { bookFolderId })
       }
 
       // Get or create purpose subfolder
@@ -390,11 +375,6 @@ export class FileOperationsService implements FileOperationsServiceMethods {
         folderId: targetFolderId,
         fileContent: fileStream,
         description: `${purpose} file for ${book.title}`,
-      })
-
-      logger.debug('File uploaded to Google Drive', {
-        driveFileId: uploadResult.id,
-        webViewLink: uploadResult.webViewLink,
       })
 
       // Generate thumbnail if it's an image or PDF
@@ -462,8 +442,6 @@ export class FileOperationsService implements FileOperationsServiceMethods {
 
       if (isDriveFileId) {
         // Download directly by Google Drive file ID (for gallery images)
-        logger.debug('Starting direct download by file ID', { fileId: id })
-
         const driveClient = await this.driveManager.getServiceAccountClient()
 
         // Get file metadata first
@@ -519,8 +497,6 @@ export class FileOperationsService implements FileOperationsServiceMethods {
       if (!purpose) {
         throw new BadRequest('Purpose is required for download')
       }
-
-      logger.debug('Starting download', { bookId, purpose })
 
       // Get the book
       const book = await this.app.service('books').get(bookId)
@@ -1274,15 +1250,6 @@ export class FileOperationsService implements FileOperationsServiceMethods {
         session.fileSize - 1,
       )
 
-      logger.debug('Downloading chunk', {
-        downloadId,
-        chunkIndex,
-        startByte,
-        endByte,
-        fileSize: session.fileSize,
-        fileSizeMB: (session.fileSize / (1024 * 1024)).toFixed(2),
-      })
-
       // Download chunk from Google Drive using HTTP range request
       const driveClient = await this.driveManager.getServiceAccountClient()
       const chunkBuffer = await driveClient.downloadFileChunk(
@@ -1298,13 +1265,6 @@ export class FileOperationsService implements FileOperationsServiceMethods {
       session.lastActivityAt = new Date()
 
       const complete = chunkIndex === session.totalChunks - 1
-
-      logger.debug('Chunk downloaded', {
-        downloadId,
-        chunkIndex,
-        chunkSize: chunkBuffer.length,
-        complete,
-      })
 
       // Emit progress event
       if (params.connection) {

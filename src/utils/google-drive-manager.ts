@@ -64,7 +64,6 @@ export class GoogleDriveManager {
       // Check cache
       const cached = this.userClients.get(userId)
       if (cached && cached.expiry > Date.now()) {
-        logger.debug(`Using cached client for user ${userId}`)
         return cached.client
       }
 
@@ -90,7 +89,6 @@ export class GoogleDriveManager {
    */
   clearUserClient(userId: string): void {
     this.userClients.delete(userId)
-    logger.debug(`Cleared cached client for user ${userId}`)
   }
 
   /**
@@ -98,17 +96,11 @@ export class GoogleDriveManager {
    */
   private cleanupExpiredClients(): void {
     const now = Date.now()
-    let cleaned = 0
 
     for (const [userId, cached] of this.userClients.entries()) {
       if (cached.expiry <= now) {
         this.userClients.delete(userId)
-        cleaned++
       }
-    }
-
-    if (cleaned > 0) {
-      logger.debug(`Cleaned up ${cleaned} expired user clients`)
     }
   }
 

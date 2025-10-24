@@ -125,7 +125,6 @@ export function pipeWithCleanup(
   source
     .pipe(destination)
     .on('finish', () => {
-      logger.debug('Stream transfer completed')
       if (onComplete) onComplete()
     })
     .on('error', (error) => {

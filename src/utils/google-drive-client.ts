@@ -75,7 +75,6 @@ export class GoogleDriveClient {
    */
   static async createServiceAccountClient(): Promise<GoogleDriveClient> {
     try {
-      logger.debug('Creating service account client')
       const serviceAccountJson = process.env.GOOGLE_DRIVE_SERVICE_ACCOUNT
       if (!serviceAccountJson) {
         logger.error(
@@ -87,10 +86,6 @@ export class GoogleDriveClient {
       }
 
       const serviceAccount = JSON.parse(serviceAccountJson)
-      logger.debug('Service account parsed', {
-        client_email: serviceAccount.client_email,
-        has_private_key: !!serviceAccount.private_key,
-      })
 
       // Create JWT client for service account
       const impersonateEmail = process.env.GOOGLE_WORKSPACE_IMPERSONATE_EMAIL
@@ -107,7 +102,6 @@ export class GoogleDriveClient {
       // Only add subject if impersonation email is configured
       if (impersonateEmail && impersonateEmail.trim() !== '') {
         authConfig.subject = impersonateEmail
-        logger.debug('Using impersonation for:', impersonateEmail)
       }
 
       const auth = new google.auth.JWT(authConfig)
@@ -117,9 +111,6 @@ export class GoogleDriveClient {
 
       // Get the configured shared drive ID
       const sharedDriveId = await GoogleDriveClient.getSharedDriveId()
-      logger.debug('Service account client initialized', {
-        sharedDriveId,
-      })
 
       return new GoogleDriveClient(auth, sharedDriveId)
     } catch (error) {
@@ -177,13 +168,6 @@ export class GoogleDriveClient {
           ? [this.sharedDriveId]
           : undefined
 
-      logger.debug('Creating folder in Google Drive', {
-        name: options.name,
-        parents: parentIds,
-        sharedDriveId: this.sharedDriveId,
-        description: options.description,
-      })
-
       const fileMetadata: drive_v3.Schema$File = {
         name: options.name,
         mimeType: MIME_TYPES.FOLDER,
@@ -195,13 +179,6 @@ export class GoogleDriveClient {
         requestBody: fileMetadata,
         fields: 'id, name, mimeType, parents, createdTime, modifiedTime',
         supportsAllDrives: true,
-      })
-
-      logger.debug('Google Drive API response for folder creation', {
-        id: response.data.id,
-        name: response.data.name,
-        parents: response.data.parents,
-        status: response.status,
       })
 
       if (!response.data.id) {
@@ -233,13 +210,6 @@ export class GoogleDriveClient {
    */
   async uploadFile(options: UploadFileOptions): Promise<DriveFile> {
     try {
-      logger.debug('Uploading file to Google Drive', {
-        fileName: options.fileName,
-        folderId: options.folderId,
-        mimeType: options.mimeType,
-        description: options.description,
-      })
-
       const fileMetadata: drive_v3.Schema$File = {
         name: options.fileName,
         parents: [options.folderId],
@@ -257,15 +227,6 @@ export class GoogleDriveClient {
         fields:
           'id, name, mimeType, size, parents, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink',
         supportsAllDrives: true,
-      })
-
-      logger.debug('Google Drive API response for file upload', {
-        id: response.data.id,
-        name: response.data.name,
-        size: response.data.size,
-        parents: response.data.parents,
-        webViewLink: response.data.webViewLink,
-        status: response.status,
       })
 
       if (!response.data.id) {
@@ -496,13 +457,6 @@ export class GoogleDriveClient {
         query += ` and ${options.query}`
       }
 
-      logger.debug('Listing files with query', {
-        query,
-        folderId: options.folderId,
-        sharedDriveId: this.sharedDriveId,
-        hasSharedDrive: !!this.sharedDriveId,
-      })
-
       const requestParams: any = {
         q: query,
         pageSize: options.pageSize || 100,
@@ -535,15 +489,6 @@ export class GoogleDriveClient {
           webContentLink: file.webContentLink || undefined,
           thumbnailLink: file.thumbnailLink || undefined,
         })) || []
-
-      logger.debug('List files response', {
-        fileCount: files.length,
-        files: files.map((f) => ({
-          id: f.id,
-          name: f.name,
-          parents: f.parents,
-        })),
-      })
 
       return {
         files,
@@ -599,13 +544,6 @@ export class GoogleDriveClient {
         throw new GeneralError('Failed to get access token')
       }
 
-      logger.debug('Downloading file chunk with range request', {
-        fileId,
-        startByte,
-        endByte,
-        rangeSize: endByte - startByte + 1,
-      })
-
       const response = await axios.get(
         `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&supportsAllDrives=true`,
         {
@@ -616,14 +554,6 @@ export class GoogleDriveClient {
           responseType: 'arraybuffer',
         },
       )
-
-      logger.debug('File chunk downloaded', {
-        fileId,
-        startByte,
-        endByte,
-        bytesReceived: response.data.byteLength,
-        status: response.status,
-      })
 
       return Buffer.from(response.data)
     } catch (error) {
@@ -697,12 +627,6 @@ export class GoogleDriveClient {
     bookTitle: string,
   ): Promise<{ folderId: string; subfolders: Record<string, string> }> {
     try {
-      logger.debug('Creating book folder structure', {
-        bookId,
-        bookTitle,
-        sharedDriveId: this.sharedDriveId,
-      })
-
       // Create main book folder directly in the shared drive root
       const sanitizedTitle = bookTitle
         .replace(/[<>:"/\\|?*]/g, '_')
@@ -730,20 +654,9 @@ export class GoogleDriveClient {
         }
       }
 
-      logger.debug('Creating main book folder in shared drive root', {
-        folderName: bookFolderName,
-        sharedDriveId: this.sharedDriveId,
-      })
-
       const bookFolder = await this.createFolder({
         name: bookFolderName,
         description: `Files for book: ${bookTitle} (ID: ${bookId})`,
-      })
-
-      logger.debug('Main book folder created', {
-        folderId: bookFolder.id,
-        folderName: bookFolder.name,
-        parents: bookFolder.parents,
       })
 
       logger.info(`Created folder structure for book ${bookId}`)

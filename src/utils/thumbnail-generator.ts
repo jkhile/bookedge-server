@@ -31,8 +31,6 @@ export async function generateThumbnail(
 
     if (mimeType === 'application/pdf') {
       // Handle PDF files - extract first page as image
-      logger.debug('Generating thumbnail from PDF')
-
       // Create temporary files for pdf-poppler
       const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'pdf-thumb-'))
       const tempPdfPath = path.join(tempDir, 'input.pdf')
@@ -66,8 +64,6 @@ export async function generateThumbnail(
         // Read the generated PNG file (without page number suffix due to -singlefile)
         const generatedPngPath = `${outputPath}.png`
         imageBuffer = await fs.readFile(generatedPngPath)
-
-        logger.debug('PDF converted to PNG successfully')
       } catch (pdfError) {
         logger.error('Failed to convert PDF to image, using placeholder', {
           error: pdfError,
@@ -115,13 +111,6 @@ export async function generateThumbnail(
 
     // Convert to base64
     const base64 = thumbnail.toString('base64')
-
-    logger.debug('Thumbnail generated successfully', {
-      originalType: mimeType,
-      thumbnailSize: thumbnail.length,
-      width: metadata.width,
-      height: metadata.height,
-    })
 
     return {
       data: base64,
