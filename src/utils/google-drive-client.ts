@@ -656,25 +656,11 @@ export class GoogleDriveClient {
       // This is more efficient than fetching all folders but more precise than 'name contains'
       const expectedFolderPrefix = `${bookId}-`
 
-      logger.debug(
-        `[Book ${bookId}] Searching for existing folder with prefix '${expectedFolderPrefix}'`,
-      )
-
       // Search for folders that contain the book ID
       // This will return a smaller set to filter through
       const potentialFolders = await this.listFiles({
         query: `mimeType='application/vnd.google-apps.folder' and name contains '${bookId}'`,
       })
-
-      logger.debug(
-        `[Book ${bookId}] Found ${potentialFolders.files.length} potential folders containing '${bookId}'`,
-        {
-          folders: potentialFolders.files.map((f) => ({
-            id: f.id,
-            name: f.name,
-          })),
-        },
-      )
 
       // Filter to find exact match on book ID prefix
       // The folder name must start with "bookId-" exactly (e.g., "373-" not "3730-")
@@ -688,16 +674,9 @@ export class GoogleDriveClient {
           const idPart = folder.name.split('-')[0]
           const exactMatch = idPart === String(bookId)
 
-          logger.debug(
-            `[Book ${bookId}] Checking folder '${folder.name}': starts with '${expectedFolderPrefix}' = ${nameStartsWithId}, ID part = '${idPart}', exact match = ${exactMatch}`,
-          )
-
           return exactMatch
         }
 
-        logger.debug(
-          `[Book ${bookId}] Folder '${folder.name}' does not start with '${expectedFolderPrefix}'`,
-        )
         return false
       })
 
@@ -726,10 +705,6 @@ export class GoogleDriveClient {
           subfolders: {}, // Empty since we're not pre-creating subfolders
         }
       }
-
-      logger.debug(
-        `[Book ${bookId}] No existing folder found, will create new one`,
-      )
 
       const bookFolder = await this.createFolder({
         name: bookFolderName,
