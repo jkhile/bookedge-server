@@ -175,11 +175,16 @@ export class GoogleDriveClient {
         description: options.description,
       }
 
-      const response = await this.drive.files.create({
-        requestBody: fileMetadata,
-        fields: 'id, name, mimeType, parents, createdTime, modifiedTime',
-        supportsAllDrives: true,
-      })
+      const response = await this.drive.files.create(
+        {
+          requestBody: fileMetadata,
+          fields: 'id, name, mimeType, parents, createdTime, modifiedTime',
+          supportsAllDrives: true,
+        },
+        {
+          timeout: 30000, // 30 second timeout for folder creation
+        },
+      )
 
       if (!response.data.id) {
         logger.error('Failed to create folder - no ID returned', {
@@ -221,13 +226,19 @@ export class GoogleDriveClient {
         body: options.fileContent,
       }
 
-      const response = await this.drive.files.create({
-        requestBody: fileMetadata,
-        media: media,
-        fields:
-          'id, name, mimeType, size, parents, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink',
-        supportsAllDrives: true,
-      })
+      // Add timeout for Google Drive API call (60 seconds for upload)
+      const response = await this.drive.files.create(
+        {
+          requestBody: fileMetadata,
+          media: media,
+          fields:
+            'id, name, mimeType, size, parents, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink',
+          supportsAllDrives: true,
+        },
+        {
+          timeout: 60000, // 60 second timeout for file uploads
+        },
+      )
 
       if (!response.data.id) {
         logger.error('Failed to upload file - no ID returned', {
@@ -297,6 +308,7 @@ export class GoogleDriveClient {
             'X-Upload-Content-Type': options.mimeType,
             'X-Upload-Content-Length': options.fileSize.toString(),
           },
+          timeout: 30000, // 30 second timeout for initiating upload
         },
       )
 
@@ -339,6 +351,7 @@ export class GoogleDriveClient {
         },
         validateStatus: (status) =>
           status === 200 || status === 201 || status === 308,
+        timeout: 45000, // 45 second timeout for chunk upload
       })
 
       const progress = Math.round(((endByte + 1) / totalSize) * 100)
@@ -474,7 +487,9 @@ export class GoogleDriveClient {
         requestParams.corpora = 'drive'
       }
 
-      const response = await this.drive.files.list(requestParams)
+      const response = await this.drive.files.list(requestParams, {
+        timeout: 30000, // 30 second timeout for file listing
+      })
 
       const files: DriveFile[] =
         response.data.files?.map((file) => ({
