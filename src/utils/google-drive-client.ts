@@ -634,32 +634,73 @@ export class GoogleDriveClient {
       const bookFolderName = `${bookId}-${sanitizedTitle}`
 
       // First check if a book folder already exists for this book ID
-      // Search for folders with name starting with "bookId-"
+      // We need to be careful with the search to avoid matching similar IDs
+      // For example, searching for "373" should not match "3730", "3731", etc.
+
+      // Strategy: Search for folders containing the book ID, then filter precisely
+      // This is more efficient than fetching all folders but more precise than 'name contains'
+      const expectedFolderPrefix = `${bookId}-`
+
       logger.debug(
-        `[Book ${bookId}] Searching for existing folder with query: name contains '${bookId}-'`,
+        `[Book ${bookId}] Searching for existing folder with prefix '${expectedFolderPrefix}'`,
       )
-      const existingFolders = await this.listFiles({
-        query: `mimeType='application/vnd.google-apps.folder' and name contains '${bookId}-'`,
+
+      // Search for folders that contain the book ID
+      // This will return a smaller set to filter through
+      const potentialFolders = await this.listFiles({
+        query: `mimeType='application/vnd.google-apps.folder' and name contains '${bookId}'`,
       })
 
       logger.debug(
-        `[Book ${bookId}] Found ${existingFolders.files.length} potential folders`,
+        `[Book ${bookId}] Found ${potentialFolders.files.length} potential folders containing '${bookId}'`,
         {
-          folders: existingFolders.files.map((f) => ({
+          folders: potentialFolders.files.map((f) => ({
             id: f.id,
             name: f.name,
           })),
         },
       )
 
-      // Filter to exact match on book ID prefix (in case other books have IDs like 2731, 2732, etc)
-      const existingBookFolder = existingFolders.files.find((folder) => {
-        const matches = folder.name.match(new RegExp(`^${bookId}-`))
+      // Filter to find exact match on book ID prefix
+      // The folder name must start with "bookId-" exactly (e.g., "373-" not "3730-")
+      const matchingFolders = potentialFolders.files.filter((folder) => {
+        // Check if folder name starts with the exact book ID followed by a hyphen
+        const nameStartsWithId = folder.name.startsWith(expectedFolderPrefix)
+
+        // Additional validation: ensure the ID part is exactly our bookId
+        // This handles cases where "373-" might be confused with "3730-", "3731-", etc.
+        if (nameStartsWithId) {
+          const idPart = folder.name.split('-')[0]
+          const exactMatch = idPart === String(bookId)
+
+          logger.debug(
+            `[Book ${bookId}] Checking folder '${folder.name}': starts with '${expectedFolderPrefix}' = ${nameStartsWithId}, ID part = '${idPart}', exact match = ${exactMatch}`,
+          )
+
+          return exactMatch
+        }
+
         logger.debug(
-          `[Book ${bookId}] Checking folder '${folder.name}': matches = ${!!matches}`,
+          `[Book ${bookId}] Folder '${folder.name}' does not start with '${expectedFolderPrefix}'`,
         )
-        return matches
+        return false
       })
+
+      // Use the first matching folder if found
+      const existingBookFolder = matchingFolders[0]
+
+      // Warn if multiple matching folders found (shouldn't happen)
+      if (matchingFolders.length > 1) {
+        logger.warn(
+          `[Book ${bookId}] Found ${matchingFolders.length} matching folders, using first one`,
+          {
+            matchingFolders: matchingFolders.map((f) => ({
+              id: f.id,
+              name: f.name,
+            })),
+          },
+        )
+      }
 
       if (existingBookFolder) {
         logger.info(
@@ -680,7 +721,9 @@ export class GoogleDriveClient {
         description: `Files for book: ${bookTitle} (ID: ${bookId})`,
       })
 
-      logger.info(`Created folder structure for book ${bookId}`)
+      logger.info(
+        `[Book ${bookId}] Created new folder: '${bookFolderName}' (ID: ${bookFolder.id})`,
+      )
 
       // Return just the main folder ID - subfolders will be created on-demand during file uploads
       return {
