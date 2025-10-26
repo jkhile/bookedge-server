@@ -635,24 +635,45 @@ export class GoogleDriveClient {
 
       // First check if a book folder already exists for this book ID
       // Search for folders with name starting with "bookId-"
+      logger.debug(
+        `[Book ${bookId}] Searching for existing folder with query: name contains '${bookId}-'`,
+      )
       const existingFolders = await this.listFiles({
         query: `mimeType='application/vnd.google-apps.folder' and name contains '${bookId}-'`,
       })
 
-      // Filter to exact match on book ID prefix (in case other books have IDs like 2731, 2732, etc)
-      const existingBookFolder = existingFolders.files.find((folder) =>
-        folder.name.match(new RegExp(`^${bookId}-`)),
+      logger.debug(
+        `[Book ${bookId}] Found ${existingFolders.files.length} potential folders`,
+        {
+          folders: existingFolders.files.map((f) => ({
+            id: f.id,
+            name: f.name,
+          })),
+        },
       )
+
+      // Filter to exact match on book ID prefix (in case other books have IDs like 2731, 2732, etc)
+      const existingBookFolder = existingFolders.files.find((folder) => {
+        const matches = folder.name.match(new RegExp(`^${bookId}-`))
+        logger.debug(
+          `[Book ${bookId}] Checking folder '${folder.name}': matches = ${!!matches}`,
+        )
+        return matches
+      })
 
       if (existingBookFolder) {
         logger.info(
-          `Found existing book folder for book ${bookId}: ${existingBookFolder.name}`,
+          `[Book ${bookId}] Found existing book folder: ${existingBookFolder.name} (ID: ${existingBookFolder.id})`,
         )
         return {
           folderId: existingBookFolder.id,
           subfolders: {}, // Empty since we're not pre-creating subfolders
         }
       }
+
+      logger.debug(
+        `[Book ${bookId}] No existing folder found, will create new one`,
+      )
 
       const bookFolder = await this.createFolder({
         name: bookFolderName,

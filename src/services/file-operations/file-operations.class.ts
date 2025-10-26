@@ -335,20 +335,44 @@ export class FileOperationsService implements FileOperationsServiceMethods {
       let bookFolderId = book.drive_folder_id
       const driveClient = await this.driveManager.getServiceAccountClient()
 
+      logger.debug(`[Book ${bookId}] Starting folder creation/lookup`, {
+        bookId,
+        bookTitle: book.title,
+        existingFolderId: bookFolderId,
+        purpose,
+        fileName: file.name,
+      })
+
       if (!bookFolderId) {
+        logger.debug(
+          `[Book ${bookId}] No existing folder ID, creating new folder structure`,
+        )
         const folderStructure = await driveClient.createBookFolderStructure(
           bookId,
           book.title,
         )
         bookFolderId = folderStructure.folderId
 
+        logger.debug(`[Book ${bookId}] Created/found folder structure`, {
+          bookId,
+          folderId: bookFolderId,
+        })
+
         // Update book with folder ID
         await this.app.service('books').patch(bookId, {
           drive_folder_id: bookFolderId,
         })
+      } else {
+        logger.debug(`[Book ${bookId}] Using existing folder ID`, {
+          bookId,
+          folderId: bookFolderId,
+        })
       }
 
       // Get or create purpose subfolder
+      logger.debug(
+        `[Book ${bookId}] Looking for '${purpose}' subfolder in folder ${bookFolderId}`,
+      )
       const subfolders = await driveClient.listFiles({
         folderId: bookFolderId,
         query: `mimeType='application/vnd.google-apps.folder' and name='${purpose}'`,
@@ -357,14 +381,24 @@ export class FileOperationsService implements FileOperationsServiceMethods {
       let targetFolderId = bookFolderId
       if (subfolders.files.length > 0) {
         targetFolderId = subfolders.files[0].id
+        logger.debug(`[Book ${bookId}] Found existing '${purpose}' subfolder`, {
+          bookId,
+          subfolderId: targetFolderId,
+          subfolderName: subfolders.files[0].name,
+        })
       } else {
         // Create subfolder
+        logger.debug(`[Book ${bookId}] Creating new '${purpose}' subfolder`)
         const newFolder = await driveClient.createFolder({
           name: purpose,
           parentId: bookFolderId,
           description: `${purpose} files for ${book.title}`,
         })
         targetFolderId = newFolder.id
+        logger.debug(`[Book ${bookId}] Created '${purpose}' subfolder`, {
+          bookId,
+          subfolderId: targetFolderId,
+        })
       }
 
       // Upload file to Google Drive
@@ -409,7 +443,15 @@ export class FileOperationsService implements FileOperationsServiceMethods {
       await this.app.service('books').patch(bookId, patchData)
 
       logger.info(
-        `File uploaded successfully: ${file.name} for book ${bookId} (${purpose})`,
+        `[Book ${bookId}] File uploaded successfully: ${file.name} (${purpose})`,
+        {
+          bookId,
+          purpose,
+          fileName: file.name,
+          folderId: targetFolderId,
+          fileId: uploadResult.id,
+          webViewLink: uploadResult.webViewLink,
+        },
       )
 
       return {
