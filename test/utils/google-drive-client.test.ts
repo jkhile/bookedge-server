@@ -171,16 +171,21 @@ describe('GoogleDriveClient', () => {
         modifiedTime: '2024-01-01T00:00:00Z',
       })
 
-      expect(mockDrive.files.create).toHaveBeenCalledWith({
-        requestBody: {
-          name: 'Test Folder',
-          mimeType: 'application/vnd.google-apps.folder',
-          parents: ['parent-123'],
-          description: 'Test description',
+      expect(mockDrive.files.create).toHaveBeenCalledWith(
+        {
+          requestBody: {
+            name: 'Test Folder',
+            mimeType: 'application/vnd.google-apps.folder',
+            parents: ['parent-123'],
+            description: 'Test description',
+          },
+          fields: 'id, name, mimeType, parents, createdTime, modifiedTime',
+          supportsAllDrives: true,
         },
-        fields: 'id, name, mimeType, parents, createdTime, modifiedTime',
-        supportsAllDrives: true,
-      })
+        {
+          timeout: 30000,
+        },
+      )
     })
 
     it('should use shared drive as parent when no parent specified', async () => {
@@ -205,6 +210,9 @@ describe('GoogleDriveClient', () => {
           requestBody: expect.objectContaining({
             parents: ['test-drive-id'],
           }),
+        }),
+        expect.objectContaining({
+          timeout: 30000,
         }),
       )
     })
@@ -270,20 +278,25 @@ describe('GoogleDriveClient', () => {
         thumbnailLink: undefined,
       })
 
-      expect(mockDrive.files.create).toHaveBeenCalledWith({
-        requestBody: {
-          name: 'test.pdf',
-          parents: ['folder-123'],
-          description: 'Test file',
+      expect(mockDrive.files.create).toHaveBeenCalledWith(
+        {
+          requestBody: {
+            name: 'test.pdf',
+            parents: ['folder-123'],
+            description: 'Test file',
+          },
+          media: {
+            mimeType: 'application/pdf',
+            body: fileBuffer,
+          },
+          fields:
+            'id, name, mimeType, size, parents, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink',
+          supportsAllDrives: true,
         },
-        media: {
-          mimeType: 'application/pdf',
-          body: fileBuffer,
+        {
+          timeout: 60000,
         },
-        fields:
-          'id, name, mimeType, size, parents, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink',
-        supportsAllDrives: true,
-      })
+      )
     })
 
     it('should throw error when upload fails', async () => {
@@ -338,6 +351,7 @@ describe('GoogleDriveClient', () => {
             'X-Upload-Content-Type': 'application/pdf',
             'X-Upload-Content-Length': '10000000',
           },
+          timeout: 30000,
         },
       )
     })
@@ -386,6 +400,7 @@ describe('GoogleDriveClient', () => {
           'Content-Range': 'bytes 0-1048575/5242880',
         },
         validateStatus: expect.any(Function),
+        timeout: 45000,
       })
     })
 
@@ -561,6 +576,9 @@ describe('GoogleDriveClient', () => {
           pageSize: 10,
           supportsAllDrives: true,
         }),
+        expect.objectContaining({
+          timeout: 30000,
+        }),
       )
     })
 
@@ -574,6 +592,9 @@ describe('GoogleDriveClient', () => {
           q: "trashed = false and 'test-drive-id' in parents",
           driveId: 'test-drive-id',
           corpora: 'drive',
+        }),
+        expect.objectContaining({
+          timeout: 30000,
         }),
       )
     })
@@ -589,6 +610,9 @@ describe('GoogleDriveClient', () => {
       expect(mockDrive.files.list).toHaveBeenCalledWith(
         expect.objectContaining({
           q: "trashed = false and 'folder-123' in parents and mimeType='application/pdf'",
+        }),
+        expect.objectContaining({
+          timeout: 30000,
         }),
       )
     })
@@ -707,6 +731,11 @@ describe('GoogleDriveClient', () => {
         },
       }
 
+      // Mock listFiles to return no existing folders
+      mockDrive.files.list.mockResolvedValue({
+        data: { files: [] },
+      })
+
       mockDrive.files.create.mockResolvedValue(mockFolderResponse)
 
       const result = await client.createBookFolderStructure(1, 'Test Book')
@@ -723,6 +752,9 @@ describe('GoogleDriveClient', () => {
             description: 'Files for book: Test Book (ID: 1)',
           }),
         }),
+        expect.objectContaining({
+          timeout: 30000,
+        }),
       )
     })
 
@@ -736,6 +768,11 @@ describe('GoogleDriveClient', () => {
         },
       }
 
+      // Mock listFiles to return no existing folders
+      mockDrive.files.list.mockResolvedValue({
+        data: { files: [] },
+      })
+
       mockDrive.files.create.mockResolvedValue(mockFolderResponse)
 
       await client.createBookFolderStructure(1, 'Test: Book / Title')
@@ -745,6 +782,9 @@ describe('GoogleDriveClient', () => {
           requestBody: expect.objectContaining({
             name: '1-Test_ Book _ Title',
           }),
+        }),
+        expect.objectContaining({
+          timeout: 30000,
         }),
       )
     })
