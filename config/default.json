@@ -37,6 +37,10 @@
       "secret": "H82jKLm5Rn7PqA3Xt4zCvS6wByE9DfGu",
       "expiresIn": "3d"
     },
+    "serviceAuth": {
+      "secret": "",
+      "finutils_url": ""
+    },
     "local": {
       "usernameField": "email",
       "passwordField": "password"

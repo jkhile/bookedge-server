@@ -16,6 +16,7 @@ import { book } from './books/books'
 import { imprint } from './imprints/imprints'
 import { user } from './users/users'
 import { fileOperations } from './file-operations/file-operations'
+import { internal } from './internal/internal'
 // For more information about this file see https://dove.feathersjs.com/guides/cli/application.html#configure-functions
 import type { Application } from '../declarations'
 
@@ -39,5 +40,7 @@ export const services = (app: Application) => {
   app.configure(metadataSearch)
   // File operations service (simplified - no longer depends on deprecated services)
   app.configure(fileOperations)
+  // Internal service for service-to-service communication (finutils, etc.)
+  app.configure(internal)
   // All services will be registered here
 }

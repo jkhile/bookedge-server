@@ -9,6 +9,10 @@
   },
   "authentication": {
     "secret": "FEATHERS_SECRET",
+    "serviceAuth": {
+      "secret": "SERVICE_AUTH_SECRET",
+      "finutils_url": "FINUTILS_API_URL"
+    },
     "oauth": {
       "google": {
         "key": "GOOGLE_KEY",
