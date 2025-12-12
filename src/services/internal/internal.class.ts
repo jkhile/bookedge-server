@@ -8,7 +8,6 @@ import type { Params } from '@feathersjs/feathers'
 import { NotFound, BadRequest } from '@feathersjs/errors'
 import type { Application } from '../../declarations'
 import type { Knex } from 'knex'
-
 interface InternalParams extends Params {
   serviceClient?: 'finutils' | 'bookedge'
   query?: {
@@ -57,7 +56,9 @@ export class InternalService {
    */
   async find(
     params: InternalParams,
-  ): Promise<HealthResult | { books: BookResult[] }> {
+  ): Promise<
+    HealthResult | { books: BookResult[] } | { book: BookResult } | unknown
+  > {
     const action = params.query?.action
 
     switch (action) {
@@ -65,6 +66,13 @@ export class InternalService {
         return this.healthCheck(params)
       case 'search':
         return this.searchBooks(params)
+      case 'get-by-accounting-code':
+        return this.getBookByAccountingCode(
+          params.query?.accounting_code || '',
+          params,
+        )
+      case 'get-by-isbn':
+        return this.getBookByIsbn(params.query?.isbn || '', params)
       default:
         return this.healthCheck(params)
     }

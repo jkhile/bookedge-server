@@ -24,7 +24,7 @@ export const internal = (app: Application) => {
   // Initialize hooks
   app.service(internalPath).hooks({
     around: {
-      // Use service authentication instead of user JWT authentication
+      // Require service-to-service authentication for all internal endpoints
       all: [serviceAuthenticate()],
     },
     before: {
