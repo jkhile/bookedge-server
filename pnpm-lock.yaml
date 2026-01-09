@@ -123,6 +123,9 @@ importers:
       '@types/fs-extra':
         specifier: ^11.0.4
         version: 11.0.4
+      '@types/json5':
+        specifier: ^2.2.0
+        version: 2.2.0
       '@types/jsonwebtoken':
         specifier: ^9.0.10
         version: 9.0.10
@@ -153,6 +156,9 @@ importers:
       globals:
         specifier: ^15.15.0
         version: 15.15.0
+      json5:
+        specifier: ^2.2.3
+        version: 2.2.3
       nodemon:
         specifier: ^3.1.11
         version: 3.1.11
@@ -1059,6 +1065,10 @@ packages:
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
+
+  '@types/json5@2.2.0':
+    resolution: {integrity: sha512-NrVug5woqbvNZ0WX+Gv4R+L4TGddtmFek2u8RtccAgFZWtS9QXF2xCXY22/M4nzkaKF0q9Fc6M/5rxLDhfwc/A==}
+    deprecated: This is a stub types definition. json5 provides its own type definitions, so you do not need this installed.
 
   '@types/jsonfile@6.1.4':
     resolution: {integrity: sha512-D5qGUYwjvnNNextdU59/+fI+spnwtTFmyQP0h+PfIOSkNfpU6AOICUOkm4i0OnSk+NyjdPJrxCDro0sJsWlRpQ==}
@@ -4013,6 +4023,10 @@ snapshots:
       rxjs: 7.8.2
 
   '@types/json-schema@7.0.15': {}
+
+  '@types/json5@2.2.0':
+    dependencies:
+      json5: 2.2.3
 
   '@types/jsonfile@6.1.4':
     dependencies:

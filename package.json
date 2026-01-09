@@ -70,7 +70,8 @@
     "test-parser": "tsx src/scripts/test-parser.ts",
     "cleanup-tokens": "tsx src/scripts/cleanup-refresh-tokens.ts",
     "backup-heroku-db": "tsx src/scripts/backup-heroku-db.ts",
-    "restore-heroku-db": "tsx src/scripts/restore-heroku-db.ts"
+    "restore-heroku-db": "tsx src/scripts/restore-heroku-db.ts",
+    "update-revenue-splits": "tsx src/scripts/update-revenue-splits.ts"
   },
   "dependencies": {
     "@feathersjs/adapter-commons": "^5.0.37",
@@ -113,6 +114,7 @@
     "@feathersjs/cli": "5.0.22",
     "@types/debug": "^4.1.12",
     "@types/fs-extra": "^11.0.4",
+    "@types/json5": "^2.2.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/koa": "^3.0.1",
     "@types/koa__multer": "^2.0.8",
@@ -123,6 +125,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^9.39.1",
     "globals": "^15.15.0",
+    "json5": "^2.2.3",
     "nodemon": "^3.1.11",
     "prettier": "^3.6.2",
     "shx": "^0.3.4",

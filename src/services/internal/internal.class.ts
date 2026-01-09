@@ -33,6 +33,11 @@ interface BookResult {
   published_date?: string
   short_description?: string
   fk_imprint: number
+  // Revenue split configuration (FEP's share)
+  fep_fixed_share_pb?: number
+  fep_percentage_share_pb?: number
+  fep_fixed_share_hc?: number
+  fep_percentage_share_hc?: number
 }
 
 interface HealthResult {
@@ -135,6 +140,10 @@ export class InternalService {
         'isbn_epub',
         'short_description',
         'fk_imprint',
+        'fep_fixed_share_pb',
+        'fep_percentage_share_pb',
+        'fep_fixed_share_hc',
+        'fep_percentage_share_hc',
       )
       .where('title', 'ilike', searchPattern)
       .orWhere('subtitle', 'ilike', searchPattern)
@@ -163,6 +172,10 @@ export class InternalService {
         'isbn_epub',
         'short_description',
         'fk_imprint',
+        'fep_fixed_share_pb',
+        'fep_percentage_share_pb',
+        'fep_fixed_share_hc',
+        'fep_percentage_share_hc',
       )
       .where('accounting_code', '=', accountingCode)
       .first()
@@ -223,6 +236,10 @@ export class InternalService {
         'isbn_epub',
         'short_description',
         'fk_imprint',
+        'fep_fixed_share_pb',
+        'fep_percentage_share_pb',
+        'fep_fixed_share_hc',
+        'fep_percentage_share_hc',
       )
       .where('isbn_paperback', '=', isbn)
       .orWhere('isbn_hardcover', '=', isbn)
