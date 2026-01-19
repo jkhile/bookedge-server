@@ -5,36 +5,36 @@ import type { KnexAdapterParams, KnexAdapterOptions } from '@feathersjs/knex'
 
 import type { Application } from '../../declarations'
 import type {
-  BookContributorRoles,
-  BookContributorRolesData,
-  BookContributorRolesPatch,
-  BookContributorRolesQuery,
-} from './book-contributor-roles.schema'
+  RevenueSplitOverride,
+  RevenueSplitOverrideData,
+  RevenueSplitOverridePatch,
+  RevenueSplitOverrideQuery,
+} from './revenue-split-overrides.schema'
 
 export type {
-  BookContributorRoles,
-  BookContributorRolesData,
-  BookContributorRolesPatch,
-  BookContributorRolesQuery,
+  RevenueSplitOverride,
+  RevenueSplitOverrideData,
+  RevenueSplitOverridePatch,
+  RevenueSplitOverrideQuery,
 }
 
-export interface BookContributorRolesParams extends KnexAdapterParams<BookContributorRolesQuery> {}
+export interface RevenueSplitOverrideParams extends KnexAdapterParams<RevenueSplitOverrideQuery> {}
 
 // By default calls the standard Knex adapter service methods but can be customized with your own functionality.
-export class BookContributorRolesService<
+export class RevenueSplitOverrideService<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ServiceParams extends Params = BookContributorRolesParams,
+  ServiceParams extends Params = RevenueSplitOverrideParams,
 > extends KnexService<
-  BookContributorRoles,
-  BookContributorRolesData,
-  BookContributorRolesParams,
-  BookContributorRolesPatch
+  RevenueSplitOverride,
+  RevenueSplitOverrideData,
+  RevenueSplitOverrideParams,
+  RevenueSplitOverridePatch
 > {}
 
 export const getOptions = (app: Application): KnexAdapterOptions => {
   return {
     paginate: app.get('paginate'),
     Model: app.get('postgresqlClient'),
-    name: 'book-contributor-roles',
+    name: 'revenue-split-overrides',
   }
 }

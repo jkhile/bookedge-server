@@ -1,3 +1,4 @@
+import { execSync } from 'child_process'
 import fs from 'fs'
 import JSON5 from 'json5'
 import knex from 'knex'
@@ -30,18 +31,45 @@ interface BookRecord {
   id: number
   accounting_code: string
   title: string
+  status: string
   fep_fixed_share_pb: number
   fep_percentage_share_pb: number
   fep_fixed_share_hc: number
   fep_percentage_share_hc: number
 }
 
-// Configure Knex database connection
+// Heroku app name
+const HEROKU_APP_NAME = 'fep-bookedge-production'
+
+// Fetch DATABASE_URL from Heroku
+function getDatabaseUrl(): string {
+  try {
+    const url = execSync(
+      `heroku config:get DATABASE_URL -a ${HEROKU_APP_NAME}`,
+      {
+        encoding: 'utf-8',
+      },
+    ).trim()
+    if (!url) {
+      throw new Error('DATABASE_URL is empty')
+    }
+    return url
+  } catch {
+    console.error(
+      `Failed to fetch DATABASE_URL from Heroku app '${HEROKU_APP_NAME}'`,
+    )
+    console.error('Make sure you are logged in to Heroku (run: heroku login)')
+    process.exit(1)
+  }
+}
+
+// Configure Knex database connection to Heroku Postgres
+const databaseUrl = getDatabaseUrl()
 const db = knex({
   client: 'pg',
   connection: {
-    host: 'localhost',
-    database: 'bookedge-server',
+    connectionString: databaseUrl,
+    ssl: { rejectUnauthorized: false },
   },
   debug: false,
 })
@@ -74,6 +102,7 @@ function getBasePrefix(accountingCode: string): string {
 async function updateRevenueSplits() {
   console.log('='.repeat(70))
   console.log('Revenue Splits Update Script')
+  console.log(`Target: Heroku Production (${HEROKU_APP_NAME})`)
   console.log('='.repeat(70))
   console.log()
 
@@ -87,20 +116,54 @@ async function updateRevenueSplits() {
     console.log(`Found ${json5Keys.length} entries in JSON5 file`)
     console.log()
 
-    // Fetch all books from the database
-    const dbBooks: BookRecord[] = await db('books').select(
-      'id',
-      'accounting_code',
-      'title',
-      'fep_fixed_share_pb',
-      'fep_percentage_share_pb',
-      'fep_fixed_share_hc',
-      'fep_percentage_share_hc',
+    // Fetch books from the database that:
+    // 1. Have status 'released'
+    // 2. Have a print release with full_distribution = true
+    // 3. Do not have accounting_code starting with 'MSU-'
+    const dbBooks: BookRecord[] = await db('books')
+      .select(
+        'books.id',
+        'books.accounting_code',
+        'books.title',
+        'books.status',
+        'books.fep_fixed_share_pb',
+        'books.fep_percentage_share_pb',
+        'books.fep_fixed_share_hc',
+        'books.fep_percentage_share_hc',
+      )
+      .where('books.status', 'released')
+      .whereNot('books.accounting_code', 'like', 'MSU-%')
+      .whereExists(function () {
+        this.select(db.raw(1))
+          .from('releases')
+          .whereRaw('releases.fk_book = books.id')
+          .where('releases.release_type', 'print-LSI')
+          .where('releases.full_distribution', true)
+      })
+    console.log(
+      `Found ${dbBooks.length} eligible books in BookEdge database (released with full distribution print release)`,
     )
-    console.log(`Found ${dbBooks.length} books in BookEdge database`)
     console.log()
 
-    // Create a map of database books by accounting_code for quick lookup
+    // Fetch all books for lookup (to differentiate "doesn't exist" vs "not eligible")
+    // Exclude MSU-% books from lookup as well
+    const allDbBooks: { id: number; accounting_code: string }[] = await db(
+      'books',
+    )
+      .select('id', 'accounting_code')
+      .whereNot('accounting_code', 'like', 'MSU-%')
+    const allBooksByCode = new Map<string, number>()
+    const allBooksByPrefix = new Map<string, number[]>()
+    for (const book of allDbBooks) {
+      allBooksByCode.set(book.accounting_code, book.id)
+      const prefix = getPrefix(book.accounting_code)
+      if (!allBooksByPrefix.has(prefix)) {
+        allBooksByPrefix.set(prefix, [])
+      }
+      allBooksByPrefix.get(prefix)!.push(book.id)
+    }
+
+    // Create a map of eligible database books by accounting_code for quick lookup
     const dbBooksByCode = new Map<string, BookRecord>()
     for (const book of dbBooks) {
       dbBooksByCode.set(book.accounting_code, book)
@@ -117,15 +180,25 @@ async function updateRevenueSplits() {
     }
 
     // Track results
-    const updatedBooks: string[] = []
+    const successfullyUpdatedBooks: {
+      accountingCode: string
+      title: string
+      changes: string[]
+    }[] = []
     const discrepancies: string[] = []
     const errors: string[] = []
     const incomeAccountOverrides: string[] = []
-    const unmatchedJson5Entries: string[] = []
+    const json5EntriesNotInDb: string[] = []
+    const json5EntriesIneligible: string[] = []
     const matchedDbCodes = new Set<string>()
 
     // Process each entry in the JSON5 file
     for (const [json5Key, meta] of Object.entries(booksMeta)) {
+      // Skip MSU- entries entirely
+      if (json5Key.startsWith('MSU-')) {
+        continue
+      }
+
       const isHardcover = isHardcoverEntry(json5Key)
       const defaults = meta.revenueSplits.defaults
 
@@ -148,9 +221,15 @@ async function updateRevenueSplits() {
         const candidates = dbBooksByPrefix.get(basePrefix) || []
 
         if (candidates.length === 0) {
-          unmatchedJson5Entries.push(
-            `${json5Key} (hardcover, no base book found with prefix '${basePrefix}')`,
-          )
+          // Check if book exists but isn't eligible
+          const allCandidates = allBooksByPrefix.get(basePrefix) || []
+          if (allCandidates.length > 0) {
+            json5EntriesIneligible.push(`${json5Key} (hardcover)`)
+          } else {
+            json5EntriesNotInDb.push(
+              `${json5Key} (hardcover, no base book with prefix '${basePrefix}')`,
+            )
+          }
           continue
         } else if (candidates.length > 1) {
           errors.push(
@@ -163,7 +242,12 @@ async function updateRevenueSplits() {
         // For non-hardcover entries, match by exact accounting_code
         matchedBook = dbBooksByCode.get(json5Key)
         if (!matchedBook) {
-          unmatchedJson5Entries.push(`${json5Key} (no exact match in database)`)
+          // Check if book exists but isn't eligible
+          if (allBooksByCode.has(json5Key)) {
+            json5EntriesIneligible.push(json5Key)
+          } else {
+            json5EntriesNotInDb.push(json5Key)
+          }
           continue
         }
       }
@@ -194,19 +278,31 @@ async function updateRevenueSplits() {
         (defaults.fepPercentage !== undefined && currentPercent !== newPercent)
 
       if (hasDiscrepancy) {
-        const parts: string[] = []
-        if (defaults.fepAmount !== undefined && currentFixed !== newFixed) {
-          parts.push(`${fixedColumn}: ${currentFixed} -> ${newFixed}`)
+        // Only report discrepancies where the old value was non-zero
+        const discrepancyParts: string[] = []
+        if (
+          defaults.fepAmount !== undefined &&
+          currentFixed !== newFixed &&
+          currentFixed !== 0
+        ) {
+          discrepancyParts.push(
+            `${fixedColumn}: ${currentFixed} -> ${newFixed}`,
+          )
         }
         if (
           defaults.fepPercentage !== undefined &&
-          currentPercent !== newPercent
+          currentPercent !== newPercent &&
+          currentPercent !== 0
         ) {
-          parts.push(`${percentColumn}: ${currentPercent} -> ${newPercent}`)
+          discrepancyParts.push(
+            `${percentColumn}: ${currentPercent} -> ${newPercent}`,
+          )
         }
-        discrepancies.push(
-          `${matchedBook.accounting_code}: ${parts.join(', ')}`,
-        )
+        if (discrepancyParts.length > 0) {
+          discrepancies.push(
+            `${matchedBook.accounting_code}: ${discrepancyParts.join(', ')}`,
+          )
+        }
       }
 
       // Build update object
@@ -219,15 +315,26 @@ async function updateRevenueSplits() {
       }
 
       // Perform update if there are changes
-      if (Object.keys(updates).length > 0) {
+      if (Object.keys(updates).length > 0 && hasDiscrepancy) {
         try {
           await db('books').where('id', matchedBook.id).update(updates)
 
-          if (hasDiscrepancy) {
-            updatedBooks.push(
-              `${matchedBook.accounting_code}: updated ${Object.keys(updates).join(', ')}`,
-            )
+          // Track the successful update with details
+          const changes: string[] = []
+          if (defaults.fepAmount !== undefined && currentFixed !== newFixed) {
+            changes.push(`${fixedColumn}: ${currentFixed} -> ${newFixed}`)
           }
+          if (
+            defaults.fepPercentage !== undefined &&
+            currentPercent !== newPercent
+          ) {
+            changes.push(`${percentColumn}: ${currentPercent} -> ${newPercent}`)
+          }
+          successfullyUpdatedBooks.push({
+            accountingCode: matchedBook.accounting_code,
+            title: matchedBook.title,
+            changes,
+          })
         } catch (err) {
           const errorMessage = err instanceof Error ? err.message : String(err)
           errors.push(
@@ -237,32 +344,10 @@ async function updateRevenueSplits() {
       }
     }
 
-    // Find book IDs that need revenue splits (have releases with full distribution
-    // or non-LSI release types). Books with only print-LSI releases where
-    // full_distribution = false don't need revenue split information.
-    const booksNeedingRevenueSplits = await db('releases')
-      .distinct('fk_book')
-      .where(function () {
-        this.where('full_distribution', true).orWhereNot(
-          'release_type',
-          'print-LSI',
-        )
-      })
-    const bookIdsNeedingRevenueSplits = new Set(
-      booksNeedingRevenueSplits.map((r: { fk_book: number }) => r.fk_book),
-    )
-
-    // Find database books not in JSON5 (excluding books that only have
-    // non-distributed LSI releases)
+    // Find eligible database books not in JSON5
     const unmatchedDbBooks: { accounting_code: string; title: string }[] = []
-    let skippedNonDistributedCount = 0
     for (const book of dbBooks) {
       if (!matchedDbCodes.has(book.accounting_code)) {
-        // Skip books that don't need revenue splits (only have non-distributed LSI releases)
-        if (!bookIdsNeedingRevenueSplits.has(book.id)) {
-          skippedNonDistributedCount++
-          continue
-        }
         unmatchedDbBooks.push({
           accounting_code: book.accounting_code,
           title: book.title,
@@ -276,11 +361,16 @@ async function updateRevenueSplits() {
     console.log('='.repeat(70))
     console.log()
 
-    if (updatedBooks.length > 0) {
-      console.log(`UPDATED (${updatedBooks.length}):`)
+    if (successfullyUpdatedBooks.length > 0) {
+      console.log(
+        `SUCCESSFULLY UPDATED BOOKS (${successfullyUpdatedBooks.length}):`,
+      )
       console.log('-'.repeat(40))
-      for (const msg of updatedBooks) {
-        console.log(`  ${msg}`)
+      for (const book of successfullyUpdatedBooks) {
+        console.log(`  ${book.accountingCode}: ${book.title}`)
+        for (const change of book.changes) {
+          console.log(`    - ${change}`)
+        }
       }
       console.log()
     } else {
@@ -322,12 +412,23 @@ async function updateRevenueSplits() {
       console.log()
     }
 
-    if (unmatchedJson5Entries.length > 0) {
+    if (json5EntriesNotInDb.length > 0) {
       console.log(
-        `JSON5 ENTRIES NOT IN DATABASE (${unmatchedJson5Entries.length}):`,
+        `JSON5 ENTRIES NOT FOUND IN DATABASE (${json5EntriesNotInDb.length}):`,
       )
       console.log('-'.repeat(40))
-      for (const msg of unmatchedJson5Entries) {
+      for (const msg of json5EntriesNotInDb) {
+        console.log(`  ${msg}`)
+      }
+      console.log()
+    }
+
+    if (json5EntriesIneligible.length > 0) {
+      console.log(
+        `JSON5 ENTRIES INELIGIBLE - NO FULL DISTRIBUTION PRINT RELEASE (${json5EntriesIneligible.length}):`,
+      )
+      console.log('-'.repeat(40))
+      for (const msg of json5EntriesIneligible) {
         console.log(`  ${msg}`)
       }
       console.log()
@@ -351,20 +452,22 @@ async function updateRevenueSplits() {
     console.log('SUMMARY')
     console.log('='.repeat(70))
     console.log(`  JSON5 entries processed: ${json5Keys.length}`)
-    console.log(`  Database books: ${dbBooks.length}`)
-    console.log(`  Books updated: ${updatedBooks.length}`)
+    console.log(`  Eligible database books: ${dbBooks.length}`)
+    console.log(
+      `  Books successfully updated: ${successfullyUpdatedBooks.length}`,
+    )
     console.log(`  Discrepancies (values changed): ${discrepancies.length}`)
     console.log(`  Errors: ${errors.length}`)
     console.log(`  Income account overrides: ${incomeAccountOverrides.length}`)
     console.log(
-      `  JSON5 entries not in database: ${unmatchedJson5Entries.length}`,
+      `  JSON5 entries not found in database: ${json5EntriesNotInDb.length}`,
     )
-    console.log(`  Database books not in JSON5: ${unmatchedDbBooks.length}`)
-    if (skippedNonDistributedCount > 0) {
-      console.log(
-        `  Skipped (non-distributed LSI only): ${skippedNonDistributedCount}`,
-      )
-    }
+    console.log(
+      `  JSON5 entries ineligible (no full dist print): ${json5EntriesIneligible.length}`,
+    )
+    console.log(
+      `  Eligible database books not in JSON5: ${unmatchedDbBooks.length}`,
+    )
     console.log()
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)

@@ -4,7 +4,7 @@
 # This script creates a backup of the Heroku PostgreSQL database
 
 # Configuration
-HEROKU_APP_NAME="${HEROKU_APP_NAME:-bookedge}"  # Replace with your actual Heroku app name if different
+HEROKU_APP_NAME="${HEROKU_APP_NAME:-fep-bookedge-production}"
 BACKUP_DIR="${BACKUP_DIR:-./backups}"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 BACKUP_FILENAME="bookedge_${TIMESTAMP}.sql"

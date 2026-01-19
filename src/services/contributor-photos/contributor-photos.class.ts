@@ -18,8 +18,7 @@ export type {
   ContributorPhotosQuery,
 }
 
-export interface ContributorPhotosParams
-  extends KnexAdapterParams<ContributorPhotosQuery> {}
+export interface ContributorPhotosParams extends KnexAdapterParams<ContributorPhotosQuery> {}
 
 // By default calls the standard Knex adapter service methods but can be customized with your own functionality.
 export class ContributorPhotosService<

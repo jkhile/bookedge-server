@@ -21,9 +21,10 @@ export interface MetadataSearchParams extends Params {
 
 // This is a custom service that doesn't extend KnexService directly since we don't
 // need to persist data. It just implements the ServiceInterface
-export class MetadataSearchService
-  implements ServiceInterface<MetadataSearchResult[], MetadataSearch>
-{
+export class MetadataSearchService implements ServiceInterface<
+  MetadataSearchResult[],
+  MetadataSearch
+> {
   app: Application
   knex: Knex
 

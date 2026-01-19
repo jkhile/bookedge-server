@@ -18,8 +18,7 @@ export type {
   SigninHistoryQuery,
 }
 
-export interface SigninHistoryParams
-  extends KnexAdapterParams<SigninHistoryQuery> {}
+export interface SigninHistoryParams extends KnexAdapterParams<SigninHistoryQuery> {}
 
 // By default calls the standard Knex adapter service methods but can be customized with your own functionality.
 export class SigninHistoryService<

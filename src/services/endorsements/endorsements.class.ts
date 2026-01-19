@@ -13,8 +13,7 @@ import type {
 
 export type { Endorsement, EndorsementData, EndorsementPatch, EndorsementQuery }
 
-export interface EndorsementParams
-  extends KnexAdapterParams<EndorsementQuery> {}
+export interface EndorsementParams extends KnexAdapterParams<EndorsementQuery> {}
 
 // By default calls the standard Knex adapter service methods but can be customized with your own functionality.
 export class EndorsementService<

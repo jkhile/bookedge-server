@@ -1,3 +1,4 @@
+import { revenueSplitOverride } from './revenue-split-overrides/revenue-split-overrides'
 import { bookContributorRoles } from './book-contributor-roles/book-contributor-roles'
 import { bookImages } from './book-images/book-images'
 import { contributorPhotos } from './contributor-photos/contributor-photos'
@@ -21,6 +22,7 @@ import { internal } from './internal/internal'
 import type { Application } from '../declarations'
 
 export const services = (app: Application) => {
+  app.configure(revenueSplitOverride)
   app.configure(bookContributorRoles)
   app.configure(bookImages)
   app.configure(contributorPhotos)

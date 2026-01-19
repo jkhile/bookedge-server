@@ -84,6 +84,14 @@ export type {
   EndorsementPatch,
 } from './services/endorsements/endorsements.shared'
 
+import { revenueSplitOverrideClient } from './services/revenue-split-overrides/revenue-split-overrides.shared'
+export type {
+  RevenueSplitOverride,
+  RevenueSplitOverrideData,
+  RevenueSplitOverrideQuery,
+  RevenueSplitOverridePatch,
+} from './services/revenue-split-overrides/revenue-split-overrides.shared'
+
 export type { LogMessageData } from './services/log-messages/log-messages.shared'
 
 export type {
@@ -190,5 +198,6 @@ export const createClient = <Configuration = any>(
   client.configure(bookImagesClient)
   client.configure(contributorPhotosClient)
   client.configure(fileOperationsClient)
+  client.configure(revenueSplitOverrideClient)
   return client
 }

@@ -8,6 +8,7 @@ import type { Params } from '@feathersjs/feathers'
 import { NotFound, BadRequest } from '@feathersjs/errors'
 import type { Application } from '../../declarations'
 import type { Knex } from 'knex'
+import { getAccountPathForPlatform } from '../../utils/platform-mappings'
 interface InternalParams extends Params {
   serviceClient?: 'finutils' | 'bookedge'
   query?: {
@@ -18,6 +19,14 @@ interface InternalParams extends Params {
     limit?: number
     status?: string
   }
+}
+
+interface RevenueSplitOverrideResult {
+  account_name: string
+  fep_fixed_amount: number | null
+  fep_percentage: number | null
+  pub_fixed_amount: number | null
+  pub_percentage: number | null
 }
 
 interface BookResult {
@@ -38,6 +47,8 @@ interface BookResult {
   fep_percentage_share_pb?: number
   fep_fixed_share_hc?: number
   fep_percentage_share_hc?: number
+  // Platform-specific revenue split overrides
+  revenue_split_overrides?: RevenueSplitOverrideResult[]
 }
 
 interface HealthResult {
@@ -208,11 +219,15 @@ export class InternalService {
       .orderBy('publication_date', 'asc')
       .first()
 
+    // Get revenue split overrides
+    const overrides = await this.getRevenueSplitOverridesForBook(book.id)
+
     return {
       book: {
         ...book,
         author: authorRow?.published_name || undefined,
         published_date: releaseRow?.publication_date || undefined,
+        revenue_split_overrides: overrides,
       },
     }
   }
@@ -272,12 +287,51 @@ export class InternalService {
       .orderBy('publication_date', 'asc')
       .first()
 
+    // Get revenue split overrides
+    const overrides = await this.getRevenueSplitOverridesForBook(book.id)
+
     return {
       book: {
         ...book,
         author: authorRow?.published_name || undefined,
         published_date: releaseRow?.publication_date || undefined,
+        revenue_split_overrides: overrides,
       },
     }
+  }
+
+  /**
+   * Get revenue split overrides for a book, mapped to account names
+   */
+  private async getRevenueSplitOverridesForBook(
+    bookId: number,
+  ): Promise<RevenueSplitOverrideResult[]> {
+    const overrides = await this.db('revenue-split-overrides')
+      .select(
+        'platform',
+        'fep_fixed_amount',
+        'fep_percentage',
+        'pub_fixed_amount',
+        'pub_percentage',
+      )
+      .where('fk_book', '=', bookId)
+
+    // Map platform codes to account names
+    return overrides
+      .map((override) => {
+        const accountName = getAccountPathForPlatform(override.platform)
+        if (!accountName) {
+          // Skip overrides with unknown platform codes
+          return null
+        }
+        return {
+          account_name: accountName,
+          fep_fixed_amount: override.fep_fixed_amount,
+          fep_percentage: override.fep_percentage,
+          pub_fixed_amount: override.pub_fixed_amount,
+          pub_percentage: override.pub_percentage,
+        }
+      })
+      .filter((o): o is RevenueSplitOverrideResult => o !== null)
   }
 }

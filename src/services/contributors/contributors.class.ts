@@ -13,8 +13,7 @@ import type {
 
 export type { Contributor, ContributorData, ContributorPatch, ContributorQuery }
 
-export interface ContributorParams
-  extends KnexAdapterParams<ContributorQuery> {}
+export interface ContributorParams extends KnexAdapterParams<ContributorQuery> {}
 
 // By default calls the standard Knex adapter service methods but can be customized with your own functionality.
 export class ContributorService<

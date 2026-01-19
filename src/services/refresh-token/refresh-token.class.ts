@@ -23,8 +23,7 @@ export type {
   RefreshTokenQuery,
 }
 
-export interface RefreshTokenParams
-  extends KnexAdapterParams<RefreshTokenQuery> {}
+export interface RefreshTokenParams extends KnexAdapterParams<RefreshTokenQuery> {}
 
 // Define the authentication config interface to help TypeScript
 interface AuthConfig {
