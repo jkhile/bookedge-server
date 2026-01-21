@@ -171,6 +171,7 @@ export class InternalService {
     accountingCode: string,
     _params: InternalParams,
   ): Promise<{ book: BookResult }> {
+    // Order by status to prefer non-archived books when duplicates exist
     const book = await this.db<BookResult>('books')
       .select(
         'id',
@@ -189,6 +190,7 @@ export class InternalService {
         'fep_percentage_share_hc',
       )
       .where('accounting_code', '=', accountingCode)
+      .orderByRaw("CASE WHEN status = 'archived' THEN 1 ELSE 0 END")
       .first()
 
     if (!book) {
@@ -239,6 +241,7 @@ export class InternalService {
     isbn: string,
     _params: InternalParams,
   ): Promise<{ book: BookResult }> {
+    // Order by status to prefer non-archived books when duplicates exist
     const book = await this.db<BookResult>('books')
       .select(
         'id',
@@ -256,9 +259,13 @@ export class InternalService {
         'fep_fixed_share_hc',
         'fep_percentage_share_hc',
       )
-      .where('isbn_paperback', '=', isbn)
-      .orWhere('isbn_hardcover', '=', isbn)
-      .orWhere('isbn_epub', '=', isbn)
+      .where((builder) => {
+        builder
+          .where('isbn_paperback', '=', isbn)
+          .orWhere('isbn_hardcover', '=', isbn)
+          .orWhere('isbn_epub', '=', isbn)
+      })
+      .orderByRaw("CASE WHEN status = 'archived' THEN 1 ELSE 0 END")
       .first()
 
     if (!book) {
