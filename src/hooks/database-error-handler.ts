@@ -65,13 +65,13 @@ export async function handleDatabaseErrors(context: HookContext) {
         },
       )
     } else if (
-      constraintName.includes('imprints') &&
-      constraintName.includes('name')
+      constraintName.includes('vendors') &&
+      constraintName.includes('code_prefix')
     ) {
       context.error = new Conflict(
-        'An imprint with this name already exists. Please use a different name.',
+        'A vendor with this code prefix already exists. Please use a different prefix.',
         {
-          code: 'DUPLICATE_IMPRINT_NAME',
+          code: 'DUPLICATE_VENDOR_CODE',
           constraint: constraintName,
           originalError: error.message,
         },

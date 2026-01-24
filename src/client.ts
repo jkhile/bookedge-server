@@ -3,7 +3,7 @@ import { bookClient } from './services/books/books.shared'
 import { booksHistoryClient } from './services/books-history/books-history.shared'
 import { contributorClient } from './services/contributors/contributors.shared'
 import { feathers } from '@feathersjs/feathers'
-import { imprintClient } from './services/imprints/imprints.shared'
+import { vendorClient } from './services/vendors/vendors.shared'
 import { logMessageClient } from './services/log-messages/log-messages.shared'
 import { releaseClient } from './services/releases/releases.shared'
 import { userClient } from './services/users/users.shared'
@@ -123,11 +123,11 @@ export type {
 } from './services/books/books.shared'
 
 export type {
-  Imprint,
-  ImprintData,
-  ImprintQuery,
-  ImprintPatch,
-} from './services/imprints/imprints.shared'
+  Vendor,
+  VendorData,
+  VendorQuery,
+  VendorPatch,
+} from './services/vendors/vendors.shared'
 
 export type {
   User,
@@ -182,7 +182,7 @@ export const createClient = <Configuration = any>(
   client.set('connection', connection)
 
   client.configure(userClient)
-  client.configure(imprintClient)
+  client.configure(vendorClient)
   client.configure(bookClient)
   client.configure(booksHistoryClient)
   client.configure(contributorClient)

@@ -1,6 +1,5 @@
 import { resolve } from '@feathersjs/schema'
 import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
-import { imprintsResolver } from '../../utils/imprints-resolver'
 import {
   createDataResolver,
   createUpdateResolver,
@@ -16,7 +15,7 @@ import type { BookService } from './books.class'
 export const bookSchema = Type.Object(
   {
     id: Type.Integer(),
-    fk_imprint: Type.Integer(),
+    imprint: Type.String(), // Marketing label (e.g., "Read the Spirit Books")
     fk_derived_from: Type.Union([Type.Integer(), Type.Null()]),
     derived_type: Type.Union([
       Type.Literal('original'),
@@ -221,9 +220,9 @@ export const bookQuerySchema = Type.Intersect(
 )
 export type BookQuery = Static<typeof bookQuerySchema>
 export const bookQueryValidator = getValidator(bookQuerySchema, queryValidator)
-export const bookQueryResolver = resolve<BookQuery, HookContext<BookService>>({
-  fk_imprint: imprintsResolver,
-})
+export const bookQueryResolver = resolve<BookQuery, HookContext<BookService>>(
+  {},
+)
 export const bookSearchQuerySchema = Type.Object(
   {
     fields: Type.Array(Type.String()),

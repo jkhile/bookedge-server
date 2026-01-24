@@ -42,7 +42,7 @@ export interface ServiceTypesMap {
   issues: 'issues'
   books: 'books'
   'books-history': 'books-history'
-  imprints: 'imprints'
+  vendors: 'vendors'
   'log-messages': 'log-messages'
   'signin-history': 'signin-history'
   mentions: 'mentions'

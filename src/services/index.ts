@@ -14,7 +14,7 @@ import { release } from './releases/releases'
 import { contributor } from './contributors/contributors'
 import { booksHistory } from './books-history/books-history'
 import { book } from './books/books'
-import { imprint } from './imprints/imprints'
+import { vendor } from './vendors/vendors'
 import { user } from './users/users'
 import { fileOperations } from './file-operations/file-operations'
 import { internal } from './internal/internal'
@@ -37,7 +37,7 @@ export const services = (app: Application) => {
   app.configure(contributor)
   app.configure(booksHistory)
   app.configure(book)
-  app.configure(imprint)
+  app.configure(vendor)
   app.configure(user)
   app.configure(metadataSearch)
   // File operations service (simplified - no longer depends on deprecated services)

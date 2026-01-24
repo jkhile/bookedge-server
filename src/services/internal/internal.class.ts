@@ -15,6 +15,7 @@ interface InternalParams extends Params {
     action?: string
     accounting_code?: string
     isbn?: string
+    code_prefix?: string
     q?: string
     limit?: number
     status?: string
@@ -41,7 +42,7 @@ interface BookResult {
   author?: string
   published_date?: string
   short_description?: string
-  fk_imprint: number
+  imprint: string // Marketing label
   // Revenue split configuration (FEP's share)
   fep_fixed_share_pb?: number
   fep_percentage_share_pb?: number
@@ -49,6 +50,15 @@ interface BookResult {
   fep_percentage_share_hc?: number
   // Platform-specific revenue split overrides
   revenue_split_overrides?: RevenueSplitOverrideResult[]
+}
+
+interface VendorResult {
+  id: number
+  code_prefix: string
+  vendor_name: string
+  statement_name: string
+  generate_individual_statements: boolean
+  status: string
 }
 
 interface HealthResult {
@@ -73,7 +83,12 @@ export class InternalService {
   async find(
     params: InternalParams,
   ): Promise<
-    HealthResult | { books: BookResult[] } | { book: BookResult } | unknown
+    | HealthResult
+    | { books: BookResult[] }
+    | { book: BookResult }
+    | { vendors: VendorResult[] }
+    | { vendor: VendorResult }
+    | unknown
   > {
     const action = params.query?.action
 
@@ -89,6 +104,10 @@ export class InternalService {
         )
       case 'get-by-isbn':
         return this.getBookByIsbn(params.query?.isbn || '', params)
+      case 'get-vendors':
+        return this.getVendors(params)
+      case 'get-vendor-by-prefix':
+        return this.getVendorByPrefix(params.query?.code_prefix || '', params)
       default:
         return this.healthCheck(params)
     }
@@ -150,7 +169,7 @@ export class InternalService {
         'isbn_hardcover',
         'isbn_epub',
         'short_description',
-        'fk_imprint',
+        'imprint',
         'fep_fixed_share_pb',
         'fep_percentage_share_pb',
         'fep_fixed_share_hc',
@@ -183,7 +202,7 @@ export class InternalService {
         'isbn_hardcover',
         'isbn_epub',
         'short_description',
-        'fk_imprint',
+        'imprint',
         'fep_fixed_share_pb',
         'fep_percentage_share_pb',
         'fep_fixed_share_hc',
@@ -253,7 +272,7 @@ export class InternalService {
         'isbn_hardcover',
         'isbn_epub',
         'short_description',
-        'fk_imprint',
+        'imprint',
         'fep_fixed_share_pb',
         'fep_percentage_share_pb',
         'fep_fixed_share_hc',
@@ -340,5 +359,63 @@ export class InternalService {
         }
       })
       .filter((o): o is RevenueSplitOverrideResult => o !== null)
+  }
+
+  /**
+   * Get all active vendors
+   */
+  private async getVendors(
+    params: InternalParams,
+  ): Promise<{ vendors: VendorResult[] }> {
+    const status = params.query?.status || 'active'
+
+    const query = this.db<VendorResult>('vendors')
+      .select(
+        'id',
+        'code_prefix',
+        'vendor_name',
+        'statement_name',
+        'generate_individual_statements',
+        'status',
+      )
+      .orderBy('code_prefix', 'asc')
+
+    if (status !== 'all') {
+      query.where('status', '=', status)
+    }
+
+    const vendors = await query
+
+    return { vendors }
+  }
+
+  /**
+   * Get a vendor by code prefix
+   */
+  private async getVendorByPrefix(
+    codePrefix: string,
+    _params: InternalParams,
+  ): Promise<{ vendor: VendorResult }> {
+    if (!codePrefix) {
+      throw new BadRequest('code_prefix is required')
+    }
+
+    const vendor = await this.db<VendorResult>('vendors')
+      .select(
+        'id',
+        'code_prefix',
+        'vendor_name',
+        'statement_name',
+        'generate_individual_statements',
+        'status',
+      )
+      .where('code_prefix', '=', codePrefix)
+      .first()
+
+    if (!vendor) {
+      throw new NotFound(`Vendor not found with code prefix: ${codePrefix}`)
+    }
+
+    return { vendor }
   }
 }
