@@ -94,7 +94,7 @@ export const bookSchema = Type.Object(
     contains_others_work: Type.String(),
     web_domain: Type.String(),
     published_word_count: Type.Integer(),
-    image_count: Type.Integer(),
+    has_images: Type.Boolean(),
     press_contact: Type.String(),
     legal_notice: Type.String(),
     featured_ads: Type.String(),
