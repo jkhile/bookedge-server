@@ -4,6 +4,7 @@ import { bookImages } from './book-images/book-images'
 import { contributorPhotos } from './contributor-photos/contributor-photos'
 import { refreshToken } from './refresh-token/refresh-token'
 import { metadataSearch } from './metadata-search/metadata-search'
+import { globalSearch } from './global-search/global-search'
 import { signinHistory } from './signin-history/signin-history'
 import { mentions } from './mentions/mentions'
 import { issue } from './issues/issues'
@@ -40,6 +41,7 @@ export const services = (app: Application) => {
   app.configure(vendor)
   app.configure(user)
   app.configure(metadataSearch)
+  app.configure(globalSearch)
   // File operations service (simplified - no longer depends on deprecated services)
   app.configure(fileOperations)
   // Internal service for service-to-service communication (finutils, etc.)

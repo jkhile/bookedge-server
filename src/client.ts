@@ -92,6 +92,15 @@ export type {
   RevenueSplitOverridePatch,
 } from './services/revenue-split-overrides/revenue-split-overrides.shared'
 
+import { globalSearchClient } from './services/global-search/global-search.shared'
+export type {
+  GlobalSearch,
+  GlobalSearchResult,
+  GlobalSearchBookResult,
+  GlobalSearchContributorResult,
+  GlobalSearchVendorResult,
+} from './services/global-search/global-search.shared'
+
 export type { LogMessageData } from './services/log-messages/log-messages.shared'
 
 export type {
@@ -199,5 +208,6 @@ export const createClient = <Configuration = any>(
   client.configure(contributorPhotosClient)
   client.configure(fileOperationsClient)
   client.configure(revenueSplitOverrideClient)
+  client.configure(globalSearchClient)
   return client
 }
