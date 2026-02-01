@@ -15,7 +15,7 @@ import type { BookService } from './books.class'
 export const bookSchema = Type.Object(
   {
     id: Type.Integer(),
-    imprint: Type.String(), // Marketing label (e.g., "Read the Spirit Books")
+    imprint: Type.Union([Type.String(), Type.Null()]), // Marketing label (e.g., "Read the Spirit Books")
     fk_derived_from: Type.Union([Type.Integer(), Type.Null()]),
     derived_type: Type.Union([
       Type.Literal('original'),
