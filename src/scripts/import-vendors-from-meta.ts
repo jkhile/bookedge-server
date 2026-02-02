@@ -5,10 +5,16 @@
  * into the BookEdge vendors table.
  *
  * Usage:
- *   npx ts-node src/scripts/import-vendors-from-meta.ts [--production]
+ *   npx ts-node src/scripts/import-vendors-from-meta.ts [environment]
  *
- * Options:
- *   --production  Run against Heroku production database (default: local dev)
+ * Arguments:
+ *   environment  Target database: dev (default), staging, or production
+ *
+ * Examples:
+ *   npx ts-node src/scripts/import-vendors-from-meta.ts           # dev database
+ *   npx ts-node src/scripts/import-vendors-from-meta.ts dev       # dev database
+ *   npx ts-node src/scripts/import-vendors-from-meta.ts staging   # staging database
+ *   npx ts-node src/scripts/import-vendors-from-meta.ts production # production database
  */
 import { execSync } from 'child_process'
 import fs from 'fs'
@@ -38,15 +44,42 @@ interface VendorRecord {
   notes: string
 }
 
-// Heroku app name
-const HEROKU_APP_NAME = 'fep-bookedge-production'
+// Environment type
+type Environment = 'dev' | 'staging' | 'production'
+
+// Heroku app names for each environment
+const HEROKU_APPS: Record<Exclude<Environment, 'dev'>, string> = {
+  staging: 'fep-bookedge-staging',
+  production: 'fep-bookedge-production',
+}
 
 // Path to the JSON5 file
 const JSON5_FILE_PATH =
   '/Users/johnhile/Library/CloudStorage/GoogleDrive-john.hile@frontedgepublishing.com/Shared drives/FEP_Financials/FinancialData/FEP/PublisherStatements/vendors-meta.json5'
 
-// Check for --production flag
-const useProduction = process.argv.includes('--production')
+// Parse environment from command line
+function parseEnvironment(): Environment {
+  const arg = process.argv[2]?.toLowerCase()
+
+  if (!arg) {
+    return 'dev'
+  }
+
+  if (arg === 'dev' || arg === 'staging' || arg === 'production') {
+    return arg
+  }
+
+  // Support legacy --production flag
+  if (arg === '--production') {
+    return 'production'
+  }
+
+  console.error(`Invalid environment: ${arg}`)
+  console.error('Valid options: dev, staging, production')
+  process.exit(1)
+}
+
+const environment = parseEnvironment()
 
 /**
  * Extract vendor code prefix from accounting code
@@ -66,41 +99,27 @@ function extractCodePrefix(accountingCode: string): string {
 /**
  * Fetch DATABASE_URL from Heroku
  */
-function getHerokuDatabaseUrl(): string {
+function getHerokuDatabaseUrl(appName: string): string {
   try {
-    const url = execSync(
-      `heroku config:get DATABASE_URL -a ${HEROKU_APP_NAME}`,
-      { encoding: 'utf-8' },
-    ).trim()
+    const url = execSync(`heroku config:get DATABASE_URL -a ${appName}`, {
+      encoding: 'utf-8',
+    }).trim()
     if (!url) {
       throw new Error('DATABASE_URL is empty')
     }
     return url
   } catch {
-    console.error(
-      `Failed to fetch DATABASE_URL from Heroku app '${HEROKU_APP_NAME}'`,
-    )
+    console.error(`Failed to fetch DATABASE_URL from Heroku app '${appName}'`)
     console.error('Make sure you are logged in to Heroku (run: heroku login)')
     process.exit(1)
   }
 }
 
 /**
- * Get database connection
+ * Get database connection for the specified environment
  */
-function getDatabase(): Knex {
-  if (useProduction) {
-    console.log('Connecting to PRODUCTION database...')
-    const databaseUrl = getHerokuDatabaseUrl()
-    return knex({
-      client: 'pg',
-      connection: {
-        connectionString: databaseUrl,
-        ssl: { rejectUnauthorized: false },
-      },
-      debug: false,
-    })
-  } else {
+function getDatabase(env: Environment): Knex {
+  if (env === 'dev') {
     console.log('Connecting to LOCAL development database...')
     return knex({
       client: 'pg',
@@ -112,13 +131,26 @@ function getDatabase(): Knex {
       debug: false,
     })
   }
+
+  const appName = HEROKU_APPS[env]
+  console.log(`Connecting to ${env.toUpperCase()} database (${appName})...`)
+  const databaseUrl = getHerokuDatabaseUrl(appName)
+  return knex({
+    client: 'pg',
+    connection: {
+      connectionString: databaseUrl,
+      ssl: { rejectUnauthorized: false },
+    },
+    debug: false,
+  })
 }
 
 /**
  * Main import function
  */
 async function importVendors(): Promise<void> {
-  console.log('\n=== Import Vendors from vendors-meta.json5 ===\n')
+  console.log('\n=== Import Vendors from vendors-meta.json5 ===')
+  console.log(`Target environment: ${environment.toUpperCase()}\n`)
 
   // Read and parse the JSON5 file
   if (!fs.existsSync(JSON5_FILE_PATH)) {
@@ -133,7 +165,7 @@ async function importVendors(): Promise<void> {
     `Found ${Object.keys(vendorsMeta).length} vendors in JSON5 file\n`,
   )
 
-  const db = getDatabase()
+  const db = getDatabase(environment)
 
   try {
     // Track results
