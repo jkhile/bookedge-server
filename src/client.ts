@@ -101,6 +101,14 @@ export type {
   GlobalSearchVendorResult,
 } from './services/global-search/global-search.shared'
 
+import { marketingChecklistClient } from './services/marketing-checklists/marketing-checklists.shared'
+export type {
+  MarketingChecklist,
+  MarketingChecklistData,
+  MarketingChecklistQuery,
+  MarketingChecklistPatch,
+} from './services/marketing-checklists/marketing-checklists.shared'
+
 export type { LogMessageData } from './services/log-messages/log-messages.shared'
 
 export type {
@@ -209,5 +217,6 @@ export const createClient = <Configuration = any>(
   client.configure(fileOperationsClient)
   client.configure(revenueSplitOverrideClient)
   client.configure(globalSearchClient)
+  client.configure(marketingChecklistClient)
   return client
 }

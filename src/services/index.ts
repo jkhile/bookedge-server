@@ -1,3 +1,4 @@
+import { marketingChecklist } from './marketing-checklists/marketing-checklists'
 import { revenueSplitOverride } from './revenue-split-overrides/revenue-split-overrides'
 import { bookContributorRoles } from './book-contributor-roles/book-contributor-roles'
 import { bookImages } from './book-images/book-images'
@@ -23,6 +24,7 @@ import { internal } from './internal/internal'
 import type { Application } from '../declarations'
 
 export const services = (app: Application) => {
+  app.configure(marketingChecklist)
   app.configure(revenueSplitOverride)
   app.configure(bookContributorRoles)
   app.configure(bookImages)
