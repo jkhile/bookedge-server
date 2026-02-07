@@ -2,6 +2,7 @@ import { marketingChecklist } from './marketing-checklists/marketing-checklists'
 import { revenueSplitOverride } from './revenue-split-overrides/revenue-split-overrides'
 import { bookContributorRoles } from './book-contributor-roles/book-contributor-roles'
 import { bookImages } from './book-images/book-images'
+import { contributorSocials } from './contributor-socials/contributor-socials'
 import { contributorPhotos } from './contributor-photos/contributor-photos'
 import { refreshToken } from './refresh-token/refresh-token'
 import { metadataSearch } from './metadata-search/metadata-search'
@@ -28,6 +29,7 @@ export const services = (app: Application) => {
   app.configure(revenueSplitOverride)
   app.configure(bookContributorRoles)
   app.configure(bookImages)
+  app.configure(contributorSocials)
   app.configure(contributorPhotos)
   app.configure(refreshToken)
   app.configure(signinHistory)

@@ -14,6 +14,7 @@ import type { AuthenticationClientOptions } from '@feathersjs/authentication-cli
 import { bookContributorRolesClient } from './services/book-contributor-roles/book-contributor-roles.shared'
 import { bookImagesClient } from './services/book-images/book-images.shared'
 import { contributorPhotosClient } from './services/contributor-photos/contributor-photos.shared'
+import { contributorSocialsClient } from './services/contributor-socials/contributor-socials.shared'
 import { fileOperationsClient } from './services/file-operations/file-operations.shared'
 export type {
   BookContributorRoles,
@@ -35,6 +36,13 @@ export type {
   ContributorPhotosQuery,
   ContributorPhotosPatch,
 } from './services/contributor-photos/contributor-photos.shared'
+
+export type {
+  ContributorSocials,
+  ContributorSocialsData,
+  ContributorSocialsQuery,
+  ContributorSocialsPatch,
+} from './services/contributor-socials/contributor-socials.shared'
 
 import { refreshTokenClient } from './services/refresh-token/refresh-token.shared'
 export type {
@@ -214,6 +222,7 @@ export const createClient = <Configuration = any>(
   client.configure(bookContributorRolesClient)
   client.configure(bookImagesClient)
   client.configure(contributorPhotosClient)
+  client.configure(contributorSocialsClient)
   client.configure(fileOperationsClient)
   client.configure(revenueSplitOverrideClient)
   client.configure(globalSearchClient)
