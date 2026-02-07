@@ -25,7 +25,6 @@ export const contributorSchema = Type.Object(
     phone: Type.String(),
     wikipedia_page: Type.String(),
     amazon_author_page: Type.String(),
-    author_website: Type.String(),
     notes: Type.String(),
     fk_created_by: Type.Optional(Type.Integer()),
     created_at: Type.Optional(Type.String({ format: 'date-time' })),
