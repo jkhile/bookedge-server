@@ -82,6 +82,13 @@ export const marketingChecklistSchema = Type.Object(
     cover_art_colors: Type.String(),
     hashtags: Type.String(),
 
+    // Notes fields (one per checklist group)
+    notes_discussed_with_author: Type.String(),
+    notes_discussed_sent_samples: Type.String(),
+    notes_discussed_calculated: Type.String(),
+    notes_created: Type.String(),
+    notes_created_continued: Type.String(),
+
     // Audit fields
     fk_created_by: Type.Optional(Type.Integer()),
     created_at: Type.Optional(Type.String({ format: 'date-time' })),
