@@ -85,7 +85,7 @@ The migration adds the `thumbnail_data` column to the `book_images` table.
 cd /Users/johnhile/dev/bookedge/bookedge-server
 
 # Deploy database changes to staging
-./deploy-db-changes.zsh staging
+./scripts/deploy-db-changes.zsh staging
 ```
 
 This will:
@@ -97,7 +97,7 @@ This will:
 #### For Production:
 ```bash
 # Deploy database changes to production
-./deploy-db-changes.zsh production
+./scripts/deploy-db-changes.zsh production
 ```
 
 **⚠️ WARNING**: This will cause brief downtime while the database is reset. Plan accordingly.
@@ -229,7 +229,7 @@ Existing images in the database won't have thumbnails until they're re-uploaded.
 
 ### 2. Update Release Notes
 
-Add entry to `release-notes.md`:
+Add entry to `docs/release-notes.md`:
 ```markdown
 ## Version 1.5.0 - [Date]
 

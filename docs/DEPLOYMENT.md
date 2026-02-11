@@ -95,13 +95,13 @@ The `deploy-db-changes.zsh` script:
 ### Deploying Database Changes to Staging
 
 ```bash
-./deploy-db-changes.zsh staging
+./scripts/deploy-db-changes.zsh staging
 ```
 
 ### Deploying Database Changes to Production
 
 ```bash
-./deploy-db-changes.zsh production
+./scripts/deploy-db-changes.zsh production
 ```
 
 **IMPORTANT**: This process will cause a brief downtime while the database is being reset and reloaded. Plan accordingly.
@@ -139,7 +139,7 @@ If a migration needs to be rolled back:
 
 3. If needed, you can pull the database from production, roll back locally, and then push to the target environment:
    ```bash
-   ./pulldb.zsh
+   ./scripts/pulldb.zsh
    pnpm migrate:down
    heroku pg:reset --app=fep-bookedge-[staging|production] --confirm fep-bookedge-[staging|production]
    heroku pg:push bookedge-server DATABASE_URL --app=fep-bookedge-[staging|production]
@@ -177,7 +177,7 @@ If a migration needs to be rolled back:
 
 - Pull the production database to local for inspection:
   ```bash
-  ./pulldb.zsh
+  ./scripts/pulldb.zsh
   ```
 
 - Check Heroku configuration:
@@ -189,7 +189,7 @@ If a migration needs to be rolled back:
 
 Follow this checklist when releasing a new version:
 
-1. Create a new version entry in `release-notes.md`
+1. Create a new version entry in `docs/release-notes.md`
 2. Update the version number in `package.json`
 3. Test all changes locally and on staging
 4. Ensure all migrations work correctly

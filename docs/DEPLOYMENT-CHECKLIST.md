@@ -20,7 +20,7 @@ heroku buildpacks -a fep-bookedge-staging  # Verify order
 ### 2. Deploy Database Migration
 ```bash
 cd /Users/johnhile/dev/bookedge/bookedge-server
-./deploy-db-changes.zsh staging
+./scripts/deploy-db-changes.zsh staging
 ```
 - [ ] Migration deployed successfully
 - [ ] Database has `thumbnail_data` column
@@ -62,7 +62,7 @@ heroku buildpacks -a fep-bookedge-production  # Verify order
 
 ### 2. Deploy Database Migration
 ```bash
-./deploy-db-changes.zsh production
+./scripts/deploy-db-changes.zsh production
 ```
 **⚠️ This causes brief downtime**
 - [ ] Migration deployed successfully
@@ -89,7 +89,7 @@ curl https://fep-bookedge-production.herokuapp.com/
 - [ ] Monitor logs for 1 hour
 
 ## Post-Deployment
-- [ ] Update release notes in `release-notes.md`
+- [ ] Update release notes in `docs/release-notes.md`
 - [ ] Tag release: `git tag -a v1.5.0 -m "Version 1.5.0"`
 - [ ] Push tag: `git push origin --tags`
 - [ ] Notify team of deployment
