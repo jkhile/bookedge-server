@@ -15,67 +15,67 @@ export const marketingChecklistSchema = Type.Object(
     id: Type.Integer(),
     book_id: Type.Integer(),
 
-    // Discussed with author
-    fep_marketing_tips: Type.Boolean(),
-    author_website: Type.Boolean(),
-    author_social_media: Type.Boolean(),
-    unique_email: Type.Boolean(),
-    domain_name: Type.Boolean(),
-    author_photos: Type.Boolean(),
+    // Discussed with author (date strings, empty = not completed)
+    fep_marketing_tips: Type.String(),
+    author_website: Type.String(),
+    author_social_media: Type.String(),
+    unique_email: Type.String(),
+    domain_name: Type.String(),
+    author_photos: Type.String(),
 
     // Discussed and sent samples
-    media_kit_sample: Type.Boolean(),
-    postcards_sample: Type.Boolean(),
-    tabletop_banners_sample: Type.Boolean(),
-    floor_banners_sample: Type.Boolean(),
-    bookplates_sample: Type.Boolean(),
-    cover_reveals_sample: Type.Boolean(),
-    book_opening_videos_sample: Type.Boolean(),
-    book_trailers_sample: Type.Boolean(),
-    amazon_author_page: Type.Boolean(),
-    bookmarks_sample: Type.Boolean(),
+    media_kit_sample: Type.String(),
+    postcards_sample: Type.String(),
+    tabletop_banners_sample: Type.String(),
+    floor_banners_sample: Type.String(),
+    bookplates_sample: Type.String(),
+    cover_reveals_sample: Type.String(),
+    book_opening_videos_sample: Type.String(),
+    book_trailers_sample: Type.String(),
+    amazon_author_page: Type.String(),
+    bookmarks_sample: Type.String(),
 
     // Discussed and calculated
-    book_pricing: Type.Boolean(),
-    book_pricing_email: Type.Boolean(),
+    book_pricing: Type.String(),
+    book_pricing_email: Type.String(),
 
     // Created - Media Kit
-    media_kit_created: Type.Boolean(),
-    media_kit_dmitri_checked: Type.Boolean(),
-    media_kit_uploaded: Type.Boolean(),
-    media_kit_sent_to_printer: Type.Boolean(),
+    media_kit_created: Type.String(),
+    media_kit_dmitri_checked: Type.String(),
+    media_kit_uploaded: Type.String(),
+    media_kit_sent_to_printer: Type.String(),
 
     // Created - Media Outreach
-    media_outreach_list: Type.Boolean(),
+    media_outreach_list: Type.String(),
 
     // Created - Cover reveal
-    cover_reveal_created: Type.Boolean(),
-    cover_reveal_youtube: Type.Boolean(),
+    cover_reveal_created: Type.String(),
+    cover_reveal_youtube: Type.String(),
 
     // Created - Book opening video
-    book_opening_video_created: Type.Boolean(),
-    book_opening_video_youtube: Type.Boolean(),
+    book_opening_video_created: Type.String(),
+    book_opening_video_youtube: Type.String(),
 
     // Created - Book trailer
-    book_trailer_created: Type.Boolean(),
-    book_trailer_dmitri_checked: Type.Boolean(),
-    book_trailer_youtube: Type.Boolean(),
+    book_trailer_created: Type.String(),
+    book_trailer_dmitri_checked: Type.String(),
+    book_trailer_youtube: Type.String(),
 
     // Created - A+ Marketing
-    a_plus_marketing: Type.Boolean(),
-    a_plus_sent_to_dmitri: Type.Boolean(),
+    a_plus_marketing: Type.String(),
+    a_plus_sent_to_dmitri: Type.String(),
 
     // Other created items
-    press_release: Type.Boolean(),
+    press_release: Type.String(),
 
     // Specialty items
-    specialty_postcards: Type.Boolean(),
-    specialty_tabletop_banners: Type.Boolean(),
-    specialty_floor_banners: Type.Boolean(),
-    specialty_bookplates: Type.Boolean(),
+    specialty_postcards: Type.String(),
+    specialty_tabletop_banners: Type.String(),
+    specialty_floor_banners: Type.String(),
+    specialty_bookplates: Type.String(),
 
     // Promo copies
-    order_promo_copies: Type.Boolean(),
+    order_promo_copies: Type.String(),
 
     // Text fields
     cover_art_font: Type.String(),

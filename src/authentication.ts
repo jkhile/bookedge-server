@@ -75,7 +75,7 @@ class GoogleStrategy extends OAuthStrategy {
       (await this.findEntityByEmail(profile, params)) ||
       (await this.getCurrentEntity(params))
     if (!existingEntity) {
-      logger.warning('No existing entity found, throwing error')
+      logger.warn('No existing entity found, throwing error')
       throw new Error('User not recognized')
     }
     const authEntity = existingEntity
