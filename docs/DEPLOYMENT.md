@@ -87,7 +87,7 @@ cd bookedge-client && pnpm install           # picks up new .tgz
 cd bookedge-client && pnpm check
 ```
 
-The client is then deployed separately to Netlify.
+The client is then deployed separately to Netlify using the pnpm script.
 
 ## Database Migration Deployment
 
