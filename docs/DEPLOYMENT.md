@@ -1,213 +1,214 @@
 # BookEdge Server Deployment Guide
 
-This document provides detailed instructions for deploying the BookEdge server application to both staging and production environments.
-
 ## Overview
 
-BookEdge server is a Feathers.js application deployed on Heroku with a PostgreSQL database. The deployment process consists of two main components:
+BookEdge server is a Feathers.js application deployed on **Heroku** (Heroku-24 stack) with a **PostgreSQL** database. The client is deployed separately to **Netlify**.
 
-1. **Code deployment**: Deploying the application code to Heroku
-2. **Database deployment**: Deploying database schema changes using migrations
+### Environments
 
-## Prerequisites
+| Environment | Heroku App | Git Remote | Database |
+|-------------|-----------|------------|----------|
+| Staging | `fep-bookedge-staging` | `staging` | Heroku Postgres |
+| Production | `fep-bookedge-production` | `production` | Heroku Postgres |
 
-Before you can deploy the application, you'll need:
+### Prerequisites
 
 - Heroku CLI installed and authenticated
-- Git installed
+- Git with remotes `origin`, `staging`, and `production` configured
 - Node.js and pnpm installed
 - PostgreSQL installed locally
-- Access to the BookEdge Heroku applications (fep-bookedge-staging and fep-bookedge-production)
+- Access to both Heroku applications
 
-## Environment Configuration
+### Configuration
 
-BookEdge server uses different environment configurations:
+Environment configuration is managed in the `config` directory:
+- `default.json` — base configuration
+- `production.json` — production-specific overrides
+- `test.json` — test environment settings
+- `custom-environment-variables.json` — maps Heroku env vars to config settings
 
-- **Development**: Used for local development
-- **Staging**: Used for testing in a production-like environment
-- **Production**: The live environment used by end users
+## Version Bumping
 
-Configuration for these environments are managed in the `config` directory:
-- `default.json`: Base configuration
-- `production.json`: Production-specific overrides
-- `custom-environment-variables.json`: Maps environment variables to configuration settings
+Before deploying a new release:
 
-## Application Deployment
+1. Bump the version in both packages (e.g., for a minor release):
+   ```bash
+   cd bookedge-server && pnpm version minor
+   cd bookedge-client && pnpm version minor
+   ```
+   This updates `package.json` and creates a git tag automatically. Use `major`, `minor`, or `patch` as appropriate.
+2. Add a new entry to `docs/release-notes.md` describing the changes
+3. Push the commits and tags:
+   ```bash
+   git push origin main --tags
+   ```
+
+Current version: **1.6.0**
+
+## Application Code Deployment
+
+Both staging and production are deployed from the `main` branch.
 
 ### Deploying to Staging
 
-1. Ensure all code changes are committed to the staging branch:
-   ```bash
-   git checkout staging
-   git pull origin staging
-   ```
-
-2. Deploy to Heroku staging:
-   ```bash
-   git push heroku-staging staging:main
-   ```
-
-3. Monitor the deployment:
-   ```bash
-   heroku logs --tail --app=fep-bookedge-staging
-   ```
-
-4. Verify the deployment by accessing the staging API:
-   ```bash
-   curl https://fep-bookedge-staging.herokuapp.com/
-   ```
+```bash
+git checkout main
+git pull origin main
+git push staging main:main
+```
 
 ### Deploying to Production
 
-1. Ensure all code changes are tested on staging and committed to the main branch:
-   ```bash
-   git checkout main
-   git pull origin main
-   ```
+```bash
+git checkout main
+git pull origin main
+git push production main:main
+```
 
-2. Deploy to Heroku production:
-   ```bash
-   git push heroku-production main:main
-   ```
+### Monitoring Deployment
 
-3. Monitor the deployment:
-   ```bash
-   heroku logs --tail --app=fep-bookedge-production
-   ```
+```bash
+heroku logs --tail --app=fep-bookedge-staging
+heroku logs --tail --app=fep-bookedge-production
+```
 
-4. Verify the deployment by accessing the production API:
-   ```bash
-   curl https://fep-bookedge-production.herokuapp.com/
-   ```
+Watch for:
+- "Starting process with command `node lib/`"
+- "Feathers application started on http://0.0.0.0:PORT"
+
+## Client Bundle Deployment
+
+When server services are added or modified, the client bundle must be regenerated:
+
+```bash
+cd bookedge-server && pnpm check
+cd bookedge-server && pnpm bundle:client    # compiles + creates .tgz
+cd bookedge-client && pnpm install           # picks up new .tgz
+cd bookedge-client && pnpm check
+```
+
+The client is then deployed separately to Netlify.
 
 ## Database Migration Deployment
 
-BookEdge uses Knex.js for database migrations. The `deploy-db-changes.zsh` script automates the process of applying migrations to staging or production environments.
+BookEdge uses Knex.js for database migrations. The `deploy-db-changes.zsh` script automates the deployment process.
 
 ### How the Script Works
 
 The `deploy-db-changes.zsh` script:
 1. Downloads the production database to your local machine
 2. Applies migrations locally
-3. Resets the target environment database (staging or production)
+3. Resets the target environment database
 4. Uploads the migrated database back to the target environment
 
-### Deploying Database Changes to Staging
+**Warning**: This causes brief downtime (2-3 minutes) while the database is reset and reloaded.
+
+### Creating New Migrations
 
 ```bash
-./scripts/deploy-db-changes.zsh staging
+pnpm migrate:make migration_name
 ```
 
-### Deploying Database Changes to Production
+Edit the generated file in `migrations/` to define both `up` and `down` methods, then test locally:
 
 ```bash
+pnpm migrate
+```
+
+### Deploying Migrations
+
+```bash
+# To staging
+./scripts/deploy-db-changes.zsh staging
+
+# To production (only after verifying on staging)
 ./scripts/deploy-db-changes.zsh production
 ```
 
-**IMPORTANT**: This process will cause a brief downtime while the database is being reset and reloaded. Plan accordingly.
+## Verification
 
-## Creating New Migrations
+After deploying, verify the application is running:
 
-When you need to make database schema changes:
+```bash
+# API health check
+curl https://fep-bookedge-staging.herokuapp.com/
+curl https://fep-bookedge-production.herokuapp.com/
 
-1. Create a new migration file:
-   ```bash
-   pnpm migrate:make migration_name
-   ```
+# Verify pdftocairo is available (included natively in Heroku-24 stack)
+heroku run "which pdftocairo" -a fep-bookedge-production
+# Expected: /usr/bin/pdftocairo
 
-2. Edit the generated migration file in the `migrations` directory to define your changes:
-   - Define both `up` and `down` methods to allow rollbacks
-   - Use Knex.js schema builder methods to define changes
+# Check logs
+heroku logs --tail --app=fep-bookedge-production
+```
 
-3. Test the migration locally:
-   ```bash
-   pnpm migrate
-   ```
+## Rollback Procedures
 
-4. Deploy the migration to staging and then production using the steps above
+### Code Rollback
 
-## Rolling Back Migrations
+Roll back to a previous Heroku release:
 
-If a migration needs to be rolled back:
+```bash
+heroku releases -a fep-bookedge-production
+heroku rollback v### -a fep-bookedge-production
+```
 
-1. Run the rollback locally:
-   ```bash
-   pnpm migrate:down
-   ```
+### Database Rollback
 
-2. Test that the rollback worked correctly
+Roll back the latest migration locally:
 
-3. If needed, you can pull the database from production, roll back locally, and then push to the target environment:
-   ```bash
-   ./scripts/pulldb.zsh
-   pnpm migrate:down
-   heroku pg:reset --app=fep-bookedge-[staging|production] --confirm fep-bookedge-[staging|production]
-   heroku pg:push bookedge-server DATABASE_URL --app=fep-bookedge-[staging|production]
-   ```
+```bash
+pnpm migrate:down
+```
+
+To roll back a deployed migration:
+
+```bash
+./scripts/pulldb.zsh
+pnpm migrate:down
+heroku pg:reset --app=fep-bookedge-production --confirm fep-bookedge-production
+heroku pg:push bookedge-server DATABASE_URL --app=fep-bookedge-production
+```
 
 ## Troubleshooting
 
-### Common Issues
+### Migration Errors
+- Check Heroku logs for detailed error messages
+- Verify the migration locally before deploying
+- Roll back the migration if it can't be fixed immediately
 
-1. **Migration Errors**:
-   - Check the Heroku logs for detailed error messages
-   - Verify the migration locally before deploying
-   - Consider rolling back the migration if it can't be fixed immediately
+### Database Connection Issues
+- Verify the database URL in Heroku config vars: `heroku config --app=fep-bookedge-production`
+- Check if the database is running and accessible
 
-2. **Database Connection Issues**:
-   - Verify the database URL in Heroku config vars
-   - Check if the database is running and accessible
+### Application Crashes After Deployment
+- Roll back to the previous release
+- Check logs for error messages
+- Verify environment variables are correctly set
 
-3. **Application Crashes After Deployment**:
-   - Roll back to the previous version if necessary
-   - Check logs for error messages
-   - Verify environment variables are correctly set
+### PDF Thumbnails Not Generating
+- Verify `pdftocairo` is available: `heroku run "pdftocairo -v" -a fep-bookedge-production`
+- Heroku-24 stack includes `poppler-utils` natively — no buildpack needed
+- Check logs for "Failed to convert PDF to image" errors
 
-### Useful Commands
+## Useful Commands
 
-- View Heroku logs:
-  ```bash
-  heroku logs --tail --app=fep-bookedge-[staging|production]
-  ```
+```bash
+# View logs
+heroku logs --tail --app=fep-bookedge-[staging|production]
 
-- Access the Heroku PostgreSQL database directly:
-  ```bash
-  heroku pg:psql --app=fep-bookedge-[staging|production]
-  ```
+# Access Heroku PostgreSQL directly
+heroku pg:psql --app=fep-bookedge-[staging|production]
 
-- Pull the production database to local for inspection:
-  ```bash
-  ./scripts/pulldb.zsh
-  ```
+# Pull production database to local
+./scripts/pulldb.zsh
 
-- Check Heroku configuration:
-  ```bash
-  heroku config --app=fep-bookedge-[staging|production]
-  ```
+# Check Heroku configuration
+heroku config --app=fep-bookedge-[staging|production]
 
-## Release Process Checklist
+# Check buildpacks
+heroku buildpacks --app=fep-bookedge-[staging|production]
 
-Follow this checklist when releasing a new version:
-
-1. Create a new version entry in `docs/release-notes.md`
-2. Update the version number in `package.json`
-3. Test all changes locally and on staging
-4. Ensure all migrations work correctly
-5. Deploy code changes to production
-6. Deploy database changes to production (if any)
-7. Verify the application is working correctly in production
-8. Tag the release in git:
-   ```bash
-   git tag -a v0.x.0 -m "Version 0.x.0"
-   git push origin --tags
-   ```
-
-## Client-Side Deployment
-
-Note that the BookEdge client application is deployed separately to Netlify. See the client deployment guide for details on that process.
-
-## Additional Resources
-
-- [Feathers.js Documentation](https://docs.feathersjs.com/)
-- [Knex.js Documentation](https://knexjs.org/)
-- [Heroku Dev Center](https://devcenter.heroku.com/)
+# View release history
+heroku releases --app=fep-bookedge-[staging|production]
+```
