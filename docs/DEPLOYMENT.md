@@ -83,7 +83,7 @@ When server services are added or modified, the client bundle must be regenerate
 ```bash
 cd bookedge-server && pnpm check
 cd bookedge-server && pnpm bundle:client    # compiles + creates .tgz
-cd bookedge-client && pnpm install           # picks up new .tgz
+cd bookedge-client && pnpm update-server           # picks up new .tgz
 cd bookedge-client && pnpm check
 ```
 
