@@ -87,7 +87,7 @@ async function parseCSV(filePath: string): Promise<AuthorData[]> {
         skip_empty_lines: true,
         from_line: 2, // Skip header row
       },
-      (err, records) => {
+      (err, records: AuthorData[]) => {
         if (err) {
           reject(err)
           return

@@ -1,12 +1,27 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { GoogleDriveClient } from '../../src/utils/google-drive-client'
-import { google } from 'googleapis'
 import { GeneralError } from '@feathersjs/errors'
 import type { OAuth2Client } from 'google-auth-library'
 import axios from 'axios'
 
+// Create stable mock references for google.auth constructors (hoisted above vi.mock)
+const { mockJWTConstructor, mockOAuth2Constructor, mockDriveFactory } =
+  vi.hoisted(() => ({
+    mockJWTConstructor: vi.fn(),
+    mockOAuth2Constructor: vi.fn(),
+    mockDriveFactory: vi.fn(),
+  }))
+
 // Mock the dependencies
-vi.mock('googleapis')
+vi.mock('googleapis', () => ({
+  google: {
+    auth: {
+      JWT: mockJWTConstructor,
+      OAuth2: mockOAuth2Constructor,
+    },
+    drive: mockDriveFactory,
+  },
+}))
 vi.mock('axios')
 vi.mock('../../src/logger')
 
@@ -36,7 +51,7 @@ describe('GoogleDriveClient', () => {
     }
 
     // Mock google.drive to return our mock
-    vi.mocked(google.drive).mockReturnValue(mockDrive)
+    mockDriveFactory.mockReturnValue(mockDrive)
 
     // Create client instance
     client = new GoogleDriveClient(mockAuth, 'test-drive-id')
@@ -79,7 +94,9 @@ describe('GoogleDriveClient', () => {
         authorize: vi.fn().mockResolvedValue(undefined),
       }
 
-      vi.mocked(google.auth.JWT).mockReturnValue(mockJWT as any)
+      mockJWTConstructor.mockImplementation(function () {
+        return mockJWT
+      })
 
       const client = await GoogleDriveClient.createServiceAccountClient()
 
@@ -110,11 +127,13 @@ describe('GoogleDriveClient', () => {
         authorize: vi.fn().mockResolvedValue(undefined),
       }
 
-      const jwtSpy = vi.mocked(google.auth.JWT).mockReturnValue(mockJWT as any)
+      mockJWTConstructor.mockImplementation(function () {
+        return mockJWT
+      })
 
       await GoogleDriveClient.createServiceAccountClient()
 
-      expect(jwtSpy).toHaveBeenCalledWith(
+      expect(mockJWTConstructor).toHaveBeenCalledWith(
         expect.objectContaining({
           subject: 'impersonate@example.com',
         }),
@@ -128,7 +147,9 @@ describe('GoogleDriveClient', () => {
         setCredentials: vi.fn(),
       }
 
-      vi.mocked(google.auth.OAuth2).mockReturnValue(mockOAuth2 as any)
+      mockOAuth2Constructor.mockImplementation(function () {
+        return mockOAuth2
+      })
 
       const client = await GoogleDriveClient.createUserClient('test-token')
 
