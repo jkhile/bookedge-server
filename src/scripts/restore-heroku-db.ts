@@ -82,6 +82,7 @@ class HerokuDatabaseRestore {
 
       return databaseUrl
     } catch (error) {
+      // eslint-disable-next-line preserve-caught-error -- error message includes original error details
       throw new Error(
         `Failed to get DATABASE_URL from Heroku app '${this.options.herokuAppName}': ${error}`,
       )

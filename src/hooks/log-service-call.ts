@@ -22,7 +22,7 @@ export const logServiceCall = async (
     context.path !== 'log-messages' &&
     (process.env.DEBUG_SERVICES?.includes(context.path) ||
       process.env.DEBUG_SERVICES?.includes('*'))
-  let simplifiedContext: Partial<HookContext> = {}
+  let simplifiedContext: Partial<HookContext>
   if (context.logThis) {
     simplifiedContext = pick(context, ['method', 'path', 'id'])
     simplifiedContext._type = 'before'
