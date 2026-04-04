@@ -12,50 +12,50 @@ importers:
   .:
     dependencies:
       '@feathersjs/adapter-commons':
-        specifier: ^5.0.43
-        version: 5.0.43
+        specifier: ^5.0.44
+        version: 5.0.44
       '@feathersjs/authentication':
-        specifier: ^5.0.43
-        version: 5.0.43(typescript@5.9.3)
+        specifier: ^5.0.44
+        version: 5.0.44(typescript@6.0.2)
       '@feathersjs/authentication-client':
-        specifier: ^5.0.43
-        version: 5.0.43(typescript@5.9.3)
+        specifier: ^5.0.44
+        version: 5.0.44(typescript@6.0.2)
       '@feathersjs/authentication-local':
-        specifier: ^5.0.43
-        version: 5.0.43(typescript@5.9.3)
+        specifier: ^5.0.44
+        version: 5.0.44(typescript@6.0.2)
       '@feathersjs/authentication-oauth':
-        specifier: ^5.0.43
-        version: 5.0.43(typescript@5.9.3)
+        specifier: ^5.0.44
+        version: 5.0.44(typescript@6.0.2)
       '@feathersjs/configuration':
-        specifier: ^5.0.43
-        version: 5.0.43(typescript@5.9.3)
+        specifier: ^5.0.44
+        version: 5.0.44(typescript@6.0.2)
       '@feathersjs/errors':
-        specifier: ^5.0.43
-        version: 5.0.43
+        specifier: ^5.0.44
+        version: 5.0.44
       '@feathersjs/feathers':
-        specifier: ^5.0.43
-        version: 5.0.43
+        specifier: ^5.0.44
+        version: 5.0.44
       '@feathersjs/knex':
-        specifier: ^5.0.43
-        version: 5.0.43(knex@3.2.8(pg@8.20.0))
+        specifier: ^5.0.44
+        version: 5.0.44(knex@3.2.9(pg@8.20.0))
       '@feathersjs/koa':
-        specifier: ^5.0.43
-        version: 5.0.43(typescript@5.9.3)
+        specifier: ^5.0.44
+        version: 5.0.44(typescript@6.0.2)
       '@feathersjs/rest-client':
-        specifier: ^5.0.43
-        version: 5.0.43
+        specifier: ^5.0.44
+        version: 5.0.44
       '@feathersjs/schema':
-        specifier: ^5.0.43
-        version: 5.0.43(typescript@5.9.3)
+        specifier: ^5.0.44
+        version: 5.0.44(typescript@6.0.2)
       '@feathersjs/socketio':
-        specifier: ^5.0.43
-        version: 5.0.43
+        specifier: ^5.0.44
+        version: 5.0.44
       '@feathersjs/transport-commons':
-        specifier: ^5.0.43
-        version: 5.0.43
+        specifier: ^5.0.44
+        version: 5.0.44
       '@feathersjs/typebox':
-        specifier: ^5.0.43
-        version: 5.0.43(typescript@5.9.3)
+        specifier: ^5.0.44
+        version: 5.0.44(typescript@6.0.2)
       axios:
         specifier: ^1.14.0
         version: 1.14.0(debug@4.4.3)
@@ -87,11 +87,11 @@ importers:
         specifier: ^6.0.2
         version: 6.0.2
       knex:
-        specifier: ^3.2.8
-        version: 3.2.8(pg@8.20.0)
+        specifier: ^3.2.9
+        version: 3.2.9(pg@8.20.0)
       lodash:
-        specifier: ^4.17.23
-        version: 4.17.23
+        specifier: ^4.18.1
+        version: 4.18.1
       multer:
         specifier: ^2.1.1
         version: 2.1.1
@@ -116,10 +116,10 @@ importers:
     devDependencies:
       '@eslint/js':
         specifier: ^10.0.1
-        version: 10.0.1(eslint@10.1.0)
+        version: 10.0.1(eslint@10.2.0)
       '@feathersjs/cli':
-        specifier: 5.0.43
-        version: 5.0.43(@types/node@22.19.15)
+        specifier: 5.0.44
+        version: 5.0.44(@types/node@22.19.15)
       '@types/debug':
         specifier: ^4.1.13
         version: 4.1.13
@@ -139,7 +139,7 @@ importers:
         specifier: ^4.17.24
         version: 4.17.24
       '@types/node':
-        specifier: ^22.19.15
+        specifier: ~22
         version: 22.19.15
       '@vitest/coverage-v8':
         specifier: ^4.1.2
@@ -151,8 +151,8 @@ importers:
         specifier: ^10.1.0
         version: 10.1.0
       eslint:
-        specifier: ^10.1.0
-        version: 10.1.0
+        specifier: ^10.2.0
+        version: 10.2.0
       globals:
         specifier: ^17.4.0
         version: 17.4.0
@@ -170,16 +170,16 @@ importers:
         version: 0.4.0
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.15)(typescript@5.9.3)
+        version: 10.9.2(@types/node@22.19.15)(typescript@6.0.2)
       tsx:
         specifier: ^4.21.0
         version: 4.21.0
       typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
+        specifier: ^6.0.2
+        version: 6.0.2
       typescript-eslint:
         specifier: ^8.58.0
-        version: 8.58.0(eslint@10.1.0)(typescript@5.9.3)
+        version: 8.58.0(eslint@10.2.0)(typescript@6.0.2)
       vitest:
         specifier: ^4.1.2
         version: 4.1.2(@types/node@22.19.15)(@vitest/ui@4.1.2)(vite@7.3.1(@types/node@22.19.15)(tsx@4.21.0))
@@ -394,16 +394,16 @@ packages:
     resolution: {integrity: sha512-EriSTlt5OC9/7SXkRSCAhfSxxoSUgBm33OH+IkwbdpgoqsSsUg7y3uh+IICI/Qg4BBWr3U2i39RpmycbxMq4ew==}
     engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
 
-  '@eslint/config-array@0.23.3':
-    resolution: {integrity: sha512-j+eEWmB6YYLwcNOdlwQ6L2OsptI/LO6lNBuLIqe5R7RetD658HLoF+Mn7LzYmAWWNNzdC6cqP+L6r8ujeYXWLw==}
+  '@eslint/config-array@0.23.4':
+    resolution: {integrity: sha512-lf19F24LSMfF8weXvW5QEtnLqW70u7kgit5e9PSx0MsHAFclGd1T9ynvWEMDT1w5J4Qt54tomGeAhdoAku1Xow==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
-  '@eslint/config-helpers@0.5.3':
-    resolution: {integrity: sha512-lzGN0onllOZCGroKJmRwY6QcEHxbjBw1gwB8SgRSqK8YbbtEXMvKynsXc3553ckIEBxsbMBU7oOZXKIPGZNeZw==}
+  '@eslint/config-helpers@0.5.4':
+    resolution: {integrity: sha512-jJhqiY3wPMlWWO3370M86CPJ7pt8GmEwSLglMfQhjXal07RCvhmU0as4IuUEW5SJeunfItiEetHmSxCCe9lDBg==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
-  '@eslint/core@1.1.1':
-    resolution: {integrity: sha512-QUPblTtE51/7/Zhfv8BDwO0qkkzQL7P/aWWbqcf4xWLEYn1oKjdO0gglQBB4GAsu7u6wjijbCmzsUTy6mnk6oQ==}
+  '@eslint/core@1.2.0':
+    resolution: {integrity: sha512-8FTGbNzTvmSlc4cZBaShkC6YvFMG0riksYWRFKXztqVdXaQbcZLXlFbSpC05s70sGEsXAw0qwhx69JiW7hQS7A==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
   '@eslint/js@10.0.1':
@@ -415,12 +415,12 @@ packages:
       eslint:
         optional: true
 
-  '@eslint/object-schema@3.0.3':
-    resolution: {integrity: sha512-iM869Pugn9Nsxbh/YHRqYiqd23AmIbxJOcpUMOuWCVNdoQJ5ZtwL6h3t0bcZzJUlC3Dq9jCFCESBZnX0GTv7iQ==}
+  '@eslint/object-schema@3.0.4':
+    resolution: {integrity: sha512-55lO/7+Yp0ISKRP0PsPtNTeNGapXaO085aELZmWCVc5SH3jfrqpuU6YgOdIxMS99ZHkQN1cXKE+cdIqwww9ptw==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
-  '@eslint/plugin-kit@0.6.1':
-    resolution: {integrity: sha512-iH1B076HoAshH1mLpHMgwdGeTs0CYwL0SPMkGuSebZrwBp16v415e9NZXg2jtrqPVQjf6IANe2Vtlr5KswtcZQ==}
+  '@eslint/plugin-kit@0.7.0':
+    resolution: {integrity: sha512-ejvBr8MQCbVsWNZnCwDXjUKq40MDmHalq7cJ6e9s/qzTUFIIo/afzt1Vui9T97FM/V/pN4YsFVoed5NIa96RDg==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
   '@featherscloud/pinion@0.5.5':
@@ -428,89 +428,89 @@ packages:
     engines: {node: '>= 20'}
     hasBin: true
 
-  '@feathersjs/adapter-commons@5.0.43':
-    resolution: {integrity: sha512-WIHucmPpJezssAyeNSHpAUZ6K4W863VdhZN0+0UoMpSqDD0Fw62dH0AxA6xLoxAqFBJerIXCsfqtmURmswPUmQ==}
+  '@feathersjs/adapter-commons@5.0.44':
+    resolution: {integrity: sha512-m9rho8bJnNw8wJEuwQkUMiWf9N8qeWxUB/4yDD2lEwKIlP7/DKxwrWveN11T5veO4T452Z+5/uv5chBWijYG5w==}
     engines: {node: '>= 12'}
 
-  '@feathersjs/authentication-client@5.0.43':
-    resolution: {integrity: sha512-n5ApX75+i+eeJey1mOWqZSZT3vQp0hWv9MafgaP3SoDH7V18lKCI9/AUBUHeju02krryM+P56UNAdQ4akf4kWg==}
+  '@feathersjs/authentication-client@5.0.44':
+    resolution: {integrity: sha512-VJ+WoEDnAQQK+2VnSxkFzZ2zFZ1lf+CTMmb1VPmUT+sn64tcxAXcHxqGbb9hFJh2WTiDF+jFAgSkuc0+C1d3TA==}
     engines: {node: '>= 12'}
 
-  '@feathersjs/authentication-local@5.0.43':
-    resolution: {integrity: sha512-FigkwrqTXxzuwKWiqCxtcXC0FoLAmSxHqDCbp6pP5CVavDhhoyFCkbJ3sDn7Aa1NGUigGKzXVnjqVcpP5cRMpg==}
+  '@feathersjs/authentication-local@5.0.44':
+    resolution: {integrity: sha512-UcDJLxcNj2UOUvnXbEA63/FHBmDlAy+XvrnGfeofN7DCvl547s/a22QLJJ7GCSgAM6gST8At0hfXTCy2x4pGyg==}
     engines: {node: '>= 12'}
 
-  '@feathersjs/authentication-oauth@5.0.43':
-    resolution: {integrity: sha512-pMWG0qMvrP1DWT0jQ8W+sN9UxBU49xZQLpN3mKJYwRsl5S5oliXTF1vBCuyWpf8iXrIW2Ot2c7915B8v7aH3ig==}
+  '@feathersjs/authentication-oauth@5.0.44':
+    resolution: {integrity: sha512-5tDS+ofsRUiEXuwvEqqlkAxONKWBRmYAVnxR2yawepyyXMDiIV8T4NRTsP/2CcJbZ6JSXKWC8P8tHsVenjogsw==}
     engines: {node: '>= 12'}
 
-  '@feathersjs/authentication@5.0.43':
-    resolution: {integrity: sha512-xl4dEASPadGLR6qZWFbhkEI6ze/rqiaEg8R1g8S/hYBtsakclkLPkWkoCrGBC75x3Dn2uzDlgpDXbG2OdpjZaw==}
+  '@feathersjs/authentication@5.0.44':
+    resolution: {integrity: sha512-ZTWYtLI1rOa7jvijhJQNNkNJaB/SGCY2q/qgKafoNxBxvyj+u8lIGYi53aZzTL397XbbDG2d7aeBZaV1pc+eMA==}
     engines: {node: '>= 12'}
 
-  '@feathersjs/cli@5.0.43':
-    resolution: {integrity: sha512-K5yVnlOBwVlHDh18cpK3MYLsa8nPphUYFbI5wEvOgvRmtu1nRcJ4vOiZG22+x22BSmKa/bbBKpBwHSwmdJLv7Q==}
+  '@feathersjs/cli@5.0.44':
+    resolution: {integrity: sha512-T4goD/185P78sinrcm6kzW7gWG4TxvFhzhm0V5HnbRlcqXMiarUHP9BuQz0RnBfVqxjHlHcUp2u7RQ0yGv8vlQ==}
     engines: {node: '>= 14'}
     hasBin: true
 
-  '@feathersjs/commons@5.0.43':
-    resolution: {integrity: sha512-47LdD2U01vyCZOCEscR5QNhKqAQjjcaHUXGI1fnZYp+r0ufP3pjPSDW0FkY9r5YOg7wq8HL8o3RAEReqWjA+3A==}
+  '@feathersjs/commons@5.0.44':
+    resolution: {integrity: sha512-PnxCyKqzWLAqv1LSazDsOXNf520KQOlqUasZ/9YRz4lYRPJ0pzzfZXvzmjBFOsNPaohzKmyySS8578E9vlTQrA==}
     engines: {node: '>= 12'}
 
-  '@feathersjs/configuration@5.0.43':
-    resolution: {integrity: sha512-kRE1rBf7sK43GW4mK6NspVPw8dKztFIvBeyoQBcaEy67RUY86ySiNQ57EqwC8Zk4WwI9f3/vjRmeSurKu3kFmA==}
+  '@feathersjs/configuration@5.0.44':
+    resolution: {integrity: sha512-JIag7lt/odJw1a5PqqdxhjmbDHzkOMwpTfbXUktbRU6XKVmWxqr72HKmSU0Iw8XB/n1bOC/VcVWlOlnHKqnDiA==}
     engines: {node: '>= 12'}
 
-  '@feathersjs/errors@5.0.43':
-    resolution: {integrity: sha512-fOTPnKNFoa7kv5SvDZZ7VaSulHKBaV4gbYsaDROMabSXYywmcZus7OrQqKhZuwpdYpSrF0On7FK66OYy35zPDg==}
+  '@feathersjs/errors@5.0.44':
+    resolution: {integrity: sha512-QcxrUvEFHGBT47VyH02rlhw51M+G0yam3fpDnko1HlkM6C62notLwE2lirEDz34JWITwkn/lwV527h1HwHpOuQ==}
     engines: {node: '>= 12'}
 
-  '@feathersjs/express@5.0.43':
-    resolution: {integrity: sha512-ymariSTPeMgzYXUVRG1VKm9GIFUBvF+rLFflfmjJJgQ9p34MkLQdZ5RPripRo7nsS9iDLhKN+Kz5y3dagAOspA==}
+  '@feathersjs/express@5.0.44':
+    resolution: {integrity: sha512-mnSUxOjQnuDzQJD6jlmTtsZimxB7IoJMHyXe0T+nnYOhBIWnuX//6oznncgUUXIGxjhcpswA/2BPoeLFDnZFzQ==}
     engines: {node: '>= 12'}
 
-  '@feathersjs/feathers@5.0.43':
-    resolution: {integrity: sha512-RgJCFfsQwIxx88N4aOZ8jHyi9d9GGVOnZc7SgifUeiCoP3XQh6tLeE2LFRuRNgQgU00mqhqGqmmpivBOiRsxXg==}
+  '@feathersjs/feathers@5.0.44':
+    resolution: {integrity: sha512-qxZ9ZQQBIfyIdQKUIFUXZ2EegcUWpIwG4BOBpO7RZXu7nlv9SNMttrTbVWEfUzc72jhKtJuRW8/FHdrsb1446g==}
     engines: {node: '>= 12'}
 
-  '@feathersjs/generators@5.0.43':
-    resolution: {integrity: sha512-/JWjAiS/DQ3Rpbun4Ts+Ma6Pvhd+IX1cqb0oKrg4Z8LDXt/jxBJvNyeXBaalWRkGF8nS3s//2WsM3Sb+egRWqA==}
+  '@feathersjs/generators@5.0.44':
+    resolution: {integrity: sha512-bpe/B36vsm2kfdqTS7vRSMdCu3JnJ+kovNG4wGC81hlvpSFvSjvaP370okjjf1m02RR7igbxyepXxAmFp8dRYg==}
     engines: {node: '>= 16'}
 
   '@feathersjs/hooks@0.9.0':
     resolution: {integrity: sha512-kLfWnuhbC25CPkR1/TDcVs0rSiv0JLNxrpUivLwc7FUnkyeciRi5VOmC1SOzL2SOagcozu3+m4VQiONyzgfY7w==}
     engines: {node: '>= 14'}
 
-  '@feathersjs/knex@5.0.43':
-    resolution: {integrity: sha512-LakF1Ufu+T4m+IrKbssz2kC6AdFSemLAQerrRcUxMuF2CgApF5gjdVK2AdqEt3lkLNxbdkCCh4o3/xXcs5kOXA==}
+  '@feathersjs/knex@5.0.44':
+    resolution: {integrity: sha512-F1l4/kBK+IP/CROmiP2agNfEzUs8RFYdCMkV/yge80lSpSc1PeMrcMmLB2hiAYF2aGkhthyXolGPtYdvBY0KNw==}
     engines: {node: '>= 14'}
     peerDependencies:
-      knex: '>=3.1.0'
+      knex: '>=3.2.8'
 
-  '@feathersjs/koa@5.0.43':
-    resolution: {integrity: sha512-MyKTj9nwbukzN766tbhdSb3NMkSKGOtmtRMkFTi9OdH4kjTw2GRBurBFJedOR2qfyKBfthW00pRAd947T28kYA==}
+  '@feathersjs/koa@5.0.44':
+    resolution: {integrity: sha512-sRPCXsq4bDBuibSwsU6/RJKJbXCwF12scOmMaDS8mxupWI5/5GGu6wZw+vDfNgRteUYHw7n/6yqRME5SmU8qGw==}
     engines: {node: '>= 14'}
 
-  '@feathersjs/rest-client@5.0.43':
-    resolution: {integrity: sha512-SDquQSBwvF4szNM1i9zQQ/ZT0KMpriZTha3rRczk47UZqjn79WO4U8EZfRTm/MsuzYXhEA0LLBM0kt0NTVb8yA==}
+  '@feathersjs/rest-client@5.0.44':
+    resolution: {integrity: sha512-3YhMFYjY3sL7IzBz3MATdnA+4hCFTpYEVZB7Fnio5V7ZM7ZvN1vEf4dg1Y/d91oNSzDt0trxQyIU+IbGAzkWOA==}
     engines: {node: '>= 12'}
 
-  '@feathersjs/schema@5.0.43':
-    resolution: {integrity: sha512-ifrcGQo2M+deVUvyaU2kBzMff4XB4ifvTN0aAfG1vHvXXRBdpszU+Msqd3UYE/Nubc90SdtKsnVVJ9wveCSGTQ==}
+  '@feathersjs/schema@5.0.44':
+    resolution: {integrity: sha512-1xk7+Zs17MQEgfPDipf9ribG4hF+YdYxfO3Dijn1GSk1x285HVqgSH4MQLUpY+z6gfBn5/jE3S7+yDQ4ITmrXw==}
     engines: {node: '>= 12'}
     peerDependencies:
-      typescript: '>=5.9'
+      typescript: '>=5.0'
 
-  '@feathersjs/socketio@5.0.43':
-    resolution: {integrity: sha512-fvfgiHLTg4ZTu8xiUJdChdpZyg/wph3mLlBRs+9KtW3cQz1dNSHmbcO5xBlp3+4ghaoLcWEuG75Qii9iaFzzUA==}
+  '@feathersjs/socketio@5.0.44':
+    resolution: {integrity: sha512-Z9QHn5pK3SexzzI9Ro6oR6VQNsPvC060Nxa64smb1KlOJAeJe/dSLfvDj4FTQNu8Ikow0BEd6vmWYB0SMsU02w==}
     engines: {node: '>= 12'}
 
-  '@feathersjs/transport-commons@5.0.43':
-    resolution: {integrity: sha512-HfjU+GykO1sAnqQa+jEHOi8HEjpYeapHqXmfu1pPpk+Ch0abPwHrfSgx9ynrIwMm2RiMiVxL4BCrf93XgbO+CA==}
+  '@feathersjs/transport-commons@5.0.44':
+    resolution: {integrity: sha512-BxUyGFcbt+o5TWcXKXNVrbh3zrq2iGAzE9uvaVJ7tVQX820LVHOWAp6NL5GxG+InhLUq0cc3CTpQENE0+oXRMw==}
     engines: {node: '>= 12'}
 
-  '@feathersjs/typebox@5.0.43':
-    resolution: {integrity: sha512-7wfEKsfXFZ5qQyz6ThtsjNe1mtk0xVZFZONdRLgkh5eYCvla37JKitZVvAYv3woH8tQBuVly+Jvf0LDnQXlHtg==}
+  '@feathersjs/typebox@5.0.44':
+    resolution: {integrity: sha512-UEUnJZ49DADpWpehTPANQTPPvX6l1X5p2TEh2X24WRVNxMFUTnlgQ2b8Cvp2reh6KP7bWGvmmEAuW5NM7ZvaqQ==}
     engines: {node: '>= 12'}
 
   '@hapi/bourne@3.0.0':
@@ -1606,8 +1606,8 @@ packages:
     resolution: {integrity: sha512-tD40eHxA35h0PEIZNeIjkHoDR4YjjJp34biM0mDvplBe//mB+IHCqHDGV7pxF+7MklTvighcCPPZC7ynWyjdTA==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
-  eslint@10.1.0:
-    resolution: {integrity: sha512-S9jlY/ELKEUwwQnqWDO+f+m6sercqOPSqXM5Go94l7DOmxHVDgmSFGWEzeE/gwgTAr0W103BWt0QLe/7mabIvA==}
+  eslint@10.2.0:
+    resolution: {integrity: sha512-+L0vBFYGIpSNIt/KWTpFonPrqYvgKw1eUI5Vn7mEogrQcWtWYtNQ7dNqC+px/J0idT3BAkiWrhfS7k+Tum8TUA==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
     hasBin: true
     peerDependencies:
@@ -2051,13 +2051,12 @@ packages:
   keygrip@1.1.0:
     resolution: {integrity: sha512-iYSchDJ+liQ8iwbSI2QqsQOvqv58eJCEanyJPJi+Khyu8smkcKSFUCbPwzFcL7YVtZ6eONjqRX/38caJ7QjRAQ==}
     engines: {node: '>= 0.6'}
-    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
 
-  knex@3.2.8:
-    resolution: {integrity: sha512-ElXXxu9Nq+5hWYdBUddYIWIT5yKKs5KNCsmKGbJSHPyaMpAABp3xs4L55GgdQoAs6QQ7dv72ai3M4pxYQ8utEg==}
+  knex@3.2.9:
+    resolution: {integrity: sha512-dtAILTjBMaG8YloP5oBxohDIKyIsdQ/TkcVvSjhsksvsjeH63Y0PADyuMDfNZKbVT3Rlx3vEYVBlecbPT/KerA==}
     engines: {node: '>=16'}
     hasBin: true
     peerDependencies:
@@ -2145,8 +2144,8 @@ packages:
   lodash.once@4.1.1:
     resolution: {integrity: sha512-Sb487aTOCr9drQVL8pIxOzVhafOjZN9UU54hiN8PU3uAiSV7lx1yYNpbNmex2PK6dSJoNTSJUUswT651yww3Mg==}
 
-  lodash@4.17.23:
-    resolution: {integrity: sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==}
+  lodash@4.18.1:
+    resolution: {integrity: sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==}
 
   log-symbols@4.1.0:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}
@@ -2854,6 +2853,11 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  typescript@6.0.2:
+    resolution: {integrity: sha512-bGdAIrZ0wiGDo5l8c++HWtbaNCWTS4UTv7RaTH/ThVIgjkveJt83m74bBHMJkuCbslY8ixgLBVZJIOiQlQTjfQ==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
   undefsafe@2.0.5:
     resolution: {integrity: sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA==}
 
@@ -3161,38 +3165,38 @@ snapshots:
   '@esbuild/win32-x64@0.27.4':
     optional: true
 
-  '@eslint-community/eslint-utils@4.9.1(eslint@10.1.0)':
+  '@eslint-community/eslint-utils@4.9.1(eslint@10.2.0)':
     dependencies:
-      eslint: 10.1.0
+      eslint: 10.2.0
       eslint-visitor-keys: 3.4.3
 
   '@eslint-community/regexpp@4.12.2': {}
 
-  '@eslint/config-array@0.23.3':
+  '@eslint/config-array@0.23.4':
     dependencies:
-      '@eslint/object-schema': 3.0.3
+      '@eslint/object-schema': 3.0.4
       debug: 4.4.3(supports-color@5.5.0)
       minimatch: 10.2.5
     transitivePeerDependencies:
       - supports-color
 
-  '@eslint/config-helpers@0.5.3':
+  '@eslint/config-helpers@0.5.4':
     dependencies:
-      '@eslint/core': 1.1.1
+      '@eslint/core': 1.2.0
 
-  '@eslint/core@1.1.1':
+  '@eslint/core@1.2.0':
     dependencies:
       '@types/json-schema': 7.0.15
 
-  '@eslint/js@10.0.1(eslint@10.1.0)':
+  '@eslint/js@10.0.1(eslint@10.2.0)':
     optionalDependencies:
-      eslint: 10.1.0
+      eslint: 10.2.0
 
-  '@eslint/object-schema@3.0.3': {}
+  '@eslint/object-schema@3.0.4': {}
 
-  '@eslint/plugin-kit@0.6.1':
+  '@eslint/plugin-kit@0.7.0':
     dependencies:
-      '@eslint/core': 1.1.1
+      '@eslint/core': 1.2.0
       levn: 0.4.1
 
   '@featherscloud/pinion@0.5.5(@types/node@22.19.15)':
@@ -3205,41 +3209,41 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@feathersjs/adapter-commons@5.0.43':
+  '@feathersjs/adapter-commons@5.0.44':
     dependencies:
-      '@feathersjs/commons': 5.0.43
-      '@feathersjs/errors': 5.0.43
-      '@feathersjs/feathers': 5.0.43
+      '@feathersjs/commons': 5.0.44
+      '@feathersjs/errors': 5.0.44
+      '@feathersjs/feathers': 5.0.44
 
-  '@feathersjs/authentication-client@5.0.43(typescript@5.9.3)':
+  '@feathersjs/authentication-client@5.0.44(typescript@6.0.2)':
     dependencies:
-      '@feathersjs/authentication': 5.0.43(typescript@5.9.3)
-      '@feathersjs/commons': 5.0.43
-      '@feathersjs/errors': 5.0.43
-      '@feathersjs/feathers': 5.0.43
+      '@feathersjs/authentication': 5.0.44(typescript@6.0.2)
+      '@feathersjs/commons': 5.0.44
+      '@feathersjs/errors': 5.0.44
+      '@feathersjs/feathers': 5.0.44
     transitivePeerDependencies:
       - typescript
 
-  '@feathersjs/authentication-local@5.0.43(typescript@5.9.3)':
+  '@feathersjs/authentication-local@5.0.44(typescript@6.0.2)':
     dependencies:
-      '@feathersjs/authentication': 5.0.43(typescript@5.9.3)
-      '@feathersjs/commons': 5.0.43
-      '@feathersjs/errors': 5.0.43
-      '@feathersjs/feathers': 5.0.43
+      '@feathersjs/authentication': 5.0.44(typescript@6.0.2)
+      '@feathersjs/commons': 5.0.44
+      '@feathersjs/errors': 5.0.44
+      '@feathersjs/feathers': 5.0.44
       bcryptjs: 3.0.3
-      lodash: 4.17.23
+      lodash: 4.18.1
     transitivePeerDependencies:
       - typescript
 
-  '@feathersjs/authentication-oauth@5.0.43(typescript@5.9.3)':
+  '@feathersjs/authentication-oauth@5.0.44(typescript@6.0.2)':
     dependencies:
-      '@feathersjs/authentication': 5.0.43(typescript@5.9.3)
-      '@feathersjs/commons': 5.0.43
-      '@feathersjs/errors': 5.0.43
-      '@feathersjs/express': 5.0.43(typescript@5.9.3)
-      '@feathersjs/feathers': 5.0.43
-      '@feathersjs/koa': 5.0.43(typescript@5.9.3)
-      '@feathersjs/schema': 5.0.43(typescript@5.9.3)
+      '@feathersjs/authentication': 5.0.44(typescript@6.0.2)
+      '@feathersjs/commons': 5.0.44
+      '@feathersjs/errors': 5.0.44
+      '@feathersjs/express': 5.0.44(typescript@6.0.2)
+      '@feathersjs/feathers': 5.0.44
+      '@feathersjs/koa': 5.0.44(typescript@6.0.2)
+      '@feathersjs/schema': 5.0.44(typescript@6.0.2)
       cookie-session: 2.1.1
       grant: 5.4.24
       koa-session: 7.0.2
@@ -3248,51 +3252,51 @@ snapshots:
       - supports-color
       - typescript
 
-  '@feathersjs/authentication@5.0.43(typescript@5.9.3)':
+  '@feathersjs/authentication@5.0.44(typescript@6.0.2)':
     dependencies:
-      '@feathersjs/commons': 5.0.43
-      '@feathersjs/errors': 5.0.43
-      '@feathersjs/feathers': 5.0.43
+      '@feathersjs/commons': 5.0.44
+      '@feathersjs/errors': 5.0.44
+      '@feathersjs/feathers': 5.0.44
       '@feathersjs/hooks': 0.9.0
-      '@feathersjs/schema': 5.0.43(typescript@5.9.3)
-      '@feathersjs/transport-commons': 5.0.43
+      '@feathersjs/schema': 5.0.44(typescript@6.0.2)
+      '@feathersjs/transport-commons': 5.0.44
       '@types/jsonwebtoken': 9.0.10
       jsonwebtoken: 9.0.3
-      lodash: 4.17.23
+      lodash: 4.18.1
       long-timeout: 0.1.1
       uuid: 11.1.0
     transitivePeerDependencies:
       - typescript
 
-  '@feathersjs/cli@5.0.43(@types/node@22.19.15)':
+  '@feathersjs/cli@5.0.44(@types/node@22.19.15)':
     dependencies:
-      '@feathersjs/generators': 5.0.43(@types/node@22.19.15)
+      '@feathersjs/generators': 5.0.44(@types/node@22.19.15)
       chalk: 5.6.2
       commander: 13.1.0
     transitivePeerDependencies:
       - '@types/node'
 
-  '@feathersjs/commons@5.0.43': {}
+  '@feathersjs/commons@5.0.44': {}
 
-  '@feathersjs/configuration@5.0.43(typescript@5.9.3)':
+  '@feathersjs/configuration@5.0.44(typescript@6.0.2)':
     dependencies:
-      '@feathersjs/commons': 5.0.43
-      '@feathersjs/feathers': 5.0.43
-      '@feathersjs/schema': 5.0.43(typescript@5.9.3)
+      '@feathersjs/commons': 5.0.44
+      '@feathersjs/feathers': 5.0.44
+      '@feathersjs/schema': 5.0.44(typescript@6.0.2)
       '@types/config': 3.3.5
       config: 4.1.1
     transitivePeerDependencies:
       - typescript
 
-  '@feathersjs/errors@5.0.43': {}
+  '@feathersjs/errors@5.0.44': {}
 
-  '@feathersjs/express@5.0.43(typescript@5.9.3)':
+  '@feathersjs/express@5.0.44(typescript@6.0.2)':
     dependencies:
-      '@feathersjs/authentication': 5.0.43(typescript@5.9.3)
-      '@feathersjs/commons': 5.0.43
-      '@feathersjs/errors': 5.0.43
-      '@feathersjs/feathers': 5.0.43
-      '@feathersjs/transport-commons': 5.0.43
+      '@feathersjs/authentication': 5.0.44(typescript@6.0.2)
+      '@feathersjs/commons': 5.0.44
+      '@feathersjs/errors': 5.0.44
+      '@feathersjs/feathers': 5.0.44
+      '@feathersjs/transport-commons': 5.0.44
       '@types/compression': 1.8.1
       '@types/cors': 2.8.19
       '@types/express': 4.17.25
@@ -3304,17 +3308,17 @@ snapshots:
       - supports-color
       - typescript
 
-  '@feathersjs/feathers@5.0.43':
+  '@feathersjs/feathers@5.0.44':
     dependencies:
-      '@feathersjs/commons': 5.0.43
+      '@feathersjs/commons': 5.0.44
       '@feathersjs/hooks': 0.9.0
       events: 3.3.0
 
-  '@feathersjs/generators@5.0.43(@types/node@22.19.15)':
+  '@feathersjs/generators@5.0.44(@types/node@22.19.15)':
     dependencies:
       '@featherscloud/pinion': 0.5.5(@types/node@22.19.15)
       chalk: 5.6.2
-      lodash: 4.17.23
+      lodash: 4.18.1
       prettier: 3.8.1
       typescript: 5.9.3
     transitivePeerDependencies:
@@ -3322,21 +3326,21 @@ snapshots:
 
   '@feathersjs/hooks@0.9.0': {}
 
-  '@feathersjs/knex@5.0.43(knex@3.2.8(pg@8.20.0))':
+  '@feathersjs/knex@5.0.44(knex@3.2.9(pg@8.20.0))':
     dependencies:
-      '@feathersjs/adapter-commons': 5.0.43
-      '@feathersjs/commons': 5.0.43
-      '@feathersjs/errors': 5.0.43
-      '@feathersjs/feathers': 5.0.43
-      knex: 3.2.8(pg@8.20.0)
+      '@feathersjs/adapter-commons': 5.0.44
+      '@feathersjs/commons': 5.0.44
+      '@feathersjs/errors': 5.0.44
+      '@feathersjs/feathers': 5.0.44
+      knex: 3.2.9(pg@8.20.0)
 
-  '@feathersjs/koa@5.0.43(typescript@5.9.3)':
+  '@feathersjs/koa@5.0.44(typescript@6.0.2)':
     dependencies:
-      '@feathersjs/authentication': 5.0.43(typescript@5.9.3)
-      '@feathersjs/commons': 5.0.43
-      '@feathersjs/errors': 5.0.43
-      '@feathersjs/feathers': 5.0.43
-      '@feathersjs/transport-commons': 5.0.43
+      '@feathersjs/authentication': 5.0.44(typescript@6.0.2)
+      '@feathersjs/commons': 5.0.44
+      '@feathersjs/errors': 5.0.44
+      '@feathersjs/feathers': 5.0.44
+      '@feathersjs/transport-commons': 5.0.44
       '@koa/cors': 5.0.0
       '@types/koa': 3.0.2
       '@types/koa-qs': 2.0.5
@@ -3351,49 +3355,49 @@ snapshots:
       - supports-color
       - typescript
 
-  '@feathersjs/rest-client@5.0.43':
+  '@feathersjs/rest-client@5.0.44':
     dependencies:
-      '@feathersjs/commons': 5.0.43
-      '@feathersjs/errors': 5.0.43
-      '@feathersjs/feathers': 5.0.43
+      '@feathersjs/commons': 5.0.44
+      '@feathersjs/errors': 5.0.44
+      '@feathersjs/feathers': 5.0.44
       '@types/superagent': 8.1.9
       qs: 6.15.0
 
-  '@feathersjs/schema@5.0.43(typescript@5.9.3)':
+  '@feathersjs/schema@5.0.44(typescript@6.0.2)':
     dependencies:
-      '@feathersjs/adapter-commons': 5.0.43
-      '@feathersjs/commons': 5.0.43
-      '@feathersjs/errors': 5.0.43
-      '@feathersjs/feathers': 5.0.43
+      '@feathersjs/adapter-commons': 5.0.44
+      '@feathersjs/commons': 5.0.44
+      '@feathersjs/errors': 5.0.44
+      '@feathersjs/feathers': 5.0.44
       '@feathersjs/hooks': 0.9.0
       '@types/json-schema': 7.0.15
       ajv: 8.18.0
       ajv-formats: 3.0.1(ajv@8.18.0)
       json-schema-to-ts: 3.1.1
-      typescript: 5.9.3
+      typescript: 6.0.2
 
-  '@feathersjs/socketio@5.0.43':
+  '@feathersjs/socketio@5.0.44':
     dependencies:
-      '@feathersjs/commons': 5.0.43
-      '@feathersjs/feathers': 5.0.43
-      '@feathersjs/transport-commons': 5.0.43
+      '@feathersjs/commons': 5.0.44
+      '@feathersjs/feathers': 5.0.44
+      '@feathersjs/transport-commons': 5.0.44
       socket.io: 4.8.3
     transitivePeerDependencies:
       - bufferutil
       - supports-color
       - utf-8-validate
 
-  '@feathersjs/transport-commons@5.0.43':
+  '@feathersjs/transport-commons@5.0.44':
     dependencies:
-      '@feathersjs/commons': 5.0.43
-      '@feathersjs/errors': 5.0.43
-      '@feathersjs/feathers': 5.0.43
+      '@feathersjs/commons': 5.0.44
+      '@feathersjs/errors': 5.0.44
+      '@feathersjs/feathers': 5.0.44
       encodeurl: 2.0.0
-      lodash: 4.17.23
+      lodash: 4.18.1
 
-  '@feathersjs/typebox@5.0.43(typescript@5.9.3)':
+  '@feathersjs/typebox@5.0.44(typescript@6.0.2)':
     dependencies:
-      '@feathersjs/schema': 5.0.43(typescript@5.9.3)
+      '@feathersjs/schema': 5.0.44(typescript@6.0.2)
       '@sinclair/typebox': 0.25.24
     transitivePeerDependencies:
       - typescript
@@ -3675,7 +3679,7 @@ snapshots:
 
   '@types/compression@1.8.1':
     dependencies:
-      '@types/express': 4.17.25
+      '@types/express': 5.0.6
       '@types/node': 22.19.15
 
   '@types/config@3.3.5': {}
@@ -3857,40 +3861,40 @@ snapshots:
     dependencies:
       '@types/node': 22.19.15
 
-  '@typescript-eslint/eslint-plugin@8.58.0(@typescript-eslint/parser@8.58.0(eslint@10.1.0)(typescript@5.9.3))(eslint@10.1.0)(typescript@5.9.3)':
+  '@typescript-eslint/eslint-plugin@8.58.0(@typescript-eslint/parser@8.58.0(eslint@10.2.0)(typescript@6.0.2))(eslint@10.2.0)(typescript@6.0.2)':
     dependencies:
       '@eslint-community/regexpp': 4.12.2
-      '@typescript-eslint/parser': 8.58.0(eslint@10.1.0)(typescript@5.9.3)
+      '@typescript-eslint/parser': 8.58.0(eslint@10.2.0)(typescript@6.0.2)
       '@typescript-eslint/scope-manager': 8.58.0
-      '@typescript-eslint/type-utils': 8.58.0(eslint@10.1.0)(typescript@5.9.3)
-      '@typescript-eslint/utils': 8.58.0(eslint@10.1.0)(typescript@5.9.3)
+      '@typescript-eslint/type-utils': 8.58.0(eslint@10.2.0)(typescript@6.0.2)
+      '@typescript-eslint/utils': 8.58.0(eslint@10.2.0)(typescript@6.0.2)
       '@typescript-eslint/visitor-keys': 8.58.0
-      eslint: 10.1.0
+      eslint: 10.2.0
       ignore: 7.0.5
       natural-compare: 1.4.0
-      ts-api-utils: 2.5.0(typescript@5.9.3)
-      typescript: 5.9.3
+      ts-api-utils: 2.5.0(typescript@6.0.2)
+      typescript: 6.0.2
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@8.58.0(eslint@10.1.0)(typescript@5.9.3)':
+  '@typescript-eslint/parser@8.58.0(eslint@10.2.0)(typescript@6.0.2)':
     dependencies:
       '@typescript-eslint/scope-manager': 8.58.0
       '@typescript-eslint/types': 8.58.0
-      '@typescript-eslint/typescript-estree': 8.58.0(typescript@5.9.3)
+      '@typescript-eslint/typescript-estree': 8.58.0(typescript@6.0.2)
       '@typescript-eslint/visitor-keys': 8.58.0
       debug: 4.4.3(supports-color@5.5.0)
-      eslint: 10.1.0
-      typescript: 5.9.3
+      eslint: 10.2.0
+      typescript: 6.0.2
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/project-service@8.58.0(typescript@5.9.3)':
+  '@typescript-eslint/project-service@8.58.0(typescript@6.0.2)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.58.0(typescript@5.9.3)
+      '@typescript-eslint/tsconfig-utils': 8.58.0(typescript@6.0.2)
       '@typescript-eslint/types': 8.58.0
       debug: 4.4.3(supports-color@5.5.0)
-      typescript: 5.9.3
+      typescript: 6.0.2
     transitivePeerDependencies:
       - supports-color
 
@@ -3899,47 +3903,47 @@ snapshots:
       '@typescript-eslint/types': 8.58.0
       '@typescript-eslint/visitor-keys': 8.58.0
 
-  '@typescript-eslint/tsconfig-utils@8.58.0(typescript@5.9.3)':
+  '@typescript-eslint/tsconfig-utils@8.58.0(typescript@6.0.2)':
     dependencies:
-      typescript: 5.9.3
+      typescript: 6.0.2
 
-  '@typescript-eslint/type-utils@8.58.0(eslint@10.1.0)(typescript@5.9.3)':
+  '@typescript-eslint/type-utils@8.58.0(eslint@10.2.0)(typescript@6.0.2)':
     dependencies:
       '@typescript-eslint/types': 8.58.0
-      '@typescript-eslint/typescript-estree': 8.58.0(typescript@5.9.3)
-      '@typescript-eslint/utils': 8.58.0(eslint@10.1.0)(typescript@5.9.3)
+      '@typescript-eslint/typescript-estree': 8.58.0(typescript@6.0.2)
+      '@typescript-eslint/utils': 8.58.0(eslint@10.2.0)(typescript@6.0.2)
       debug: 4.4.3(supports-color@5.5.0)
-      eslint: 10.1.0
-      ts-api-utils: 2.5.0(typescript@5.9.3)
-      typescript: 5.9.3
+      eslint: 10.2.0
+      ts-api-utils: 2.5.0(typescript@6.0.2)
+      typescript: 6.0.2
     transitivePeerDependencies:
       - supports-color
 
   '@typescript-eslint/types@8.58.0': {}
 
-  '@typescript-eslint/typescript-estree@8.58.0(typescript@5.9.3)':
+  '@typescript-eslint/typescript-estree@8.58.0(typescript@6.0.2)':
     dependencies:
-      '@typescript-eslint/project-service': 8.58.0(typescript@5.9.3)
-      '@typescript-eslint/tsconfig-utils': 8.58.0(typescript@5.9.3)
+      '@typescript-eslint/project-service': 8.58.0(typescript@6.0.2)
+      '@typescript-eslint/tsconfig-utils': 8.58.0(typescript@6.0.2)
       '@typescript-eslint/types': 8.58.0
       '@typescript-eslint/visitor-keys': 8.58.0
       debug: 4.4.3(supports-color@5.5.0)
       minimatch: 10.2.5
       semver: 7.7.4
       tinyglobby: 0.2.15
-      ts-api-utils: 2.5.0(typescript@5.9.3)
-      typescript: 5.9.3
+      ts-api-utils: 2.5.0(typescript@6.0.2)
+      typescript: 6.0.2
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.58.0(eslint@10.1.0)(typescript@5.9.3)':
+  '@typescript-eslint/utils@8.58.0(eslint@10.2.0)(typescript@6.0.2)':
     dependencies:
-      '@eslint-community/eslint-utils': 4.9.1(eslint@10.1.0)
+      '@eslint-community/eslint-utils': 4.9.1(eslint@10.2.0)
       '@typescript-eslint/scope-manager': 8.58.0
       '@typescript-eslint/types': 8.58.0
-      '@typescript-eslint/typescript-estree': 8.58.0(typescript@5.9.3)
-      eslint: 10.1.0
-      typescript: 5.9.3
+      '@typescript-eslint/typescript-estree': 8.58.0(typescript@6.0.2)
+      eslint: 10.2.0
+      typescript: 6.0.2
     transitivePeerDependencies:
       - supports-color
 
@@ -4514,14 +4518,14 @@ snapshots:
 
   eslint-visitor-keys@5.0.1: {}
 
-  eslint@10.1.0:
+  eslint@10.2.0:
     dependencies:
-      '@eslint-community/eslint-utils': 4.9.1(eslint@10.1.0)
+      '@eslint-community/eslint-utils': 4.9.1(eslint@10.2.0)
       '@eslint-community/regexpp': 4.12.2
-      '@eslint/config-array': 0.23.3
-      '@eslint/config-helpers': 0.5.3
-      '@eslint/core': 1.1.1
-      '@eslint/plugin-kit': 0.6.1
+      '@eslint/config-array': 0.23.4
+      '@eslint/config-helpers': 0.5.4
+      '@eslint/core': 1.2.0
+      '@eslint/plugin-kit': 0.7.0
       '@humanfs/node': 0.16.7
       '@humanwhocodes/module-importer': 1.0.1
       '@humanwhocodes/retry': 0.4.3
@@ -5056,7 +5060,7 @@ snapshots:
     dependencies:
       json-buffer: 3.0.1
 
-  knex@3.2.8(pg@8.20.0):
+  knex@3.2.9(pg@8.20.0):
     dependencies:
       colorette: 2.0.19
       commander: 10.0.1
@@ -5066,7 +5070,7 @@ snapshots:
       get-package-type: 0.1.0
       getopts: 2.3.0
       interpret: 2.2.0
-      lodash: 4.17.23
+      lodash: 4.18.1
       pg-connection-string: 2.6.2
       rechoir: 0.8.0
       resolve-from: 5.0.0
@@ -5161,7 +5165,7 @@ snapshots:
 
   lodash.once@4.1.1: {}
 
-  lodash@4.17.23: {}
+  lodash@4.18.1: {}
 
   log-symbols@4.1.0:
     dependencies:
@@ -5811,11 +5815,11 @@ snapshots:
 
   ts-algebra@2.0.0: {}
 
-  ts-api-utils@2.5.0(typescript@5.9.3):
+  ts-api-utils@2.5.0(typescript@6.0.2):
     dependencies:
-      typescript: 5.9.3
+      typescript: 6.0.2
 
-  ts-node@10.9.2(@types/node@22.19.15)(typescript@5.9.3):
+  ts-node@10.9.2(@types/node@22.19.15)(typescript@6.0.2):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.12
@@ -5829,7 +5833,7 @@ snapshots:
       create-require: 1.1.1
       diff: 4.0.4
       make-error: 1.3.6
-      typescript: 5.9.3
+      typescript: 6.0.2
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
 
@@ -5867,18 +5871,20 @@ snapshots:
 
   typedarray@0.0.6: {}
 
-  typescript-eslint@8.58.0(eslint@10.1.0)(typescript@5.9.3):
+  typescript-eslint@8.58.0(eslint@10.2.0)(typescript@6.0.2):
     dependencies:
-      '@typescript-eslint/eslint-plugin': 8.58.0(@typescript-eslint/parser@8.58.0(eslint@10.1.0)(typescript@5.9.3))(eslint@10.1.0)(typescript@5.9.3)
-      '@typescript-eslint/parser': 8.58.0(eslint@10.1.0)(typescript@5.9.3)
-      '@typescript-eslint/typescript-estree': 8.58.0(typescript@5.9.3)
-      '@typescript-eslint/utils': 8.58.0(eslint@10.1.0)(typescript@5.9.3)
-      eslint: 10.1.0
-      typescript: 5.9.3
+      '@typescript-eslint/eslint-plugin': 8.58.0(@typescript-eslint/parser@8.58.0(eslint@10.2.0)(typescript@6.0.2))(eslint@10.2.0)(typescript@6.0.2)
+      '@typescript-eslint/parser': 8.58.0(eslint@10.2.0)(typescript@6.0.2)
+      '@typescript-eslint/typescript-estree': 8.58.0(typescript@6.0.2)
+      '@typescript-eslint/utils': 8.58.0(eslint@10.2.0)(typescript@6.0.2)
+      eslint: 10.2.0
+      typescript: 6.0.2
     transitivePeerDependencies:
       - supports-color
 
   typescript@5.9.3: {}
+
+  typescript@6.0.2: {}
 
   undefsafe@2.0.5: {}
 
