@@ -139,7 +139,9 @@ export class RefreshTokenService<
       const user = await userService.get(userId, { provider: undefined })
 
       if (!user) {
-        logger.error(`In refreshToken, User not found for ID: ${userId}`)
+        // Dangling refresh token (user deleted but token not cleaned up).
+        // This is a 401 from the client's perspective, not a server error.
+        logger.warn(`Refresh token references missing user (userId: ${userId})`)
         throw new NotAuthenticated('User not found')
       }
 

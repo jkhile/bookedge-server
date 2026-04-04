@@ -13,8 +13,15 @@ export const errorHandler =
         throw new NotFound(`Path ${ctx.path} not found`)
       }
     } catch (error: any) {
-      logger.error(error)
-      ctx.response.status = error instanceof FeathersError ? error.code : 500
+      // 4xx are client errors, not server bugs — log quietly so they don't
+      // trigger alerting noise. 5xx and unclassified errors log at error.
+      const code = error instanceof FeathersError ? error.code : 500
+      if (code >= 400 && code < 500) {
+        logger.info(error.message, { code, name: error.name })
+      } else {
+        logger.error(error)
+      }
+      ctx.response.status = code
       ctx.body =
         typeof error.toJSON === 'function'
           ? error.toJSON()

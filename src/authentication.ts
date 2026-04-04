@@ -1,5 +1,6 @@
 import { AuthenticationService, JWTStrategy } from '@feathersjs/authentication'
 import { LocalStrategy } from '@feathersjs/authentication-local'
+import { NotAuthenticated } from '@feathersjs/errors'
 import { logger } from './logger'
 import { oauth, OAuthStrategy } from '@feathersjs/authentication-oauth'
 // For more information about this file see https://dove.feathersjs.com/guides/cli/authentication.html
@@ -75,8 +76,8 @@ class GoogleStrategy extends OAuthStrategy {
       (await this.findEntityByEmail(profile, params)) ||
       (await this.getCurrentEntity(params))
     if (!existingEntity) {
-      logger.warn('No existing entity found, throwing error')
-      throw new Error('User not recognized')
+      logger.warn('No existing entity found for OAuth sign-in')
+      throw new NotAuthenticated('User not recognized')
     }
     const authEntity = existingEntity
       ? await this.updateEntity(existingEntity, profile, params)

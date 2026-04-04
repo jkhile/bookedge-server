@@ -9,7 +9,7 @@ export const logError = async (context: HookContext, next: NextFunction) => {
     // Safely extract user email from various possible locations
     const userEmail = getUserEmail(context)
 
-    const logLevel = isInfoLevel(error.message) ? 'info' : 'error'
+    const logLevel = isInfoLevel(error) ? 'info' : 'error'
 
     // Construct metadata safely
     const metadata = {
@@ -64,15 +64,26 @@ function getUserEmail(context: HookContext): string | undefined {
 }
 
 /**
- * Determines if an error message should be logged at info level
+ * Determines if an error should be logged at info level rather than error.
+ * Client errors (4xx) are not server bugs — we log them quietly so they don't
+ * trigger alerting noise. Server errors (5xx) and unclassified errors still
+ * log at error level.
  */
-function isInfoLevel(errMessage: string): boolean {
-  const infoPatterns = [
+function isInfoLevel(error: unknown): boolean {
+  const e = error as { code?: number; name?: string; className?: string }
+  // Any FeathersError with a 4xx code is a client problem, not a server bug
+  if (typeof e?.code === 'number' && e.code >= 400 && e.code < 500) {
+    return true
+  }
+  // Non-Feathers auth errors (e.g. jsonwebtoken) may not carry a code
+  const clientErrorNames = [
     'NotAuthenticated',
     'TokenExpiredError',
+    'JsonWebTokenError',
     'NotFound',
     'Forbidden',
-    'jwt expired',
   ]
-  return infoPatterns.some((pattern) => errMessage.includes(pattern))
+  return clientErrorNames.some(
+    (name) => e?.name === name || e?.className === name,
+  )
 }

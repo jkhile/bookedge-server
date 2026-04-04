@@ -9,8 +9,11 @@ const removeProperties = [
   'access_token',
   'accessToken',
   'refresh_token',
+  'refreshToken',
   'id_token',
   'password',
+  'token',
+  'secret',
 ]
 
 export const logServiceCall = async (

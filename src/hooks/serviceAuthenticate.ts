@@ -33,7 +33,15 @@ export const serviceAuthenticate = () => {
     const next = typeof _next === 'function' ? _next : async () => context
     const { app, params } = context
 
-    // Get service auth config
+    // Get authorization header from params (set by REST/socket middleware)
+    const authHeader = params.headers?.authorization as string | undefined
+
+    if (!authHeader?.startsWith('Bearer ')) {
+      throw new NotAuthenticated('Missing service token')
+    }
+
+    // Get service auth config — only check after we know a token was presented,
+    // so unauthenticated probes get a 401 instead of a logged 500.
     const authConfig = app.get('authentication') as {
       serviceAuth?: { secret?: string; finutils_url?: string }
     }
@@ -41,13 +49,6 @@ export const serviceAuthenticate = () => {
 
     if (!serviceSecret) {
       throw new GeneralError('Service authentication not configured')
-    }
-
-    // Get authorization header from params (set by REST/socket middleware)
-    const authHeader = params.headers?.authorization as string | undefined
-
-    if (!authHeader?.startsWith('Bearer ')) {
-      throw new NotAuthenticated('Missing service token')
     }
 
     const token = authHeader.slice(7)
