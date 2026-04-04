@@ -111,9 +111,7 @@ export class RefreshTokenService<
         ? result
         : (result as any).data || []
       if (!tokenRecords || tokenRecords.length === 0) {
-        logger.error(
-          `In refreshToken, no refresh token found for token: ${refreshToken}`,
-        )
+        logger.warn('Refresh token not found (possibly rotated or revoked)')
         throw new NotAuthenticated('Invalid refresh token')
       }
 
@@ -123,7 +121,7 @@ export class RefreshTokenService<
       )
 
       if (!tokenRecord) {
-        logger.error('In refreshToken, Exact token match not found')
+        logger.warn('Refresh token exact match not found')
         throw new NotAuthenticated('Invalid refresh token')
       }
 
@@ -214,7 +212,9 @@ export class RefreshTokenService<
 
       return enhancedResponse
     } catch (error) {
-      logger.error('Error refreshing refreshToken:', error)
+      if (!(error instanceof NotAuthenticated)) {
+        logger.error('Error refreshing refreshToken:', error)
+      }
       throw error
     }
   }
