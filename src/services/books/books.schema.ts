@@ -135,6 +135,7 @@ export const bookSchema = Type.Object(
     cover_text_submitted_date: Type.String(),
     supplementary_notes: Type.String(),
     marketing_notes: Type.String(),
+    speaking_engagement_topic: Type.String(),
     amazon_review_quotes: Type.String(),
     media_list: Type.String(),
     media_list_file_name: Type.Optional(Type.String()),
