@@ -48,6 +48,8 @@ interface BookResult {
   fep_percentage_share_pb?: number
   fep_fixed_share_hc?: number
   fep_percentage_share_hc?: number
+  ebook_percentage?: number
+  audio_book_percentage?: number
   // Platform-specific revenue split overrides
   revenue_split_overrides?: RevenueSplitOverrideResult[]
 }
@@ -174,6 +176,8 @@ export class InternalService {
         'fep_percentage_share_pb',
         'fep_fixed_share_hc',
         'fep_percentage_share_hc',
+        'ebook_percentage',
+        'audio_book_percentage',
       )
       .where('title', 'ilike', searchPattern)
       .orWhere('subtitle', 'ilike', searchPattern)
@@ -207,6 +211,8 @@ export class InternalService {
         'fep_percentage_share_pb',
         'fep_fixed_share_hc',
         'fep_percentage_share_hc',
+        'ebook_percentage',
+        'audio_book_percentage',
       )
       .where('accounting_code', '=', accountingCode)
       .orderByRaw("CASE WHEN status = 'archived' THEN 1 ELSE 0 END")
@@ -277,6 +283,8 @@ export class InternalService {
         'fep_percentage_share_pb',
         'fep_fixed_share_hc',
         'fep_percentage_share_hc',
+        'ebook_percentage',
+        'audio_book_percentage',
       )
       .where((builder) => {
         builder
